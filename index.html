@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Biblio 100 - Édition Prestige</title>
+    <title>Ma Biblio 100 - Connexion Membre</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -11,18 +11,16 @@
             --paper-bg: #FAF9F6;
             --gold-accent: #C5A059;
             --deep-black: #1A1A1A;
-            --muted-gold: #D4AF37;
         }
 
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: var(--paper-bg);
             color: var(--deep-black);
+            margin: 0;
         }
 
-        h1, h2, .font-serif {
-            font-family: 'Playfair Display', serif;
-        }
+        .font-serif { font-family: 'Playfair Display', serif; }
 
         /* --- AUTHENTIFICATION --- */
         #auth-screen {
@@ -33,41 +31,42 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background-image: radial-gradient(circle at 2px 2px, rgba(197, 160, 89, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
         }
         
-        #main-content {
-            display: none;
-        }
+        #main-content { display: none; }
 
         .auth-card {
             background: white;
-            padding: 50px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            border: 1px solid rgba(197, 160, 89, 0.15);
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .auth-input {
+            width: 100%;
+            background: #f8f8f8;
+            border: 1px solid #eee;
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
-            border: 1px solid rgba(197, 160, 89, 0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        .pin-input {
-            width: 100%;
-            border-bottom: 2px solid #eee;
-            text-align: center;
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: 0.5em;
-            padding: 10px;
-            margin: 30px 0;
+            padding: 14px 18px;
+            font-size: 15px;
+            margin-bottom: 12px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
 
-        .pin-input:focus {
+        .auth-input:focus {
             border-color: var(--gold-accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
         }
 
-        /* --- STYLE SITE ORIGINAL --- */
+        /* --- STYLE BIBLIOTHEQUE --- */
         .view-section { display: none; }
         .view-section.active { display: block; }
 
@@ -88,13 +87,13 @@
 
         .fiche-container {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            max-width: 900px;
-            margin: 0 auto 40px auto;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.03);
+            max-width: 950px;
+            margin: 0 auto 60px auto;
             position: relative;
-            border: 1px solid rgba(197, 160, 89, 0.1);
+            border: 1px solid rgba(197, 160, 89, 0.08);
         }
 
         .fiche-number {
@@ -112,8 +111,8 @@
             font-weight: 900;
             text-transform: uppercase;
             color: var(--deep-black);
-            line-height: 1;
-            margin-bottom: 4px;
+            line-height: 1.1;
+            margin-bottom: 8px;
             letter-spacing: -0.02em;
         }
 
@@ -122,23 +121,17 @@
             font-weight: 700;
             text-transform: uppercase;
             color: var(--gold-accent);
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+            letter-spacing: 0.05em;
         }
 
         .section-label {
             font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
-            color: #888;
-            margin-bottom: 8px;
-            letter-spacing: 0.05em;
-        }
-
-        .fiche-summary {
-            font-size: 15px;
-            color: #444;
-            font-style: italic;
-            line-height: 1.6;
+            color: #a1a1a1;
+            margin-bottom: 10px;
+            letter-spacing: 0.08em;
         }
 
         .info-grid {
@@ -146,13 +139,8 @@
             grid-template-columns: repeat(5, 1fr);
             gap: 20px;
             margin-top: 40px;
-            padding-top: 15px;
-            border-top: 1px solid #f9f9f9;
-        }
-
-        .info-item {
-            border-bottom: 2px solid #f9f9f9;
-            padding-bottom: 8px;
+            padding-top: 25px;
+            border-top: 1px solid #f5f5f5;
         }
 
         .info-value {
@@ -161,88 +149,36 @@
             color: var(--deep-black);
         }
 
-        .avis-box {
-            background-color: #fcfbf8;
-            border-radius: 12px;
-            padding: 25px;
-            margin-top: 15px;
-            min-height: 80px;
-            border-left: 4px solid var(--gold-accent);
-        }
-
-        .avis-text {
-            color: #444;
-            font-style: italic;
-            font-weight: 500;
-            font-size: 15px;
-        }
-
         .cover-box {
-            width: 220px;
-            height: 330px;
-            background: #eee;
-            border-radius: 8px;
+            width: 230px;
+            height: 345px;
+            background: #fdfdfd;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 15px 15px 30px rgba(0,0,0,0.08);
+            border: 1px solid #eee;
         }
 
-        .grid-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-        }
         .grid-thumb {
             width: 100%;
             aspect-ratio: 2/3;
             background: white;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.04);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 12px;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
         .grid-thumb:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15);
-        }
-        .grid-placeholder {
-            font-size: 11px;
-            font-weight: 900;
-            color: #ddd;
-            text-transform: uppercase;
-        }
-
-        .modal-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            font-size: 14px;
-            background-color: #fff;
-        }
-        
-        .modal-input:focus {
-            outline: none;
-            border-color: var(--gold-accent);
-        }
-
-        label {
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: #94a3b8;
-            margin-bottom: 4px;
-            display: block;
-            margin-left: 4px;
+            transform: translateY(-10px) scale(1.02); 
+            box-shadow: 0 20px 40px rgba(197, 160, 89, 0.2);
         }
 
         .star-filled { color: var(--gold-accent); }
@@ -251,358 +187,364 @@
         .btn-gold-main {
             background-color: var(--gold-accent);
             color: white;
-            transition: all 0.2s;
-            font-size: 11px;
-            font-weight: 900;
+            transition: all 0.3s;
+            font-size: 12px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
         }
         .btn-gold-main:hover {
             background-color: #A68548;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(166, 133, 72, 0.3);
+        }
+
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
 
-    <!-- Écran d'Authentification -->
+    <div id="loading-overlay">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C5A059] mb-4"></div>
+            <p class="section-label">Chargement de votre univers...</p>
+        </div>
+    </div>
+
+    <!-- Écran de Connexion / Pseudo + Password -->
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 class="text-2xl font-black italic uppercase tracking-tighter font-serif mb-2">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
-            <p class="section-label">Accès Sécurisé</p>
-            <input type="password" id="pin-code" class="pin-input" placeholder="••••" maxlength="4">
-            <button onclick="checkPin()" class="w-full py-4 rounded-xl btn-gold-main shadow-lg">Déverrouiller</button>
-            <p id="auth-error" class="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-4 hidden">Code incorrect</p>
+            <div class="mb-8">
+                <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif mb-1">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
+                <p class="section-label">Édition Collectionneur</p>
+            </div>
+            
+            <div class="text-left space-y-4">
+                <div>
+                    <label class="section-label ml-1">Nom d'utilisateur / Pseudo</label>
+                    <input type="text" id="auth-username" class="auth-input" placeholder="Ex: JeanDupont">
+                </div>
+                <div>
+                    <label class="section-label ml-1">Mot de passe</label>
+                    <input type="password" id="auth-password" class="auth-input" placeholder="••••••••">
+                </div>
+            </div>
+
+            <button onclick="handleAuth()" class="w-full py-4 mt-4 rounded-xl btn-gold-main shadow-lg">Ouvrir ma collection</button>
+            
+            <div class="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-100">
+                <p class="text-[10px] text-amber-700 leading-relaxed font-medium">
+                    Note : Si le compte n'existe pas, il sera créé automatiquement avec ces identifiants lors de votre première sauvegarde.
+                </p>
+            </div>
         </div>
     </div>
 
     <!-- Contenu Principal -->
     <div id="main-content">
         <div class="max-w-6xl mx-auto px-6 py-10">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-10">
-                <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
-                <div class="flex gap-3">
-                    <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 mr-2">🔒 Quitter</button>
-                    <button onclick="exportJSON()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Exporter</button>
-                    <button onclick="document.getElementById('importFile').click()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-black text-white rounded-lg hover:opacity-80">Importer</button>
-                    <input type="file" id="importFile" class="hidden" onchange="importJSON(event)">
+            <header class="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
+                <div>
+                    <h1 class="text-4xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
+                    <p class="text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase mt-1">
+                        Collection de <span id="display-name" class="text-gray-900">...</span>
+                    </p>
                 </div>
-            </div>
+                <div class="flex gap-4">
+                    <button onclick="location.reload()" class="text-[10px] font-bold uppercase tracking-widest px-6 py-3 bg-white border border-gray-100 rounded-full hover:bg-gray-50 transition-colors shadow-sm">
+                        Déconnexion
+                    </button>
+                </div>
+            </header>
 
-            <!-- Navigation -->
-            <div class="flex gap-10 border-b border-slate-100 mb-12">
+            <nav class="flex gap-10 border-b border-slate-100 mb-12">
                 <button onclick="showSection('grille')" id="btn-grille" class="tab-btn active">Ma Grille</button>
-                <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
-            </div>
+                <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Détails des Fiches</button>
+            </nav>
 
-            <!-- SECTION GRILLE -->
             <section id="section-grille" class="view-section active">
-                <div id="grid-content" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10"></div>
+                <div id="grid-content" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-10"></div>
             </section>
 
-            <!-- SECTION FICHES -->
             <section id="section-fiches" class="view-section">
-                <div id="fiches-content" class="space-y-20"></div>
+                <div id="fiches-content" class="space-y-10"></div>
             </section>
         </div>
     </div>
 
     <!-- MODAL D'ÉDITION -->
-    <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <div>
-                    <label>Titre du livre</label>
-                    <input id="in-title" placeholder="Ex: Le Petit Prince" class="modal-input">
-                </div>
-                <div>
-                    <label>Auteur</label>
-                    <input id="in-author" placeholder="Ex: Saint-Exupéry" class="modal-input">
-                </div>
+    <div id="edit-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-black uppercase tracking-tight font-serif">Fiche #<span id="modal-id"></span></h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-black">✕</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div class="md:col-span-2">
-                    <label>URL de la couverture</label>
-                    <input id="in-cover" placeholder="Lien vers l'image .jpg ou .png" class="modal-input">
+                    <label class="section-label">Titre du livre</label>
+                    <input id="in-title" class="auth-input mb-0" placeholder="Le titre original...">
                 </div>
                 <div>
-                    <label>Note (Étoiles)</label>
-                    <select id="in-rating" class="modal-input">
-                        <option value="0">Aucune étoile</option>
-                        <option value="1">1 Étoile</option>
-                        <option value="2">2 Étoiles</option>
-                        <option value="3">3 Étoiles</option>
-                        <option value="4">4 Étoiles</option>
-                        <option value="5">5 Étoiles</option>
+                    <label class="section-label">Auteur</label>
+                    <input id="in-author" class="auth-input mb-0" placeholder="Nom de l'auteur...">
+                </div>
+                <div>
+                    <label class="section-label">URL de la Couverture</label>
+                    <input id="in-cover" class="auth-input mb-0" placeholder="Lien .jpg ou .png">
+                </div>
+                <div>
+                    <label class="section-label">Note</label>
+                    <select id="in-rating" class="auth-input mb-0">
+                        <option value="0">Aucune note</option>
+                        <option value="1">⭐ (Très décevant)</option>
+                        <option value="2">⭐⭐ (Moyen)</option>
+                        <option value="3">⭐⭐⭐ (Bon livre)</option>
+                        <option value="4">⭐⭐⭐⭐ (Excellent)</option>
+                        <option value="5">⭐⭐⭐⭐⭐ (Chef-d'œuvre)</option>
                     </select>
                 </div>
                 <div>
-                    <label>Format</label>
-                    <select id="in-format" class="modal-input">
+                    <label class="section-label">Format</label>
+                    <select id="in-format" class="auth-input mb-0">
                         <option value="-">-</option>
-                        <option value="Livre">Livre</option>
+                        <option value="Papier">Papier</option>
                         <option value="Ebook">Ebook</option>
                         <option value="Audiobook">Audiobook</option>
                     </select>
                 </div>
-                <div>
-                    <label>Genre</label>
-                    <input id="in-genre" list="list-genres" placeholder="Saisir ou choisir..." class="modal-input">
-                    <datalist id="list-genres"></datalist>
-                </div>
-                <div>
-                    <label>Langue</label>
-                    <input id="in-lang" list="list-langs" placeholder="Saisir ou choisir..." class="modal-input">
-                    <datalist id="list-langs"></datalist>
-                </div>
-                <div>
-                    <label>Date de début</label>
-                    <input id="in-start" placeholder="Ex: 12/05/2023" class="modal-input">
-                </div>
-                <div>
-                    <label>Date de fin</label>
-                    <input id="in-end" placeholder="Ex: 20/05/2023" class="modal-input">
-                </div>
-            </div>
-
-            <div class="mt-2">
-                <label>Résumé de l'histoire</label>
-                <textarea id="in-summary" placeholder="De quoi parle le livre ?" class="modal-input h-24"></textarea>
-            </div>
-            <div>
-                <label>Mon avis personnel</label>
-                <textarea id="in-comment" placeholder="Qu'avez-vous pensé de cette lecture ?" class="modal-input h-24"></textarea>
+                <div><label class="section-label">Genre</label><input id="in-genre" class="auth-input mb-0"></div>
+                <div><label class="section-label">Langue</label><input id="in-lang" class="auth-input mb-0"></div>
+                <div><label class="section-label">Date Début</label><input id="in-start" class="auth-input mb-0" type="text" placeholder="JJ/MM/AAAA"></div>
+                <div><label class="section-label">Date Fin</label><input id="in-end" class="auth-input mb-0" type="text" placeholder="JJ/MM/AAAA"></div>
             </div>
             
-            <div class="flex gap-3 mt-6">
-                <button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">Annuler</button>
-                <button onclick="saveBook()" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest btn-gold-main rounded-xl shadow-lg shadow-yellow-900/10 transition-colors">Enregistrer la fiche</button>
+            <div class="mt-6">
+                <label class="section-label">Résumé de l'œuvre</label>
+                <textarea id="in-summary" class="auth-input h-32 mb-0" placeholder="De quoi parle ce livre ?"></textarea>
+            </div>
+            <div class="mt-4">
+                <label class="section-label">Votre avis personnel</label>
+                <textarea id="in-comment" class="auth-input h-32 mb-0" placeholder="Qu'avez-vous ressenti ?"></textarea>
+            </div>
+
+            <div class="flex gap-4 mt-10">
+                <button onclick="closeModal()" class="flex-1 py-4 text-[11px] font-black uppercase tracking-widest bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">Fermer</button>
+                <button onclick="saveBook()" class="flex-1 py-4 text-[11px] font-black uppercase tracking-widest btn-gold-main rounded-xl">Enregistrer la fiche</button>
             </div>
         </div>
     </div>
 
-    <script>
-        const PIN = "1234";
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ma-biblio-100-v2';
+
         let library = [];
-        const COUNT = 100;
+        let currentUserId = null;
+        const TOTAL_BOOKS = 100;
 
-        let knownGenres = new Set(["Roman", "Thriller", "Fantastique", "Biographie", "Essai"]);
-        let knownLangs = new Set(["Français", "Anglais", "Espagnol", "Japonais"]);
+        // Fonction simple pour générer un ID à partir du pseudo + pass (pour l'exemple)
+        function generateSecureId(user, pass) {
+            return btoa(user.trim().toLowerCase() + "_" + pass.trim()).replace(/=/g, "");
+        }
 
-        // --- AUTH LOGIC ---
-        function checkPin() {
-            const input = document.getElementById('pin-code').value;
-            if(input === PIN) {
+        window.handleAuth = async () => {
+            const user = document.getElementById('auth-username').value;
+            const pass = document.getElementById('auth-password').value;
+
+            if (!user || !pass) return alert("Veuillez remplir le pseudo et le mot de passe.");
+            
+            showLoading(true);
+            try {
+                // On utilise le couple pseudo/pass pour identifier l'espace de stockage
+                currentUserId = generateSecureId(user, pass);
+                
+                await signInAnonymously(auth);
+                
+                document.getElementById('display-name').innerText = user;
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
-                load();
-            } else {
-                document.getElementById('auth-error').classList.remove('hidden');
-                document.getElementById('pin-code').value = "";
+                
+                initLibrary();
+            } catch (error) {
+                console.error(error);
+                alert("Erreur lors de l'accès à la bibliothèque.");
+            } finally {
+                showLoading(false);
             }
-        }
+        };
 
-        function logout() {
-            location.reload();
-        }
-
-        // Touche Entrée pour déverrouiller
-        document.getElementById('pin-code').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') checkPin();
-        });
-
-        // --- CORE LOGIC (ORIGINAL) ---
-        function load() {
-            const saved = localStorage.getItem('my_library_v100');
-            if (saved) {
-                library = JSON.parse(saved);
-                if (library.length < COUNT) {
-                    for (let i = library.length + 1; i <= COUNT; i++) {
-                        library.push({ id: i, title: "", author: "", cover: "", rating: 0, summary: "", start: "", end: "", genre: "", format: "-", lang: "", comment: "" });
-                    }
+        async function initLibrary() {
+            // Chemin Firestore : public/data/libraries/{userId}
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'libraries', currentUserId);
+            
+            onSnapshot(docRef, (snap) => {
+                if (snap.exists()) {
+                    library = snap.data().books;
+                } else {
+                    // Première connexion : créer la liste de 100 emplacements
+                    library = Array.from({length: TOTAL_BOOKS}, (_, i) => ({
+                        id: i + 1, title: "", author: "", cover: "", rating: 0,
+                        summary: "", start: "", end: "", genre: "", format: "-",
+                        lang: "", comment: ""
+                    }));
+                    saveToCloud();
                 }
-                library.forEach(b => {
-                    if(b.genre) knownGenres.add(b.genre);
-                    if(b.lang) knownLangs.add(b.lang);
-                });
-            } else {
-                for (let i = 1; i <= COUNT; i++) {
-                    library.push({ id: i, title: "", author: "", cover: "", rating: 0, summary: "", start: "", end: "", genre: "", format: "-", lang: "", comment: "" });
-                }
-            }
-            updateDatalists();
-            render();
+                render();
+            }, (err) => console.error("Erreur Firestore:", err));
         }
 
-        function updateDatalists() {
-            document.getElementById('list-genres').innerHTML = Array.from(knownGenres).map(g => `<option value="${g}">`).join('');
-            document.getElementById('list-langs').innerHTML = Array.from(knownLangs).map(l => `<option value="${l}">`).join('');
+        async function saveToCloud() {
+            if (!currentUserId) return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'libraries', currentUserId);
+            await setDoc(docRef, { books: library, updatedAt: new Date() });
         }
 
-        function render() {
-            renderGrid();
-            renderFiches();
+        function showLoading(show) {
+            document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
         }
 
-        function renderGrid() {
-            const container = document.getElementById('grid-content');
-            container.innerHTML = library.map(book => `
+        // --- Moteur de Rendu ---
+        window.render = () => {
+            // Grille
+            const grid = document.getElementById('grid-content');
+            grid.innerHTML = library.map(book => `
                 <div class="grid-item" onclick="jumpToFiche(${book.id})">
                     <div class="grid-thumb">
-                        ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="grid-placeholder">#${book.id}</span>`}
+                        ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="section-label" style="font-size:14px; color:#ddd">#${book.id}</span>`}
                     </div>
-                    <div class="flex gap-0.5">
-                        ${[1,2,3,4,5].map(i => `<span class="text-[9px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}
+                    <div class="text-center">
+                        <div class="flex justify-center gap-0.5 mb-1">
+                            ${[1,2,3,4,5].map(i => `<span class="text-[10px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}
+                        </div>
+                        <p class="text-[9px] font-black uppercase truncate px-2 text-gray-400">${book.title || 'À lire'}</p>
                     </div>
                 </div>
             `).join('');
-        }
 
-        function renderFiches() {
-            const container = document.getElementById('fiches-content');
-            container.innerHTML = library.map(book => `
+            // Fiches détaillées
+            const fiches = document.getElementById('fiches-content');
+            fiches.innerHTML = library.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
-                    <div class="fiche-number">#${book.id}</div>
-                    <div class="flex flex-col md:flex-row gap-10">
-                        <div class="cover-box shrink-0">
-                            ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
+                    <div class="fiche-number">PROJET 100 / №${book.id}</div>
+                    <div class="flex flex-col lg:flex-row gap-12">
+                        <div class="cover-box shrink-0 mx-auto lg:mx-0">
+                            ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-7xl font-serif">${book.id}</span>`}
                         </div>
                         <div class="flex-1">
-                            <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
-                            <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
-                            <div class="mb-6">
-                                <p class="section-label">Note :</p>
-                                <div class="flex gap-1">
-                                    ${[1,2,3,4,5].map(i => `<span class="text-2xl ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}
+                            <h2 class="fiche-title">${book.title || 'FICHE EN ATTENTE'}</h2>
+                            <h3 class="fiche-author">${book.author || 'Auteur non renseigné'}</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div>
+                                    <p class="section-label">Résumé & Contexte</p>
+                                    <p class="text-sm leading-relaxed text-gray-600 italic">"${book.summary || 'Aucun résumé disponible pour le moment.'}"</p>
                                 </div>
-                            </div>
-                            <div>
-                                <p class="section-label">Résumé :</p>
-                                <p class="fiche-summary">${book.summary || 'Aucun résumé pour le moment.'}</p>
+                                <div>
+                                    <p class="section-label">Note du lecteur</p>
+                                    <div class="flex gap-1 mb-4">
+                                        ${[1,2,3,4,5].map(i => `<span class="text-2xl ${i <= (book.rating || 0) ? 'star-filled' : 'star-empty'}">★</span>`).join('')}
+                                    </div>
+                                    <p class="section-label">Avis Personnel</p>
+                                    <p class="text-sm leading-relaxed text-gray-700 font-medium">${book.comment || 'Pas encore d\'avis rédigé.'}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="info-grid">
-                        <div class="info-item"><p class="section-label">Début :</p><p class="info-value">${book.start || '—'}</p></div>
-                        <div class="info-item"><p class="section-label">Fin :</p><p class="info-value">${book.end || '—'}</p></div>
-                        <div class="info-item"><p class="section-label">Genre :</p><p class="info-value">${book.genre || '—'}</p></div>
-                        <div class="info-item"><p class="section-label">Format :</p><p class="info-value">${book.format || '—'}</p></div>
-                        <div class="info-item"><p class="section-label">Langue :</p><p class="info-value">${book.lang || '—'}</p></div>
-                    </div>
-                    <div class="mt-8">
-                        <p class="section-label">Mon avis personnel :</p>
-                        <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire rédigé.'}</p></div>
-                    </div>
-                    <div class="mt-8 flex justify-end">
-                        <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:bg-yellow-50 hover:text-yellow-600 transition-all">Modifier la fiche</button>
+                        <div class="info-item"><p class="section-label">Lecture</p><p class="info-value">${book.start || '-'} / ${book.end || '-'}</p></div>
+                        <div class="info-item"><p class="section-label">Genre</p><p class="info-value">${book.genre || '-'}</p></div>
+                        <div class="info-item"><p class="section-label">Support</p><p class="info-value">${book.format || '-'}</p></div>
+                        <div class="info-item"><p class="section-label">Langue</p><p class="info-value">${book.lang || '-'}</p></div>
+                        <div class="info-item flex items-end justify-end">
+                             <button onclick="openEdit(${book.id})" class="px-4 py-2 bg-slate-50 rounded-lg text-[9px] font-bold uppercase tracking-tighter hover:bg-amber-50 hover:text-amber-700 transition-all">Éditer la fiche</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
-        }
+        };
 
-        function showSection(id) {
+        window.showSection = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
             document.getElementById('btn-' + id).classList.add('active');
-            if(id === 'grille') window.scrollTo({top: 0, behavior: 'smooth'});
-        }
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
 
-        function jumpToFiche(id) {
+        window.jumpToFiche = (id) => {
             showSection('fiches');
             setTimeout(() => {
                 const el = document.getElementById('fiche-scroll-' + id);
                 if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-        }
+            }, 150);
+        };
 
         let editingId = null;
-        function openEdit(id) {
+        window.openEdit = (id) => {
             editingId = id;
             const b = library.find(x => x.id === id);
             document.getElementById('modal-id').innerText = id;
-            document.getElementById('in-title').value = b.title;
-            document.getElementById('in-author').value = b.author;
-            document.getElementById('in-cover').value = b.cover;
-            document.getElementById('in-rating').value = b.rating;
-            document.getElementById('in-genre').value = b.genre;
+            document.getElementById('in-title').value = b.title || "";
+            document.getElementById('in-author').value = b.author || "";
+            document.getElementById('in-cover').value = b.cover || "";
+            document.getElementById('in-rating').value = b.rating || 0;
+            document.getElementById('in-genre').value = b.genre || "";
             document.getElementById('in-format').value = b.format || "-";
-            document.getElementById('in-lang').value = b.lang;
-            document.getElementById('in-start').value = b.start;
-            document.getElementById('in-end').value = b.end;
-            document.getElementById('in-summary').value = b.summary;
-            document.getElementById('in-comment').value = b.comment;
+            document.getElementById('in-lang').value = b.lang || "";
+            document.getElementById('in-start').value = b.start || "";
+            document.getElementById('in-end').value = b.end || "";
+            document.getElementById('in-summary').value = b.summary || "";
+            document.getElementById('in-comment').value = b.comment || "";
             document.getElementById('edit-modal').classList.remove('hidden');
-        }
+        };
 
-        function closeModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-        }
+        window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
 
-        function saveBook() {
+        window.saveBook = async () => {
             const idx = library.findIndex(x => x.id === editingId);
-            const newGenre = document.getElementById('in-genre').value.trim();
-            const newLang = document.getElementById('in-lang').value.trim();
-            if(newGenre) knownGenres.add(newGenre);
-            if(newLang) knownLangs.add(newLang);
-            updateDatalists();
-
             library[idx] = {
                 id: editingId,
                 title: document.getElementById('in-title').value,
                 author: document.getElementById('in-author').value,
                 cover: document.getElementById('in-cover').value,
                 rating: parseInt(document.getElementById('in-rating').value),
-                genre: newGenre,
+                genre: document.getElementById('in-genre').value,
                 format: document.getElementById('in-format').value,
-                lang: newLang,
+                lang: document.getElementById('in-lang').value,
                 start: document.getElementById('in-start').value,
                 end: document.getElementById('in-end').value,
                 summary: document.getElementById('in-summary').value,
                 comment: document.getElementById('in-comment').value
             };
             
-            localStorage.setItem('my_library_v100', JSON.stringify(library));
-            render();
-            closeModal();
-        }
-
-        function exportJSON() {
-            const dataStr = JSON.stringify(library, null, 2);
-            const blob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Ma_Biblio_100_Export_${new Date().toLocaleDateString()}.json`;
-            a.click();
-        }
-
-        function importJSON(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const imported = JSON.parse(event.target.result);
-                    if(Array.isArray(imported)) {
-                        library = imported;
-                        if(library.length < COUNT) {
-                             for (let i = library.length + 1; i <= COUNT; i++) {
-                                library.push({ id: i, title: "", author: "", cover: "", rating: 0, summary: "", start: "", end: "", genre: "", format: "-", lang: "", comment: "" });
-                            }
-                        }
-                        library.forEach(b => {
-                            if(b.genre) knownGenres.add(b.genre);
-                            if(b.lang) knownLangs.add(b.lang);
-                        });
-                        updateDatalists();
-                        localStorage.setItem('my_library_v100', JSON.stringify(library));
-                        render();
-                    }
-                } catch(err) { console.error("Erreur lors de l'importation", err); }
-            };
-            reader.readAsText(file);
-        }
+            showLoading(true);
+            try {
+                await saveToCloud();
+                closeModal();
+            } catch (e) {
+                alert("Erreur de sauvegarde.");
+            } finally {
+                showLoading(false);
+            }
+        };
     </script>
 </body>
 </html>
