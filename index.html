@@ -24,6 +24,50 @@
             font-family: 'Playfair Display', serif;
         }
 
+        /* --- AUTHENTIFICATION --- */
+        #auth-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: var(--paper-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #main-content {
+            display: none;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(197, 160, 89, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .pin-input {
+            width: 100%;
+            border-bottom: 2px solid #eee;
+            text-align: center;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 0.5em;
+            padding: 10px;
+            margin: 30px 0;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .pin-input:focus {
+            border-color: var(--gold-accent);
+        }
+
+        /* --- STYLE SITE ORIGINAL --- */
         .view-section { display: none; }
         .view-section.active { display: block; }
 
@@ -42,7 +86,6 @@
             border-bottom: 3px solid var(--gold-accent);
         }
 
-        /* --- STYLE FICHE --- */
         .fiche-container {
             background: white;
             border-radius: 12px;
@@ -146,7 +189,6 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        /* --- STYLE GRILLE --- */
         .grid-item {
             display: flex;
             flex-direction: column;
@@ -210,50 +252,40 @@
             background-color: var(--gold-accent);
             color: white;
             transition: all 0.2s;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
         .btn-gold-main:hover {
             background-color: #A68548;
-        }
-
-        /* --- AUTH STYLE --- */
-        #auth-screen {
-            position: fixed;
-            inset: 0;
-            background: var(--paper-bg);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
     </style>
 </head>
 <body>
 
-    <!-- ÉCRAN D'AUTHENTIFICATION -->
+    <!-- Écran d'Authentification -->
     <div id="auth-screen">
-        <div class="text-center w-full max-w-sm px-6">
-            <h1 class="text-4xl font-black italic uppercase tracking-tighter font-serif mb-2">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-12">Accès Sécurisé</p>
-            
-            <div class="space-y-4">
-                <input type="password" id="auth-password" placeholder="Mot de passe" class="w-full p-4 rounded-xl border border-slate-200 text-center text-lg focus:ring-2 focus:ring-[#C5A059] outline-none transition-all">
-                <button onclick="checkAuth()" class="w-full py-4 btn-gold-main rounded-xl font-black uppercase tracking-widest text-xs shadow-lg">Entrer dans la bibliothèque</button>
-                <p id="auth-error" class="text-red-500 text-[10px] font-bold uppercase hidden">Mot de passe incorrect</p>
-            </div>
+        <div class="auth-card">
+            <h1 class="text-2xl font-black italic uppercase tracking-tighter font-serif mb-2">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
+            <p class="section-label">Accès Sécurisé</p>
+            <input type="password" id="pin-code" class="pin-input" placeholder="••••" maxlength="4">
+            <button onclick="checkPin()" class="w-full py-4 rounded-xl btn-gold-main shadow-lg">Déverrouiller</button>
+            <p id="auth-error" class="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-4 hidden">Code incorrect</p>
         </div>
     </div>
 
-    <!-- CONTENU PRINCIPAL (Masqué par défaut) -->
-    <div id="main-content" class="hidden">
+    <!-- Contenu Principal -->
+    <div id="main-content">
         <div class="max-w-6xl mx-auto px-6 py-10">
             <!-- Header -->
             <div class="flex justify-between items-center mb-10">
                 <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
                 <div class="flex gap-3">
+                    <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 mr-2">🔒 Quitter</button>
                     <button onclick="exportJSON()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Exporter</button>
                     <button onclick="document.getElementById('importFile').click()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-black text-white rounded-lg hover:opacity-80">Importer</button>
                     <input type="file" id="importFile" class="hidden" onchange="importJSON(event)">
-                    <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100">Quitter</button>
                 </div>
             </div>
 
@@ -265,16 +297,12 @@
 
             <!-- SECTION GRILLE -->
             <section id="section-grille" class="view-section active">
-                <div id="grid-content" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10">
-                    <!-- Rempli par JS -->
-                </div>
+                <div id="grid-content" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10"></div>
             </section>
 
             <!-- SECTION FICHES -->
             <section id="section-fiches" class="view-section">
-                <div id="fiches-content" class="space-y-20">
-                    <!-- Rempli par JS -->
-                </div>
+                <div id="fiches-content" class="space-y-20"></div>
             </section>
         </div>
     </div>
@@ -354,48 +382,43 @@
     </div>
 
     <script>
+        const PIN = "1234";
         let library = [];
         const COUNT = 100;
-        const ACCESS_KEY = "1234"; // VOTRE MOT DE PASSE ICI
 
         let knownGenres = new Set(["Roman", "Thriller", "Fantastique", "Biographie", "Essai"]);
         let knownLangs = new Set(["Français", "Anglais", "Espagnol", "Japonais"]);
 
         // --- AUTH LOGIC ---
-        function checkAuth() {
-            const pwd = document.getElementById('auth-password').value;
-            if(pwd === ACCESS_KEY) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
+        function checkPin() {
+            const input = document.getElementById('pin-code').value;
+            if(input === PIN) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
                 load();
             } else {
-                const error = document.getElementById('auth-error');
-                error.classList.remove('hidden');
-                setTimeout(() => error.classList.add('hidden'), 2000);
+                document.getElementById('auth-error').classList.remove('hidden');
+                document.getElementById('pin-code').value = "";
             }
         }
 
         function logout() {
-            window.location.reload();
+            location.reload();
         }
 
-        // Touche Entrée pour l'auth
-        document.getElementById('auth-password').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') checkAuth();
+        // Touche Entrée pour déverrouiller
+        document.getElementById('pin-code').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkPin();
         });
 
-        // --- BIBLIO LOGIC ---
+        // --- CORE LOGIC (ORIGINAL) ---
         function load() {
             const saved = localStorage.getItem('my_library_v100');
             if (saved) {
                 library = JSON.parse(saved);
                 if (library.length < COUNT) {
                     for (let i = library.length + 1; i <= COUNT; i++) {
-                        library.push({
-                            id: i, title: "", author: "", cover: "", rating: 0,
-                            summary: "", start: "", end: "", genre: "", format: "-",
-                            lang: "", comment: ""
-                        });
+                        library.push({ id: i, title: "", author: "", cover: "", rating: 0, summary: "", start: "", end: "", genre: "", format: "-", lang: "", comment: "" });
                     }
                 }
                 library.forEach(b => {
@@ -404,11 +427,7 @@
                 });
             } else {
                 for (let i = 1; i <= COUNT; i++) {
-                    library.push({
-                        id: i, title: "", author: "", cover: "", rating: 0,
-                        summary: "", start: "", end: "", genre: "", format: "-",
-                        lang: "", comment: ""
-                    });
+                    library.push({ id: i, title: "", author: "", cover: "", rating: 0, summary: "", start: "", end: "", genre: "", format: "-", lang: "", comment: "" });
                 }
             }
             updateDatalists();
@@ -444,60 +463,36 @@
             container.innerHTML = library.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
                     <div class="fiche-number">#${book.id}</div>
-                    
                     <div class="flex flex-col md:flex-row gap-10">
                         <div class="cover-box shrink-0">
                             ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
                         </div>
-
                         <div class="flex-1">
                             <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
                             <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
-
                             <div class="mb-6">
                                 <p class="section-label">Note :</p>
                                 <div class="flex gap-1">
                                     ${[1,2,3,4,5].map(i => `<span class="text-2xl ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}
                                 </div>
                             </div>
-
                             <div>
                                 <p class="section-label">Résumé :</p>
                                 <p class="fiche-summary">${book.summary || 'Aucun résumé pour le moment.'}</p>
                             </div>
                         </div>
                     </div>
-
                     <div class="info-grid">
-                        <div class="info-item">
-                            <p class="section-label">Début :</p>
-                            <p class="info-value">${book.start || '—'}</p>
-                        </div>
-                        <div class="info-item">
-                            <p class="section-label">Fin :</p>
-                            <p class="info-value">${book.end || '—'}</p>
-                        </div>
-                        <div class="info-item">
-                            <p class="section-label">Genre :</p>
-                            <p class="info-value">${book.genre || '—'}</p>
-                        </div>
-                        <div class="info-item">
-                            <p class="section-label">Format :</p>
-                            <p class="info-value">${book.format || '—'}</p>
-                        </div>
-                        <div class="info-item">
-                            <p class="section-label">Langue :</p>
-                            <p class="info-value">${book.lang || '—'}</p>
-                        </div>
+                        <div class="info-item"><p class="section-label">Début :</p><p class="info-value">${book.start || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Fin :</p><p class="info-value">${book.end || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Genre :</p><p class="info-value">${book.genre || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Format :</p><p class="info-value">${book.format || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Langue :</p><p class="info-value">${book.lang || '—'}</p></div>
                     </div>
-
                     <div class="mt-8">
                         <p class="section-label">Mon avis personnel :</p>
-                        <div class="avis-box">
-                            <p class="avis-text">${book.comment || 'Aucun commentaire rédigé.'}</p>
-                        </div>
+                        <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire rédigé.'}</p></div>
                     </div>
-
                     <div class="mt-8 flex justify-end">
                         <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:bg-yellow-50 hover:text-yellow-600 transition-all">Modifier la fiche</button>
                     </div>
@@ -548,7 +543,6 @@
             const idx = library.findIndex(x => x.id === editingId);
             const newGenre = document.getElementById('in-genre').value.trim();
             const newLang = document.getElementById('in-lang').value.trim();
-
             if(newGenre) knownGenres.add(newGenre);
             if(newLang) knownLangs.add(newLang);
             updateDatalists();
@@ -605,9 +599,7 @@
                         localStorage.setItem('my_library_v100', JSON.stringify(library));
                         render();
                     }
-                } catch(err) {
-                    console.error("Erreur lors de l'importation", err);
-                }
+                } catch(err) { console.error("Erreur lors de l'importation", err); }
             };
             reader.readAsText(file);
         }
