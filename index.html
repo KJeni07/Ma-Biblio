@@ -22,7 +22,9 @@
             overflow-x: hidden;
         }
 
-        h1, h2, .font-serif { font-family: 'Playfair Display', serif; }
+        h1, h2, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
 
         /* --- AUTHENTIFICATION STYLE --- */
         #auth-screen {
@@ -30,6 +32,7 @@
             background-image: radial-gradient(rgba(197, 160, 89, 0.1) 1px, transparent 1px);
             background-size: 30px 30px;
         }
+
         .auth-card {
             background: white;
             border: 1px solid rgba(197, 160, 89, 0.2);
@@ -77,9 +80,11 @@
         }
 
         .fiche-title {
+            font-family: 'Playfair Display', serif;
             font-size: 32px;
             font-weight: 900;
             text-transform: uppercase;
+            color: var(--deep-black);
             line-height: 1.1;
             margin-bottom: 4px;
             letter-spacing: -0.02em;
@@ -117,17 +122,35 @@
             padding-top: 15px;
             border-top: 1px solid #f9f9f9;
         }
-        @media (min-width: 768px) { .info-grid { grid-template-columns: repeat(5, 1fr); } }
+        @media (min-width: 768px) {
+            .info-grid { grid-template-columns: repeat(5, 1fr); }
+        }
 
-        .info-item { border-bottom: 2px solid #f9f9f9; padding-bottom: 8px; }
-        .info-value { font-size: 13px; font-weight: 700; color: var(--deep-black); }
+        .info-item {
+            border-bottom: 2px solid #f9f9f9;
+            padding-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--deep-black);
+        }
 
         .avis-box {
             background-color: #fcfbf8;
             border-radius: 12px;
             padding: 20px;
             margin-top: 10px;
+            min-height: 60px;
             border-left: 4px solid var(--gold-accent);
+        }
+
+        .avis-text {
+            color: #444;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 14px;
         }
 
         .cover-box {
@@ -144,7 +167,12 @@
         }
 
         /* --- STYLE GRILLE --- */
-        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
         .grid-thumb {
             width: 100%;
             aspect-ratio: 2/3;
@@ -157,10 +185,17 @@
             margin-bottom: 12px;
             transition: all 0.3s;
             overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
         .grid-thumb:hover { 
             transform: translateY(-8px); 
             box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15);
+        }
+        .grid-placeholder {
+            font-size: 11px;
+            font-weight: 900;
+            color: #ddd;
+            text-transform: uppercase;
         }
 
         .modal-input {
@@ -170,11 +205,25 @@
             border-radius: 10px;
             margin-bottom: 12px;
             font-size: 14px;
+            background-color: #fff;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--gold-accent);
         }
 
         .star-filled { color: var(--gold-accent); }
         .star-empty { color: #e5e7eb; }
-        .btn-gold-main { background-color: var(--gold-accent); color: white; }
+
+        .btn-gold-main {
+            background-color: var(--gold-accent);
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-gold-main:hover {
+            background-color: #A68548;
+        }
     </style>
 </head>
 <body>
@@ -221,7 +270,7 @@
                 <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
                 <div class="flex items-center gap-3">
                     <span id="user-display" class="text-[10px] font-bold text-gray-400 uppercase mr-2"></span>
-                    <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-red-400 hover:text-red-600 border border-red-100 rounded-lg">Déconnexion</button>
+                    <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-red-400 hover:text-red-600 border border-red-100 rounded-lg">Quitter</button>
                 </div>
             </div>
 
@@ -251,15 +300,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Titre du livre</label>
-                    <input id="in-title" class="modal-input">
+                    <input id="in-title" placeholder="Ex: Le Petit Prince" class="modal-input">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Auteur</label>
-                    <input id="in-author" class="modal-input">
+                    <input id="in-author" placeholder="Ex: Saint-Exupéry" class="modal-input">
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">URL de la couverture</label>
-                    <input id="in-cover" class="modal-input">
+                    <input id="in-cover" placeholder="Lien vers l'image .jpg ou .png" class="modal-input">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Note</label>
@@ -291,11 +340,11 @@
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Date de début</label>
-                    <input id="in-start" class="modal-input" placeholder="JJ/MM/AAAA">
+                    <input id="in-start" class="modal-input">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Date de fin</label>
-                    <input id="in-end" class="modal-input" placeholder="JJ/MM/AAAA">
+                    <input id="in-end" class="modal-input">
                 </div>
             </div>
 
@@ -309,19 +358,19 @@
             </div>
             
             <div class="flex gap-3 mt-6">
-                <button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Annuler</button>
-                <button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl">Enregistrer</button>
+                <button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest bg-slate-50 rounded-xl">Annuler</button>
+                <button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest btn-gold-main rounded-xl">Enregistrer</button>
             </div>
         </div>
     </div>
 
-     <!-- Firebase SDK -->
+    <!-- SCRIPTS FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIGURATION À REMPLACER PAR TES CLÉS FIREBASE
+        // CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyALZ0tu1jU2OJbGrAmCcAFXVFB5os4-pfY",
             authDomain: "ma-biblio-b7966.firebaseapp.com",
@@ -372,7 +421,7 @@
                 document.getElementById('user-display').innerText = user.email;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
-                document.getElementById('app-content').classList.add('opacity-100');
+                setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
                 await loadUserLibrary();
             } else {
                 document.getElementById('app-content').classList.add('hidden');
@@ -382,7 +431,7 @@
 
         window.logout = () => signOut(auth);
 
-        // --- DATA LOGIC ---
+        // --- DATA ---
         async function loadUserLibrary() {
             const docRef = doc(db, "users_libs", currentUser.uid);
             const docSnap = await getDoc(docRef);
@@ -403,7 +452,7 @@
             const idx = library.findIndex(b => b.id === id);
             
             library[idx] = {
-                ...library[idx],
+                id: id,
                 title: document.getElementById('in-title').value,
                 author: document.getElementById('in-author').value,
                 cover: document.getElementById('in-cover').value,
@@ -423,31 +472,30 @@
         };
 
         function render() {
-            const grid = document.getElementById('grid-content');
-            const fiches = document.getElementById('fiches-content');
-
-            grid.innerHTML = library.map(book => `
+            // Grille
+            document.getElementById('grid-content').innerHTML = library.map(book => `
                 <div class="grid-item" onclick="jumpToFiche(${book.id})">
                     <div class="grid-thumb">
-                        ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-gray-200 font-bold">#${book.id}</span>`}
+                        ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="grid-placeholder">#${book.id}</span>`}
                     </div>
-                    <div class="flex gap-0.5">${Array.from({length: 5}, (_, i) => `<span class="${i < book.rating ? 'star-filled' : 'star-empty'} text-[9px]">★</span>`).join('')}</div>
+                    <div class="flex gap-0.5">${[1,2,3,4,5].map(i => `<span class="text-[9px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
                 </div>
             `).join('');
 
-            fiches.innerHTML = library.map(book => `
+            // Fiches
+            document.getElementById('fiches-content').innerHTML = library.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
                     <div class="fiche-number">#${book.id}</div>
                     <div class="flex flex-col md:flex-row gap-10">
                         <div class="cover-box shrink-0">
-                            ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-gray-100 text-5xl font-black">?</span>`}
+                            ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
                         </div>
                         <div class="flex-1">
                             <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
                             <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
                             <div class="mb-6">
                                 <p class="section-label">Note :</p>
-                                <div class="flex gap-1">${Array.from({length: 5}, (_, i) => `<span class="${i < book.rating ? 'star-filled' : 'star-empty'} text-2xl">★</span>`).join('')}</div>
+                                <div class="flex gap-1">${[1,2,3,4,5].map(i => `<span class="text-2xl ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
                             </div>
                             <p class="section-label">Résumé :</p>
                             <p class="fiche-summary">${book.summary || 'Aucun résumé.'}</p>
@@ -460,11 +508,33 @@
                         <div class="info-item"><p class="section-label">Format :</p><p class="info-value">${book.format || '—'}</p></div>
                         <div class="info-item"><p class="section-label">Langue :</p><p class="info-value">${book.lang || '—'}</p></div>
                     </div>
-                    <div class="avis-box mt-6"><p class="section-label">Mon avis :</p><p class="text-sm italic">${book.comment || 'Non noté.'}</p></div>
-                    <div class="flex justify-end mt-4"><button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600 transition-all">Modifier</button></div>
+                    <div class="mt-8">
+                        <p class="section-label">Mon avis personnel :</p>
+                        <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire.'}</p></div>
+                    </div>
+                    <div class="mt-8 flex justify-end">
+                        <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600">Modifier</button>
+                    </div>
                 </div>
             `).join('');
         }
+
+        // --- NAVIGATION & MODAL ---
+        window.showSection = (id) => {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            document.getElementById('btn-' + id).classList.add('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+
+        window.jumpToFiche = (id) => {
+            showSection('fiches');
+            setTimeout(() => {
+                const el = document.getElementById('fiche-scroll-' + id);
+                if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        };
 
         window.openEdit = (id) => {
             const b = library.find(x => x.id === id);
@@ -484,18 +554,6 @@
         };
 
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
-        
-        window.showSection = (id) => {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('section-' + id).classList.add('active');
-            document.getElementById('btn-' + id).classList.add('active');
-        };
-
-        window.jumpToFiche = (id) => {
-            showSection('fiches');
-            setTimeout(() => document.getElementById('fiche-scroll-' + id).scrollIntoView({behavior:'smooth', block:'center'}), 100);
-        };
     </script>
 </body>
 </html>
