@@ -11,7 +11,9 @@
             --paper-bg: #FAF9F6;
             --gold-accent: #C5A059;
             --deep-black: #1A1A1A;
+            --muted-gold: #D4AF37;
         }
+
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: var(--paper-bg);
@@ -19,8 +21,10 @@
             margin: 0;
             overflow-x: hidden;
         }
+
         h1, h2, .font-serif { font-family: 'Playfair Display', serif; }
-        
+
+        /* --- AUTHENTIFICATION STYLE --- */
         #auth-screen {
             background-color: var(--paper-bg);
             background-image: radial-gradient(rgba(197, 160, 89, 0.1) 1px, transparent 1px);
@@ -31,8 +35,11 @@
             border: 1px solid rgba(197, 160, 89, 0.2);
             box-shadow: 0 20px 50px rgba(0,0,0,0.05);
         }
+
+        /* --- APP STYLE --- */
         .view-section { display: none; }
         .view-section.active { display: block; }
+
         .tab-btn {
             padding-bottom: 12px;
             font-size: 11px;
@@ -47,6 +54,8 @@
             color: var(--gold-accent);
             border-bottom: 3px solid var(--gold-accent);
         }
+
+        /* --- STYLE FICHE --- */
         .fiche-container {
             background: white;
             border-radius: 12px;
@@ -57,6 +66,7 @@
             position: relative;
             border: 1px solid rgba(197, 160, 89, 0.1);
         }
+
         .fiche-number {
             position: absolute;
             top: 25px;
@@ -65,23 +75,106 @@
             font-weight: 900;
             color: #f1f1f1;
         }
-        .fiche-title { font-size: 32px; font-weight: 900; text-transform: uppercase; line-height: 1.1; margin-bottom: 4px; }
-        .fiche-author { font-size: 16px; font-weight: 700; text-transform: uppercase; color: var(--gold-accent); margin-bottom: 30px; }
-        .section-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #888; margin-bottom: 8px; letter-spacing: 0.05em; }
-        .fiche-summary { font-size: 15px; color: #444; font-style: italic; line-height: 1.6; }
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 30px; border-top: 1px solid #f9f9f9; padding-top: 15px;}
+
+        .fiche-title {
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .fiche-author {
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--gold-accent);
+            margin-bottom: 30px;
+        }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        .fiche-summary {
+            font-size: 15px;
+            color: #444;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #f9f9f9;
+        }
         @media (min-width: 768px) { .info-grid { grid-template-columns: repeat(5, 1fr); } }
-        .info-value { font-size: 13px; font-weight: 700; }
-        .avis-box { background-color: #fcfbf8; border-radius: 12px; padding: 20px; margin-top: 10px; border-left: 4px solid var(--gold-accent); }
-        .cover-box { width: 100%; max-width: 180px; aspect-ratio: 2/3; background: #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .grid-thumb { width: 100%; aspect-ratio: 2/3; background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; transition: all 0.3s; overflow: hidden; }
-        .grid-thumb:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15); }
-        .modal-input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 12px; font-size: 14px; }
+
+        .info-item { border-bottom: 2px solid #f9f9f9; padding-bottom: 8px; }
+        .info-value { font-size: 13px; font-weight: 700; color: var(--deep-black); }
+
+        .avis-box {
+            background-color: #fcfbf8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 10px;
+            border-left: 4px solid var(--gold-accent);
+        }
+
+        .cover-box {
+            width: 100%;
+            max-width: 200px;
+            aspect-ratio: 2/3;
+            background: #eee;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* --- STYLE GRILLE --- */
+        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .grid-thumb {
+            width: 100%;
+            aspect-ratio: 2/3;
+            background: white;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        .grid-thumb:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
         .star-filled { color: var(--gold-accent); }
         .star-empty { color: #e5e7eb; }
         .btn-gold-main { background-color: var(--gold-accent); color: white; }
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--gold-accent); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -150,27 +243,79 @@
         </div>
     </div>
 
-    <!-- MODAL D'ÉDITION (Idem que ton code mais avec bouton Sauvegarder lié à Firebase) -->
+    <!-- MODAL D'ÉDITION -->
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Fiche #<span id="modal-id"></span></h2>
+            <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <input id="in-title" placeholder="Titre" class="modal-input">
-                <input id="in-author" placeholder="Auteur" class="modal-input">
-                <input id="in-cover" placeholder="URL Image Couverture" class="modal-input md:col-span-2">
-                <select id="in-rating" class="modal-input"><option value="0">0★</option><option value="1">1★</option><option value="2">2★</option><option value="3">3★</option><option value="4">4★</option><option value="5">5★</option></select>
-                <input id="in-genre" placeholder="Genre" class="modal-input">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Titre du livre</label>
+                    <input id="in-title" class="modal-input">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Auteur</label>
+                    <input id="in-author" class="modal-input">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">URL de la couverture</label>
+                    <input id="in-cover" class="modal-input">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Note</label>
+                    <select id="in-rating" class="modal-input">
+                        <option value="0">Aucune étoile</option>
+                        <option value="1">1 Étoile</option>
+                        <option value="2">2 Étoiles</option>
+                        <option value="3">3 Étoiles</option>
+                        <option value="4">4 Étoiles</option>
+                        <option value="5">5 Étoiles</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Format</label>
+                    <select id="in-format" class="modal-input">
+                        <option value="-">-</option>
+                        <option value="Livre">Livre</option>
+                        <option value="Ebook">Ebook</option>
+                        <option value="Audiobook">Audiobook</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Genre</label>
+                    <input id="in-genre" class="modal-input">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Langue</label>
+                    <input id="in-lang" class="modal-input">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Date de début</label>
+                    <input id="in-start" class="modal-input" placeholder="JJ/MM/AAAA">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Date de fin</label>
+                    <input id="in-end" class="modal-input" placeholder="JJ/MM/AAAA">
+                </div>
             </div>
-            <textarea id="in-summary" placeholder="Résumé" class="modal-input h-24"></textarea>
-            <textarea id="in-comment" placeholder="Mon avis" class="modal-input h-24"></textarea>
-            <div class="flex gap-3 mt-4">
+
+            <div class="mt-2">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Résumé</label>
+                <textarea id="in-summary" class="modal-input h-24"></textarea>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Mon avis personnel</label>
+                <textarea id="in-comment" class="modal-input h-24"></textarea>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
                 <button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Annuler</button>
-                <button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl">Sauvegarder</button>
+                <button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl">Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -245,9 +390,8 @@
             if (docSnap.exists()) {
                 library = docSnap.data().books;
             } else {
-                // Création d'une bibliothèque vide de 100 fiches
                 library = Array.from({length: 100}, (_, i) => ({
-                    id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: ""
+                    id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "", format: "-", lang: "", start: "", end: ""
                 }));
                 await setDoc(docRef, { books: library });
             }
@@ -265,6 +409,10 @@
                 cover: document.getElementById('in-cover').value,
                 rating: parseInt(document.getElementById('in-rating').value),
                 genre: document.getElementById('in-genre').value,
+                format: document.getElementById('in-format').value,
+                lang: document.getElementById('in-lang').value,
+                start: document.getElementById('in-start').value,
+                end: document.getElementById('in-end').value,
                 summary: document.getElementById('in-summary').value,
                 comment: document.getElementById('in-comment').value
             };
@@ -274,7 +422,6 @@
             closeModal();
         };
 
-        // --- RENDER LOGIC (Adaptée de ton code) ---
         function render() {
             const grid = document.getElementById('grid-content');
             const fiches = document.getElementById('fiches-content');
@@ -293,42 +440,58 @@
                     <div class="fiche-number">#${book.id}</div>
                     <div class="flex flex-col md:flex-row gap-10">
                         <div class="cover-box shrink-0">
-                            ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-gray-100 text-5xl">?</span>`}
+                            ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-gray-100 text-5xl font-black">?</span>`}
                         </div>
                         <div class="flex-1">
                             <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
                             <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
-                            <div class="flex gap-1 mb-6">${Array.from({length: 5}, (_, i) => `<span class="${i < book.rating ? 'star-filled' : 'star-empty'} text-xl">★</span>`).join('')}</div>
+                            <div class="mb-6">
+                                <p class="section-label">Note :</p>
+                                <div class="flex gap-1">${Array.from({length: 5}, (_, i) => `<span class="${i < book.rating ? 'star-filled' : 'star-empty'} text-2xl">★</span>`).join('')}</div>
+                            </div>
                             <p class="section-label">Résumé :</p>
                             <p class="fiche-summary">${book.summary || 'Aucun résumé.'}</p>
                         </div>
                     </div>
+                    <div class="info-grid">
+                        <div class="info-item"><p class="section-label">Début :</p><p class="info-value">${book.start || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Fin :</p><p class="info-value">${book.end || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Genre :</p><p class="info-value">${book.genre || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Format :</p><p class="info-value">${book.format || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Langue :</p><p class="info-value">${book.lang || '—'}</p></div>
+                    </div>
                     <div class="avis-box mt-6"><p class="section-label">Mon avis :</p><p class="text-sm italic">${book.comment || 'Non noté.'}</p></div>
-                    <div class="flex justify-end mt-4"><button onclick="openEdit(${book.id})" class="text-[10px] font-bold uppercase text-gray-400 hover:text-gold-accent">Modifier</button></div>
+                    <div class="flex justify-end mt-4"><button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600 transition-all">Modifier</button></div>
                 </div>
             `).join('');
         }
 
-        // Helpers globaux
         window.openEdit = (id) => {
             const b = library.find(x => x.id === id);
             document.getElementById('modal-id').innerText = id;
-            document.getElementById('in-title').value = b.title;
-            document.getElementById('in-author').value = b.author;
-            document.getElementById('in-cover').value = b.cover;
-            document.getElementById('in-rating').value = b.rating;
-            document.getElementById('in-genre').value = b.genre;
-            document.getElementById('in-summary').value = b.summary;
-            document.getElementById('in-comment').value = b.comment;
+            document.getElementById('in-title').value = b.title || "";
+            document.getElementById('in-author').value = b.author || "";
+            document.getElementById('in-cover').value = b.cover || "";
+            document.getElementById('in-rating').value = b.rating || 0;
+            document.getElementById('in-genre').value = b.genre || "";
+            document.getElementById('in-format').value = b.format || "-";
+            document.getElementById('in-lang').value = b.lang || "";
+            document.getElementById('in-start').value = b.start || "";
+            document.getElementById('in-end').value = b.end || "";
+            document.getElementById('in-summary').value = b.summary || "";
+            document.getElementById('in-comment').value = b.comment || "";
             document.getElementById('edit-modal').classList.remove('hidden');
         };
+
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
+        
         window.showSection = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
             document.getElementById('btn-' + id).classList.add('active');
         };
+
         window.jumpToFiche = (id) => {
             showSection('fiches');
             setTimeout(() => document.getElementById('fiche-scroll-' + id).scrollIntoView({behavior:'smooth', block:'center'}), 100);
