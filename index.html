@@ -11,6 +11,7 @@
             --paper-bg: #FAF9F6;
             --gold-accent: #C5A059;
             --deep-black: #1A1A1A;
+            --muted-gold: #D4AF37;
         }
 
         body { 
@@ -18,11 +19,12 @@
             background-color: var(--paper-bg);
             color: var(--deep-black);
             margin: 0;
+            overflow-x: hidden;
         }
 
         h1, h2, .font-serif { font-family: 'Playfair Display', serif; }
 
-        /* --- AUTH SCREEN --- */
+        /* --- AUTHENTIFICATION STYLE --- */
         #auth-screen {
             background-color: var(--paper-bg);
             background-image: radial-gradient(rgba(197, 160, 89, 0.1) 1px, transparent 1px);
@@ -35,7 +37,7 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.05);
         }
 
-        /* --- NAVIGATION --- */
+        /* --- APP STYLE --- */
         .view-section { display: none; }
         .view-section.active { display: block; }
 
@@ -67,12 +69,24 @@
             border: 1px solid rgba(197, 160, 89, 0.1);
         }
 
+        .fiche-number {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            font-size: 16px;
+            font-weight: 900;
+            color: #f1f1f1;
+        }
+
         .fiche-title {
+            font-family: 'Playfair Display', serif;
             font-size: 32px;
             font-weight: 900;
             text-transform: uppercase;
             color: var(--deep-black);
             line-height: 1.1;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
         }
 
         .fiche-author {
@@ -92,6 +106,52 @@
             letter-spacing: 0.05em;
         }
 
+        .fiche-summary {
+            font-size: 15px;
+            color: #444;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #f9f9f9;
+        }
+        @media (min-width: 768px) {
+            .info-grid { grid-template-columns: repeat(5, 1fr); }
+        }
+
+        .info-item {
+            border-bottom: 2px solid #f9f9f9;
+            padding-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--deep-black);
+        }
+
+        .avis-box {
+            background-color: #fcfbf8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 10px;
+            min-height: 60px;
+            border-left: 4px solid var(--gold-accent);
+        }
+
+        .avis-text {
+            color: #444;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
         .cover-box {
             width: 100%;
             max-width: 200px;
@@ -103,18 +163,16 @@
             justify-content: center;
             overflow: hidden;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            align-self: flex-start; /* FIX: Harry Potter ne s'étirera plus */
+            align-self: flex-start; /* FIX: Empêche l'image de s'étirer */
         }
 
-        .avis-box {
-            background-color: #fcfbf8;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 10px;
-            border-left: 4px solid var(--gold-accent);
+        /* --- STYLE GRILLE --- */
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
         }
-
-        /* --- GRILLE --- */
         .grid-thumb {
             width: 100%;
             aspect-ratio: 2/3;
@@ -124,44 +182,99 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             transition: all 0.3s;
             overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .grid-thumb:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15); }
+        .grid-thumb:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15);
+        }
+        .grid-placeholder {
+            font-size: 11px;
+            font-weight: 900;
+            color: #ddd;
+            text-transform: uppercase;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            background-color: #fff;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--gold-accent);
+        }
 
         .star-filled { color: var(--gold-accent); }
         .star-empty { color: #e5e7eb; }
 
-        .modal-input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 12px; font-size: 14px; }
+        .btn-gold-main {
+            background-color: var(--gold-accent);
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-gold-main:hover {
+            background-color: #A68548;
+        }
     </style>
 </head>
 <body>
 
-    <!-- AUTHENTIFICATION -->
+    <!-- ÉCRAN D'AUTHENTIFICATION -->
     <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
         <div class="auth-card w-full max-w-md rounded-3xl p-10 text-center">
-            <h1 class="text-3xl font-black italic uppercase font-serif mb-2">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
-            <p id="auth-mode-title" class="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-8">Connexion Membre</p>
+            <div class="mb-8">
+                <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif mb-2">
+                    Ma Biblio <span style="color: var(--gold-accent)">100</span>
+                </h1>
+                <p id="auth-mode-title" class="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">Connexion Membre</p>
+            </div>
+
             <form id="auth-form" class="space-y-5 text-left">
-                <input type="email" id="email" required class="modal-input" placeholder="Email">
-                <input type="password" id="password" required class="modal-input" placeholder="Mot de passe">
-                <button type="submit" id="auth-submit-btn" class="w-full py-4 bg-[#C5A059] text-white rounded-xl font-bold uppercase tracking-widest text-xs">Ouvrir ma collection</button>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Adresse Email</label>
+                    <input type="email" id="email" required class="modal-input !mb-0" placeholder="exemple@mail.com">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Mot de passe</label>
+                    <input type="password" id="password" required class="modal-input !mb-0" placeholder="••••••••">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg shadow-yellow-900/20 mt-4">
+                    Ouvrir ma collection
+                </button>
             </form>
+            
             <p id="auth-error" class="text-red-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
-            <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="mt-6 text-[10px] text-gray-400 font-bold uppercase tracking-widest">S'inscrire</button>
+            
+            <div class="mt-6">
+                <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent">
+                    Pas encore de compte ? S'inscrire
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- CONTENU PRINCIPAL -->
+    <!-- CONTENU DE L'APPLICATION -->
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
         <div class="max-w-6xl mx-auto px-6 py-10">
-            <div class="flex justify-between items-center mb-10">
-                <h1 class="text-3xl font-black italic uppercase font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
-                <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-red-400 border border-red-100 rounded-lg">Quitter</button>
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
+                <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
+                <div class="flex items-center gap-3">
+                    <span id="user-display" class="text-[10px] font-bold text-gray-400 uppercase mr-2"></span>
+                    <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-red-400 hover:text-red-600 border border-red-100 rounded-lg">Quitter</button>
+                </div>
             </div>
 
-            <!-- ONGLETS -->
+            <!-- Navigation -->
             <div class="flex gap-10 border-b border-slate-100 mb-12">
                 <button onclick="showSection('grille')" id="btn-grille" class="tab-btn active">Ma Grille</button>
                 <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
@@ -179,30 +292,79 @@
         </div>
     </div>
 
-    <!-- MODAL D'EDITION -->
+    <!-- MODAL D'ÉDITION -->
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-black mb-6 uppercase font-serif">Modifier Fiche #<span id="modal-id"></span></h2>
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <input id="in-title" placeholder="Titre" class="modal-input">
-                <input id="in-author" placeholder="Auteur" class="modal-input">
-                <input id="in-cover" placeholder="URL Image (Copier l'adresse de l'image)" class="modal-input md:col-span-2">
-                <select id="in-rating" class="modal-input">
-                    <option value="0">Note : 0/5</option>
-                    <option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option>
-                </select>
-                <input id="in-genre" placeholder="Genre" class="modal-input">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Titre du livre</label>
+                    <input id="in-title" placeholder="Ex: Le Petit Prince" class="modal-input">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Auteur</label>
+                    <input id="in-author" placeholder="Ex: Saint-Exupéry" class="modal-input">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">URL de la couverture (Copier l'adresse de l'image)</label>
+                    <input id="in-cover" placeholder="Lien vers l'image .jpg ou .png" class="modal-input">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Note</label>
+                    <select id="in-rating" class="modal-input">
+                        <option value="0">Aucune étoile</option>
+                        <option value="1">1 Étoile</option>
+                        <option value="2">2 Étoiles</option>
+                        <option value="3">3 Étoiles</option>
+                        <option value="4">4 Étoiles</option>
+                        <option value="5">5 Étoiles</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Format</label>
+                    <select id="in-format" class="modal-input">
+                        <option value="-">-</option>
+                        <option value="Livre">Livre</option>
+                        <option value="Ebook">Ebook</option>
+                        <option value="Audiobook">Audiobook</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Genre</label>
+                    <input id="in-genre" class="modal-input">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Langue</label>
+                    <input id="in-lang" class="modal-input">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Date de début</label>
+                    <input id="in-start" class="modal-input">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Date de fin</label>
+                    <input id="in-end" class="modal-input">
+                </div>
             </div>
-            <textarea id="in-summary" placeholder="Résumé de l'histoire..." class="modal-input h-24"></textarea>
-            <textarea id="in-comment" placeholder="Mon avis personnel..." class="modal-input h-24"></textarea>
-            <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 py-4 bg-slate-50 rounded-xl uppercase font-bold text-[10px]">Annuler</button>
-                <button onclick="saveToFirebase()" class="flex-1 py-4 bg-[#C5A059] text-white rounded-xl uppercase font-bold text-[10px]">Enregistrer</button>
+
+            <div class="mt-2">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Résumé</label>
+                <textarea id="in-summary" class="modal-input h-24"></textarea>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Mon avis personnel</label>
+                <textarea id="in-comment" class="modal-input h-24"></textarea>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest bg-slate-50 rounded-xl">Annuler</button>
+                <button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest btn-gold-main rounded-xl">Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <!-- FIREBASE & LOGIC -->
+    <!-- SCRIPTS FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -220,11 +382,11 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        let library = [];
-        let currentUser = null;
-        let isSignUp = false;
 
-        // AUTH
+        let library = [];
+        let isSignUp = false;
+        let currentUser = null;
+
         window.toggleAuthMode = () => {
             isSignUp = !isSignUp;
             document.getElementById('auth-mode-title').innerText = isSignUp ? "Création de Compte" : "Connexion Membre";
@@ -236,21 +398,25 @@
             e.preventDefault();
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            const errEl = document.getElementById('auth-error');
-            errEl.classList.add('hidden');
+            const errorEl = document.getElementById('auth-error');
+            errorEl.classList.add('hidden');
             try {
                 if (isSignUp) await createUserWithEmailAndPassword(auth, email, pass);
                 else await signInWithEmailAndPassword(auth, email, pass);
-            } catch (e) { errEl.innerText = e.message; errEl.classList.remove('hidden'); }
+            } catch (err) {
+                errorEl.innerText = "Erreur : " + err.message;
+                errorEl.classList.remove('hidden');
+            }
         });
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+                document.getElementById('user-display').innerText = user.email;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
                 setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
-                await loadData();
+                await loadUserLibrary();
             } else {
                 document.getElementById('app-content').classList.add('hidden');
                 document.getElementById('auth-screen').classList.remove('hidden');
@@ -259,61 +425,19 @@
 
         window.logout = () => signOut(auth);
 
-        // DATA
-        async function loadData() {
+        async function loadUserLibrary() {
             const docRef = doc(db, "users_libs", currentUser.uid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 library = docSnap.data().books;
             } else {
-                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "" }));
+                library = Array.from({length: 100}, (_, i) => ({
+                    id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "", format: "-", lang: "", start: "", end: ""
+                }));
                 await setDoc(docRef, { books: library });
             }
             render();
         }
-
-        window.render = () => {
-            // GRILLE (Etoiles agrandies à 14px)
-            document.getElementById('grid-content').innerHTML = library.map(book => `
-                <div class="flex flex-col items-center cursor-pointer" onclick="jumpToFiche(${book.id})">
-                    <div class="grid-thumb">
-                        ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-[10px] font-bold text-slate-200">#${book.id}</span>`}
-                    </div>
-                    <div class="flex gap-1 mt-1">
-                        ${[1,2,3,4,5].map(i => `<span class="text-[14px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-
-            // FICHES (Bouton retour et fix image)
-            document.getElementById('fiches-content').innerHTML = library.map(book => `
-                <div id="fiche-scroll-${book.id}" class="fiche-container">
-                    <div class="absolute top-6 right-8 flex items-center gap-4">
-                        <span class="text-xs font-black text-slate-200">#${book.id}</span>
-                        <button onclick="showSection('grille')" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 hover:text-gold-accent rounded-full transition-all">
-                            <span class="text-[9px] font-bold uppercase tracking-widest">Retour Grille</span>
-                        </button>
-                    </div>
-                    <div class="flex flex-col md:flex-row items-start gap-10">
-                        <div class="cover-box">
-                            ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-4xl font-black text-slate-100">?</span>`}
-                        </div>
-                        <div class="flex-1">
-                            <h2 class="fiche-title">${book.title || 'VIDE'}</h2>
-                            <h3 class="fiche-author">${book.author || 'AUCUN AUTEUR'}</h3>
-                            <div class="flex gap-1 mb-6">${[1,2,3,4,5].map(i => `<span class="text-2xl ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
-                            <p class="section-label">Résumé :</p>
-                            <p class="text-sm italic text-gray-600 leading-relaxed">${book.summary || 'Cliquez sur modifier pour ajouter un texte.'}</p>
-                        </div>
-                    </div>
-                    <div class="mt-8">
-                        <p class="section-label">Mon avis :</p>
-                        <div class="avis-box text-sm italic">${book.comment || 'Pas d\'avis.'}</div>
-                    </div>
-                    <button onclick="openEdit(${book.id})" class="mt-6 text-[10px] font-bold uppercase text-slate-300 hover:text-gold-accent">Modifier la fiche</button>
-                </div>
-            `).join('');
-        };
 
         window.saveToFirebase = async () => {
             const id = parseInt(document.getElementById('modal-id').innerText);
@@ -324,15 +448,73 @@
                 author: document.getElementById('in-author').value,
                 cover: document.getElementById('in-cover').value,
                 rating: parseInt(document.getElementById('in-rating').value),
+                genre: document.getElementById('in-genre').value,
+                format: document.getElementById('in-format').value,
+                lang: document.getElementById('in-lang').value,
+                start: document.getElementById('in-start').value,
+                end: document.getElementById('in-end').value,
                 summary: document.getElementById('in-summary').value,
-                comment: document.getElementById('in-comment').value,
-                genre: document.getElementById('in-genre').value
+                comment: document.getElementById('in-comment').value
             };
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
-            render(); closeModal();
+            render();
+            closeModal();
         };
 
-        // NAVIGATION
+        window.render = () => {
+            // GRILLE (Étoiles agrandies à 14px)
+            document.getElementById('grid-content').innerHTML = library.map(book => `
+                <div class="grid-item" onclick="jumpToFiche(${book.id})">
+                    <div class="grid-thumb">
+                        ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="grid-placeholder">#${book.id}</span>`}
+                    </div>
+                    <div class="flex gap-1">${[1,2,3,4,5].map(i => `<span class="text-[14px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
+                </div>
+            `).join('');
+
+            // FICHES (Bouton retour et fix image)
+            document.getElementById('fiches-content').innerHTML = library.map(book => `
+                <div id="fiche-scroll-${book.id}" class="fiche-container">
+                    <div class="fiche-number">#${book.id}</div>
+                    
+                    <!-- Bouton Retour Rapide -->
+                    <button onclick="showSection('grille')" class="mb-6 flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 hover:text-gold-accent rounded-full transition-all">
+                         <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Grille</span>
+                    </button>
+
+                    <div class="flex flex-col md:flex-row gap-10">
+                        <div class="cover-box shrink-0">
+                            ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
+                            <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
+                            <div class="mb-6">
+                                <p class="section-label">Note :</p>
+                                <div class="flex gap-1">${[1,2,3,4,5].map(i => `<span class="text-2xl ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
+                            </div>
+                            <p class="section-label">Résumé :</p>
+                            <p class="fiche-summary">${book.summary || 'Aucun résumé.'}</p>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item"><p class="section-label">Début :</p><p class="info-value">${book.start || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Fin :</p><p class="info-value">${book.end || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Genre :</p><p class="info-value">${book.genre || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Format :</p><p class="info-value">${book.format || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Langue :</p><p class="info-value">${book.lang || '—'}</p></div>
+                    </div>
+                    <div class="mt-8">
+                        <p class="section-label">Mon avis personnel :</p>
+                        <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire.'}</p></div>
+                    </div>
+                    <div class="mt-8 flex justify-end">
+                        <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600">Modifier</button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
         window.showSection = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -356,9 +538,13 @@
             document.getElementById('in-author').value = b.author || "";
             document.getElementById('in-cover').value = b.cover || "";
             document.getElementById('in-rating').value = b.rating || 0;
+            document.getElementById('in-genre').value = b.genre || "";
+            document.getElementById('in-format').value = b.format || "-";
+            document.getElementById('in-lang').value = b.lang || "";
+            document.getElementById('in-start').value = b.start || "";
+            document.getElementById('in-end').value = b.end || "";
             document.getElementById('in-summary').value = b.summary || "";
             document.getElementById('in-comment').value = b.comment || "";
-            document.getElementById('in-genre').value = b.genre || "";
             document.getElementById('edit-modal').classList.remove('hidden');
         };
 
