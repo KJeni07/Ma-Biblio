@@ -315,12 +315,13 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://firebase.google.com/docs/web/setup#available-libraries";
-        import { getFirestore, doc, getDoc, setDoc } from "https://firebase.google.com/docs/web/setup#available-libraries";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // CONFIGURATION À REMPLACER PAR TES CLÉS FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyALZ0tu1jU2OJbGrAmCcAFXVFB5os4-pfY",
             authDomain: "ma-biblio-b7966.firebaseapp.com",
@@ -371,7 +372,7 @@
                 document.getElementById('user-display').innerText = user.email;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
-                setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
+                document.getElementById('app-content').classList.add('opacity-100');
                 await loadUserLibrary();
             } else {
                 document.getElementById('app-content').classList.add('hidden');
