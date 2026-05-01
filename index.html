@@ -11,7 +11,6 @@
             --paper-bg: #FAF9F6;
             --gold-accent: #C5A059;
             --deep-black: #1A1A1A;
-            --muted-gold: #D4AF37;
         }
 
         body { 
@@ -19,12 +18,11 @@
             background-color: var(--paper-bg);
             color: var(--deep-black);
             margin: 0;
-            overflow-x: hidden;
         }
 
         h1, h2, .font-serif { font-family: 'Playfair Display', serif; }
 
-        /* AUTH */
+        /* --- AUTH SCREEN --- */
         #auth-screen {
             background-color: var(--paper-bg);
             background-image: radial-gradient(rgba(197, 160, 89, 0.1) 1px, transparent 1px);
@@ -37,7 +35,7 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.05);
         }
 
-        /* NAVIGATION */
+        /* --- NAVIGATION --- */
         .view-section { display: none; }
         .view-section.active { display: block; }
 
@@ -50,13 +48,14 @@
             color: #94a3b8;
             transition: all 0.2s;
             border-bottom: 3px solid transparent;
+            cursor: pointer;
         }
         .tab-btn.active {
             color: var(--gold-accent);
             border-bottom: 3px solid var(--gold-accent);
         }
 
-        /* STYLE FICHE */
+        /* --- STYLE FICHE --- */
         .fiche-container {
             background: white;
             border-radius: 12px;
@@ -74,7 +73,6 @@
             text-transform: uppercase;
             color: var(--deep-black);
             line-height: 1.1;
-            margin-bottom: 4px;
         }
 
         .fiche-author {
@@ -105,18 +103,8 @@
             justify-content: center;
             overflow: hidden;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            align-self: flex-start; /* FIX: Empêche l'étirement vertical */
+            align-self: flex-start; /* FIX: Harry Potter ne s'étirera plus */
         }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px solid #f9f9f9;
-        }
-        @media (min-width: 768px) { .info-grid { grid-template-columns: repeat(5, 1fr); } }
 
         .avis-box {
             background-color: #fcfbf8;
@@ -126,7 +114,7 @@
             border-left: 4px solid var(--gold-accent);
         }
 
-        /* GRILLE */
+        /* --- GRILLE --- */
         .grid-thumb {
             width: 100%;
             aspect-ratio: 2/3;
@@ -145,13 +133,12 @@
         .star-filled { color: var(--gold-accent); }
         .star-empty { color: #e5e7eb; }
 
-        .btn-gold-main { background-color: var(--gold-accent); color: white; }
         .modal-input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 12px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <!-- AUTH SCREEN -->
+    <!-- AUTHENTIFICATION -->
     <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
         <div class="auth-card w-full max-w-md rounded-3xl p-10 text-center">
             <h1 class="text-3xl font-black italic uppercase font-serif mb-2">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
@@ -159,14 +146,14 @@
             <form id="auth-form" class="space-y-5 text-left">
                 <input type="email" id="email" required class="modal-input" placeholder="Email">
                 <input type="password" id="password" required class="modal-input" placeholder="Mot de passe">
-                <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs">Ouvrir ma collection</button>
+                <button type="submit" id="auth-submit-btn" class="w-full py-4 bg-[#C5A059] text-white rounded-xl font-bold uppercase tracking-widest text-xs">Ouvrir ma collection</button>
             </form>
             <p id="auth-error" class="text-red-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
             <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="mt-6 text-[10px] text-gray-400 font-bold uppercase tracking-widest">S'inscrire</button>
         </div>
     </div>
 
-    <!-- APP CONTENT -->
+    <!-- CONTENU PRINCIPAL -->
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
         <div class="max-w-6xl mx-auto px-6 py-10">
             <div class="flex justify-between items-center mb-10">
@@ -174,215 +161,208 @@
                 <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-red-400 border border-red-100 rounded-lg">Quitter</button>
             </div>
 
+            <!-- ONGLETS -->
             <div class="flex gap-10 border-b border-slate-100 mb-12">
                 <button onclick="showSection('grille')" id="btn-grille" class="tab-btn active">Ma Grille</button>
                 <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
             </div>
 
+            <!-- SECTION GRILLE -->
             <section id="section-grille" class="view-section active">
                 <div id="grid-content" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10"></div>
             </section>
 
+            <!-- SECTION FICHES -->
             <section id="section-fiches" class="view-section">
                 <div id="fiches-content" class="space-y-20"></div>
             </section>
         </div>
     </div>
 
-    <!-- MODAL -->
+    <!-- MODAL D'EDITION -->
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-black mb-6 uppercase font-serif">Modifier Fiche #<span id="modal-id"></span></h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                 <input id="in-title" placeholder="Titre" class="modal-input">
                 <input id="in-author" placeholder="Auteur" class="modal-input">
-                <input id="in-cover" placeholder="URL Image Couverture" class="modal-input md:col-span-2">
-                <select id="in-rating" class="modal-input"><option value="0">0 Étoile</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+                <input id="in-cover" placeholder="URL Image (Copier l'adresse de l'image)" class="modal-input md:col-span-2">
+                <select id="in-rating" class="modal-input">
+                    <option value="0">Note : 0/5</option>
+                    <option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option>
+                </select>
                 <input id="in-genre" placeholder="Genre" class="modal-input">
             </div>
-            <textarea id="in-summary" placeholder="Résumé" class="modal-input h-24"></textarea>
-            <textarea id="in-comment" placeholder="Mon avis" class="modal-input h-24"></textarea>
+            <textarea id="in-summary" placeholder="Résumé de l'histoire..." class="modal-input h-24"></textarea>
+            <textarea id="in-comment" placeholder="Mon avis personnel..." class="modal-input h-24"></textarea>
             <div class="flex gap-3">
                 <button onclick="closeModal()" class="flex-1 py-4 bg-slate-50 rounded-xl uppercase font-bold text-[10px]">Annuler</button>
-                <button onclick="saveToFirebase()" class="flex-1 py-4 btn-gold-main rounded-xl uppercase font-bold text-[10px]">Enregistrer</button>
+                <button onclick="saveToFirebase()" class="flex-1 py-4 bg-[#C5A059] text-white rounded-xl uppercase font-bold text-[10px]">Enregistrer</button>
             </div>
         </div>
     </div>
 
+    <!-- FIREBASE & LOGIC -->
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyALZ0tu1jU2OJbGrAmCcAFXVFB5os4-pfY",
-        authDomain: "ma-biblio-b7966.firebaseapp.com",
-        projectId: "ma-biblio-b7966",
-        storageBucket: "ma-biblio-b7966.firebasestorage.app",
-        messagingSenderId: "1025405426041",
-        appId: "1:1025405426041:web:75b75d6c45a2f0313ef7a8"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    let library = [];
-    let currentUser = null;
-    let isSignUp = false;
-
-    // GESTION AUTH
-    window.toggleAuthMode = () => {
-        isSignUp = !isSignUp;
-        document.getElementById('auth-mode-title').innerText = isSignUp ? "Création de Compte" : "Connexion Membre";
-        document.getElementById('auth-submit-btn').innerText = isSignUp ? "Créer ma bibliothèque" : "Ouvrir ma collection";
-        document.getElementById('toggle-auth-btn').innerText = isSignUp ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? S'inscrire";
-    };
-
-    document.getElementById('auth-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('password').value;
-        const errorEl = document.getElementById('auth-error');
-        errorEl.classList.add('hidden');
-
-        try {
-            if (isSignUp) {
-                await createUserWithEmailAndPassword(auth, email, pass);
-            } else {
-                await signInWithEmailAndPassword(auth, email, pass);
-            }
-        } catch (err) {
-            errorEl.innerText = "Erreur : " + err.message;
-            errorEl.classList.remove('hidden');
-        }
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user;
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('app-content').classList.remove('hidden');
-            setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
-            await loadData();
-        } else {
-            document.getElementById('app-content').classList.add('hidden');
-            document.getElementById('auth-screen').classList.remove('hidden');
-        }
-    });
-
-    window.logout = () => signOut(auth);
-
-    // CHARGEMENT DONNÉES
-    async function loadData() {
-        const docRef = doc(db, "users_libs", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-            library = docSnap.data().books;
-        } else {
-            // Création initiale de la grille de 100
-            library = Array.from({length: 100}, (_, i) => ({ 
-                id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "" 
-            }));
-            await setDoc(docRef, { books: library });
-        }
-        render(); // Force l'affichage une fois les données chargées
-    }
-
-    // AFFICHAGE
-    window.render = () => {
-        // Rendu Grille
-        document.getElementById('grid-content').innerHTML = library.map(book => `
-            <div class="flex flex-col items-center cursor-pointer" onclick="jumpToFiche(${book.id})">
-                <div class="grid-thumb">
-                    ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-[10px] font-bold text-slate-200">#${book.id}</span>`}
-                </div>
-                <div class="flex gap-1 mt-1">
-                    ${[1,2,3,4,5].map(i => `<span class="text-[14px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}
-                </div>
-            </div>
-        `).join('');
-
-        // Rendu Fiches
-        document.getElementById('fiches-content').innerHTML = library.map(book => `
-            <div id="fiche-scroll-${book.id}" class="fiche-container">
-                <div class="absolute top-6 right-8 flex items-center gap-4">
-                    <span class="text-xs font-black text-slate-200">#${book.id}</span>
-                    <button onclick="showSection('grille')" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 hover:text-gold-accent rounded-full transition-all">
-                        <span class="text-[9px] font-bold uppercase tracking-widest">Retour Grille</span>
-                    </button>
-                </div>
-                <div class="flex flex-col md:flex-row items-start gap-10">
-                    <div class="cover-box">
-                        ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-4xl font-black text-slate-100">?</span>`}
-                    </div>
-                    <div class="flex-1">
-                        <h2 class="fiche-title">${book.title || 'VIDE'}</h2>
-                        <h3 class="fiche-author">${book.author || 'AUCUN AUTEUR'}</h3>
-                        <div class="flex gap-1 mb-6">${[1,2,3,4,5].map(i => `<span class="text-2xl ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
-                        <p class="section-label">Résumé :</p>
-                        <p class="text-sm italic text-gray-600 leading-relaxed">${book.summary || 'Cliquez sur modifier pour ajouter un résumé.'}</p>
-                    </div>
-                </div>
-                <div class="mt-8">
-                    <p class="section-label">Avis :</p>
-                    <div class="avis-box text-sm italic">${book.comment || 'Pas encore d\'avis.'}</div>
-                </div>
-                <button onclick="openEdit(${book.id})" class="mt-6 text-[10px] font-bold uppercase text-slate-300 hover:text-gold-accent">Modifier la fiche</button>
-            </div>
-        `).join('');
-    };
-
-    window.saveToFirebase = async () => {
-        const id = parseInt(document.getElementById('modal-id').innerText);
-        const idx = library.findIndex(b => b.id === id);
-        
-        library[idx] = {
-            id: id,
-            title: document.getElementById('in-title').value,
-            author: document.getElementById('in-author').value,
-            cover: document.getElementById('in-cover').value,
-            rating: parseInt(document.getElementById('in-rating').value),
-            summary: document.getElementById('in-summary').value,
-            comment: document.getElementById('in-comment').value,
-            genre: document.getElementById('in-genre').value
+        const firebaseConfig = {
+            apiKey: "AIzaSyALZ0tu1jU2OJbGrAmCcAFXVFB5os4-pfY",
+            authDomain: "ma-biblio-b7966.firebaseapp.com",
+            projectId: "ma-biblio-b7966",
+            storageBucket: "ma-biblio-b7966.firebasestorage.app",
+            messagingSenderId: "1025405426041",
+            appId: "1:1025405426041:web:75b75d6c45a2f0313ef7a8"
         };
 
-        await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
-        render(); 
-        closeModal();
-    };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let library = [];
+        let currentUser = null;
+        let isSignUp = false;
 
-    window.showSection = (id) => {
-        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('section-' + id).classList.add('active');
-        document.getElementById('btn-' + id).classList.add('active');
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    };
+        // AUTH
+        window.toggleAuthMode = () => {
+            isSignUp = !isSignUp;
+            document.getElementById('auth-mode-title').innerText = isSignUp ? "Création de Compte" : "Connexion Membre";
+            document.getElementById('auth-submit-btn').innerText = isSignUp ? "Créer ma bibliothèque" : "Ouvrir ma collection";
+            document.getElementById('toggle-auth-btn').innerText = isSignUp ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? S'inscrire";
+        };
 
-    window.jumpToFiche = (id) => {
-        showSection('fiches');
-        setTimeout(() => {
-            const el = document.getElementById('fiche-scroll-' + id);
-            if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
-    };
+        document.getElementById('auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const errEl = document.getElementById('auth-error');
+            errEl.classList.add('hidden');
+            try {
+                if (isSignUp) await createUserWithEmailAndPassword(auth, email, pass);
+                else await signInWithEmailAndPassword(auth, email, pass);
+            } catch (e) { errEl.innerText = e.message; errEl.classList.remove('hidden'); }
+        });
 
-    window.openEdit = (id) => {
-        const b = library.find(x => x.id === id);
-        document.getElementById('modal-id').innerText = id;
-        document.getElementById('in-title').value = b.title || "";
-        document.getElementById('in-author').value = b.author || "";
-        document.getElementById('in-cover').value = b.cover || "";
-        document.getElementById('in-rating').value = b.rating || 0;
-        document.getElementById('in-summary').value = b.summary || "";
-        document.getElementById('in-comment').value = b.comment || "";
-        document.getElementById('in-genre').value = b.genre || "";
-        document.getElementById('edit-modal').classList.remove('hidden');
-    };
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('hidden');
+                setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
+                await loadData();
+            } else {
+                document.getElementById('app-content').classList.add('hidden');
+                document.getElementById('auth-screen').classList.remove('hidden');
+            }
+        });
 
-    window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
-</script>
+        window.logout = () => signOut(auth);
+
+        // DATA
+        async function loadData() {
+            const docRef = doc(db, "users_libs", currentUser.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                library = docSnap.data().books;
+            } else {
+                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "" }));
+                await setDoc(docRef, { books: library });
+            }
+            render();
+        }
+
+        window.render = () => {
+            // GRILLE (Etoiles agrandies à 14px)
+            document.getElementById('grid-content').innerHTML = library.map(book => `
+                <div class="flex flex-col items-center cursor-pointer" onclick="jumpToFiche(${book.id})">
+                    <div class="grid-thumb">
+                        ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-[10px] font-bold text-slate-200">#${book.id}</span>`}
+                    </div>
+                    <div class="flex gap-1 mt-1">
+                        ${[1,2,3,4,5].map(i => `<span class="text-[14px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // FICHES (Bouton retour et fix image)
+            document.getElementById('fiches-content').innerHTML = library.map(book => `
+                <div id="fiche-scroll-${book.id}" class="fiche-container">
+                    <div class="absolute top-6 right-8 flex items-center gap-4">
+                        <span class="text-xs font-black text-slate-200">#${book.id}</span>
+                        <button onclick="showSection('grille')" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 hover:text-gold-accent rounded-full transition-all">
+                            <span class="text-[9px] font-bold uppercase tracking-widest">Retour Grille</span>
+                        </button>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-start gap-10">
+                        <div class="cover-box">
+                            ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-4xl font-black text-slate-100">?</span>`}
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="fiche-title">${book.title || 'VIDE'}</h2>
+                            <h3 class="fiche-author">${book.author || 'AUCUN AUTEUR'}</h3>
+                            <div class="flex gap-1 mb-6">${[1,2,3,4,5].map(i => `<span class="text-2xl ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
+                            <p class="section-label">Résumé :</p>
+                            <p class="text-sm italic text-gray-600 leading-relaxed">${book.summary || 'Cliquez sur modifier pour ajouter un texte.'}</p>
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <p class="section-label">Mon avis :</p>
+                        <div class="avis-box text-sm italic">${book.comment || 'Pas d\'avis.'}</div>
+                    </div>
+                    <button onclick="openEdit(${book.id})" class="mt-6 text-[10px] font-bold uppercase text-slate-300 hover:text-gold-accent">Modifier la fiche</button>
+                </div>
+            `).join('');
+        };
+
+        window.saveToFirebase = async () => {
+            const id = parseInt(document.getElementById('modal-id').innerText);
+            const idx = library.findIndex(b => b.id === id);
+            library[idx] = {
+                id: id,
+                title: document.getElementById('in-title').value,
+                author: document.getElementById('in-author').value,
+                cover: document.getElementById('in-cover').value,
+                rating: parseInt(document.getElementById('in-rating').value),
+                summary: document.getElementById('in-summary').value,
+                comment: document.getElementById('in-comment').value,
+                genre: document.getElementById('in-genre').value
+            };
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            render(); closeModal();
+        };
+
+        // NAVIGATION
+        window.showSection = (id) => {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            document.getElementById('btn-' + id).classList.add('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+
+        window.jumpToFiche = (id) => {
+            showSection('fiches');
+            setTimeout(() => {
+                const el = document.getElementById('fiche-scroll-' + id);
+                if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        };
+
+        window.openEdit = (id) => {
+            const b = library.find(x => x.id === id);
+            document.getElementById('modal-id').innerText = id;
+            document.getElementById('in-title').value = b.title || "";
+            document.getElementById('in-author').value = b.author || "";
+            document.getElementById('in-cover').value = b.cover || "";
+            document.getElementById('in-rating').value = b.rating || 0;
+            document.getElementById('in-summary').value = b.summary || "";
+            document.getElementById('in-comment').value = b.comment || "";
+            document.getElementById('in-genre').value = b.genre || "";
+            document.getElementById('edit-modal').classList.remove('hidden');
+        };
+
+        window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
+    </script>
 </body>
 </html>
