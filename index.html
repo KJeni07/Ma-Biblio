@@ -6,6 +6,12 @@
     <title>Ma Biblio 100 - Édition Prestige</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --paper-bg: #FAF9F6;
@@ -224,12 +230,22 @@
         .btn-gold-main:hover {
             background-color: #A68548;
         }
+
+        #loading-overlay {
+            background: var(--paper-bg);
+            z-index: 200;
+        }
     </style>
 </head>
 <body>
 
+    <!-- CHARGEMENT INITIAL -->
+    <div id="loading-overlay" class="fixed inset-0 flex items-center justify-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-accent" style="border-color: var(--gold-accent)"></div>
+    </div>
+
     <!-- ÉCRAN D'AUTHENTIFICATION -->
-    <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
+    <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6 hidden">
         <div class="auth-card w-full max-w-md rounded-3xl p-10 text-center">
             <div class="mb-8">
                 <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif mb-2">
@@ -240,19 +256,24 @@
 
             <form id="login-form" class="space-y-5 text-left">
                 <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Identifiant Collectionneur</label>
-                    <input type="text" id="username" required class="modal-input !mb-0" placeholder="Votre pseudo">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Identifiant Collectionneur (Email)</label>
+                    <input type="email" id="email" required class="modal-input !mb-0" placeholder="chef@collection.fr">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Code d'accès</label>
                     <input type="password" id="password" required class="modal-input !mb-0" placeholder="••••••••">
                 </div>
-                <button type="submit" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg shadow-yellow-900/20 mt-4">
+                <button type="submit" id="btn-submit-auth" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg shadow-yellow-900/20 mt-4">
                     Ouvrir ma collection
                 </button>
+                <div class="text-center mt-4">
+                    <button type="button" id="toggle-auth" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-gold-accent transition-colors">
+                        Pas de compte ? S'inscrire ici
+                    </button>
+                </div>
             </form>
             
-            <p id="login-error" class="text-red-500 text-[11px] mt-4 font-bold uppercase hidden">Identifiants incorrects</p>
+            <p id="login-error" class="text-red-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
             
             <div class="mt-10 pt-6 border-t border-gray-50">
                 <p class="text-[10px] text-gray-300 uppercase tracking-widest leading-relaxed">
@@ -262,13 +283,14 @@
         </div>
     </div>
 
-    <!-- CONTENU DE L'APPLICATION (Caché par défaut) -->
+    <!-- CONTENU DE L'APPLICATION -->
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
         <div class="max-w-6xl mx-auto px-6 py-10">
             <!-- Header -->
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
                 <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
                 <div class="flex items-center gap-3">
+                    <div class="hidden md:block text-[10px] font-black text-gray-400 uppercase tracking-widest mr-4" id="user-display"></div>
                     <button onclick="exportJSON()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Exporter</button>
                     <button onclick="document.getElementById('importFile').click()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 bg-black text-white rounded-lg hover:opacity-80">Importer</button>
                     <input type="file" id="importFile" class="hidden" onchange="importJSON(event)">
@@ -301,7 +323,10 @@
     <!-- MODAL D'ÉDITION -->
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
+            <div class="flex justify-between items-start mb-6">
+                <h2 class="text-2xl font-black uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                 <div>
@@ -373,72 +398,120 @@
     </div>
 
     <script>
+        // --- CONFIGURATION FIREBASE ---
+        const firebaseConfig = JSON.parse(__firebase_config);
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-biblio-id';
+
+        // --- VARIABLES D'ÉTAT ---
         let library = [];
         const COUNT = 100;
         let knownGenres = new Set(["Roman", "Thriller", "Fantastique", "Biographie", "Essai"]);
         let knownLangs = new Set(["Français", "Anglais", "Espagnol", "Japonais"]);
+        let authMode = 'login'; // 'login' or 'signup'
+        let currentUser = null;
+        let unsubscribeStore = null;
 
-        // --- GESTION AUTHENTIFICATION ---
-        const loginForm = document.getElementById('login-form');
         const authScreen = document.getElementById('auth-screen');
         const appContent = document.getElementById('app-content');
+        const loadingOverlay = document.getElementById('loading-overlay');
         const loginError = document.getElementById('login-error');
+        const toggleAuthBtn = document.getElementById('toggle-auth');
+        const btnSubmitAuth = document.getElementById('btn-submit-auth');
 
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-
-            // Simple vérification (A changer selon vos besoins)
-            // Ici on accepte n'importe quoi tant que ce n'est pas vide
-            if(user && pass) {
-                sessionStorage.setItem('is_auth', 'true');
+        // --- INITIALISATION AUTHENTIFICATION (Rule 3) ---
+        auth.onAuthStateChanged(user => {
+            currentUser = user;
+            loadingOverlay.classList.add('hidden');
+            if (user) {
+                document.getElementById('user-display').innerText = user.email;
                 enterApp();
             } else {
+                showAuth();
+            }
+        });
+
+        // --- GESTION DES ÉCRANS ---
+        function showAuth() {
+            appContent.classList.add('hidden');
+            authScreen.classList.remove('hidden');
+        }
+
+        async function enterApp() {
+            authScreen.classList.add('hidden');
+            appContent.classList.remove('hidden');
+            setTimeout(() => appContent.classList.add('opacity-100'), 50);
+            initFirestoreListener();
+        }
+
+        // --- AUTHENTIFICATION ACTIONS ---
+        toggleAuthBtn.addEventListener('click', () => {
+            authMode = authMode === 'login' ? 'signup' : 'login';
+            btnSubmitAuth.innerText = authMode === 'login' ? 'Ouvrir ma collection' : "Créer ma collection";
+            toggleAuthBtn.innerText = authMode === 'login' ? "Pas de compte ? S'inscrire ici" : "Déjà membre ? Se connecter";
+            loginError.classList.add('hidden');
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            loginError.classList.add('hidden');
+            
+            try {
+                if (authMode === 'login') {
+                    await auth.signInWithEmailAndPassword(email, pass);
+                } else {
+                    await auth.createUserWithEmailAndPassword(email, pass);
+                }
+            } catch (error) {
+                loginError.innerText = error.message;
                 loginError.classList.remove('hidden');
             }
         });
 
-        function enterApp() {
-            authScreen.classList.add('hidden');
-            appContent.classList.remove('hidden');
-            setTimeout(() => appContent.classList.add('opacity-100'), 50);
-            load();
-        }
-
         function logout() {
-            sessionStorage.removeItem('is_auth');
-            location.reload();
+            if (unsubscribeStore) unsubscribeStore();
+            auth.signOut();
         }
 
-        // Vérifier au chargement si déjà connecté
-        if(sessionStorage.getItem('is_auth') === 'true') {
-            enterApp();
-        }
+        // --- FIRESTORE SYNC (Rule 1 & 2) ---
+        function initFirestoreListener() {
+            if (!currentUser) return;
+            
+            // Path: /artifacts/{appId}/users/{userId}/library
+            const userColl = db.collection('artifacts').doc(appId).collection('users').doc(currentUser.uid).collection('library');
+            
+            if (unsubscribeStore) unsubscribeStore();
 
-        // --- LOGIQUE BIBLIOTHÈQUE ---
-        function load() {
-            const saved = localStorage.getItem('my_library_v100');
-            if (saved) {
-                library = JSON.parse(saved);
-                if (library.length < COUNT) {
-                    for (let i = library.length + 1; i <= COUNT; i++) {
-                        library.push({ id: i, title: "", author: "", cover: "", rating: 0, summary: "", start: "", end: "", genre: "", format: "-", lang: "", comment: "" });
+            unsubscribeStore = userColl.onSnapshot((snapshot) => {
+                const cloudData = {};
+                snapshot.forEach(doc => {
+                    cloudData[doc.id] = doc.data();
+                });
+
+                // Reconstruire la bibliothèque de 1 à 100
+                const newLibrary = [];
+                for (let i = 1; i <= COUNT; i++) {
+                    if (cloudData[i]) {
+                        newLibrary.push({ id: i, ...cloudData[i] });
+                        if (cloudData[i].genre) knownGenres.add(cloudData[i].genre);
+                        if (cloudData[i].lang) knownLangs.add(cloudData[i].lang);
+                    } else {
+                        newLibrary.push({ id: i, title: "", author: "", cover: "", rating: 0, summary: "", start: "", end: "", genre: "", format: "-", lang: "", comment: "" });
                     }
                 }
-                library.forEach(b => {
-                    if(b.genre) knownGenres.add(b.genre);
-                    if(b.lang) knownLangs.add(b.lang);
-                });
-            } else {
-                for (let i = 1; i <= COUNT; i++) {
-                    library.push({ id: i, title: "", author: "", cover: "", rating: 0, summary: "", start: "", end: "", genre: "", format: "-", lang: "", comment: "" });
-                }
-            }
-            updateDatalists();
-            render();
+                library = newLibrary;
+                updateDatalists();
+                render();
+            }, (err) => {
+                console.error("Firestore error:", err);
+            });
         }
 
+        // --- LOGIQUE RENDU (Inchangée) ---
         function updateDatalists() {
             document.getElementById('list-genres').innerHTML = Array.from(knownGenres).map(g => `<option value="${g}">`).join('');
             document.getElementById('list-langs').innerHTML = Array.from(knownLangs).map(l => `<option value="${l}">`).join('');
@@ -454,7 +527,8 @@
             container.innerHTML = library.map(book => `
                 <div class="grid-item" onclick="jumpToFiche(${book.id})">
                     <div class="grid-thumb">
-                        ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="grid-placeholder">#${book.id}</span>`}
+                        ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover" onerror="this.style.display='none'">` : ''}
+                        <span class="grid-placeholder ${book.cover ? 'hidden' : ''}">#${book.id}</span>
                     </div>
                     <div class="flex gap-0.5">
                         ${[1,2,3,4,5].map(i => `<span class="text-[9px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}
@@ -514,6 +588,7 @@
             `).join('');
         }
 
+        // --- NAVIGATION ---
         function showSection(id) {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -530,22 +605,23 @@
             }, 100);
         }
 
+        // --- ÉDITION ACTIONS ---
         let editingId = null;
         function openEdit(id) {
             editingId = id;
             const b = library.find(x => x.id === id);
             document.getElementById('modal-id').innerText = id;
-            document.getElementById('in-title').value = b.title;
-            document.getElementById('in-author').value = b.author;
-            document.getElementById('in-cover').value = b.cover;
-            document.getElementById('in-rating').value = b.rating;
-            document.getElementById('in-genre').value = b.genre;
+            document.getElementById('in-title').value = b.title || "";
+            document.getElementById('in-author').value = b.author || "";
+            document.getElementById('in-cover').value = b.cover || "";
+            document.getElementById('in-rating').value = b.rating || 0;
+            document.getElementById('in-genre').value = b.genre || "";
             document.getElementById('in-format').value = b.format || "-";
-            document.getElementById('in-lang').value = b.lang;
-            document.getElementById('in-start').value = b.start;
-            document.getElementById('in-end').value = b.end;
-            document.getElementById('in-summary').value = b.summary;
-            document.getElementById('in-comment').value = b.comment;
+            document.getElementById('in-lang').value = b.lang || "";
+            document.getElementById('in-start').value = b.start || "";
+            document.getElementById('in-end').value = b.end || "";
+            document.getElementById('in-summary').value = b.summary || "";
+            document.getElementById('in-comment').value = b.comment || "";
             document.getElementById('edit-modal').classList.remove('hidden');
         }
 
@@ -553,34 +629,37 @@
             document.getElementById('edit-modal').classList.add('hidden');
         }
 
-        function saveBook() {
-            const idx = library.findIndex(x => x.id === editingId);
-            const newGenre = document.getElementById('in-genre').value.trim();
-            const newLang = document.getElementById('in-lang').value.trim();
-            if(newGenre) knownGenres.add(newGenre);
-            if(newLang) knownLangs.add(newLang);
-            updateDatalists();
+        async function saveBook() {
+            if (!currentUser || !editingId) return;
 
-            library[idx] = {
-                id: editingId,
+            const updatedData = {
                 title: document.getElementById('in-title').value,
                 author: document.getElementById('in-author').value,
                 cover: document.getElementById('in-cover').value,
                 rating: parseInt(document.getElementById('in-rating').value),
-                genre: newGenre,
+                genre: document.getElementById('in-genre').value.trim(),
                 format: document.getElementById('in-format').value,
-                lang: newLang,
+                lang: document.getElementById('in-lang').value.trim(),
                 start: document.getElementById('in-start').value,
                 end: document.getElementById('in-end').value,
                 summary: document.getElementById('in-summary').value,
-                comment: document.getElementById('in-comment').value
+                comment: document.getElementById('in-comment').value,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
-            
-            localStorage.setItem('my_library_v100', JSON.stringify(library));
-            render();
-            closeModal();
+
+            try {
+                await db.collection('artifacts').doc(appId)
+                    .collection('users').doc(currentUser.uid)
+                    .collection('library').doc(editingId.toString())
+                    .set(updatedData, { merge: true });
+                
+                closeModal();
+            } catch (err) {
+                alert("Erreur lors de la sauvegarde : " + err.message);
+            }
         }
 
+        // --- IMPORT / EXPORT ---
         function exportJSON() {
             const dataStr = JSON.stringify(library, null, 2);
             const blob = new Blob([dataStr], {type: 'application/json'});
@@ -591,24 +670,29 @@
             a.click();
         }
 
-        function importJSON(e) {
+        async function importJSON(e) {
             const file = e.target.files[0];
-            if (!file) return;
+            if (!file || !currentUser) return;
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = async (event) => {
                 try {
                     const imported = JSON.parse(event.target.result);
                     if(Array.isArray(imported)) {
-                        library = imported;
-                        if(library.length < COUNT) {
-                             for (let i = library.length + 1; i <= COUNT; i++) {
-                                library.push({ id: i, title: "", author: "", cover: "", rating: 0, summary: "", start: "", end: "", genre: "", format: "-", lang: "", comment: "" });
+                        const batch = db.batch();
+                        const userColl = db.collection('artifacts').doc(appId).collection('users').doc(currentUser.uid).collection('library');
+                        
+                        imported.forEach(book => {
+                            if (book.id && book.id <= COUNT) {
+                                const ref = userColl.doc(book.id.toString());
+                                const { id, ...data } = book;
+                                batch.set(ref, data, { merge: true });
                             }
-                        }
-                        localStorage.setItem('my_library_v100', JSON.stringify(library));
-                        render();
+                        });
+
+                        await batch.commit();
+                        alert("Importation réussie !");
                     }
-                } catch(err) { console.error("Erreur import", err); }
+                } catch(err) { console.error("Erreur import", err); alert("Format de fichier invalide"); }
             };
             reader.readAsText(file);
         }
