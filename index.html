@@ -153,17 +153,19 @@
             font-size: 14px;
         }
 
-        .cover-box {
-            width: 100%;
-            max-width: 200px;
-            aspect-ratio: 2/3;
-            background: #eee;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+       .cover-box {
+    width: 100%;
+    max-width: 200px;
+    aspect-ratio: 2/3;
+    background: #eee;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    /* AJOUTE CETTE LIGNE ICI */
+    align-self: flex-start;
         }
 
         /* --- STYLE GRILLE --- */
@@ -478,18 +480,25 @@
                     <div class="grid-thumb">
                         ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="grid-placeholder">#${book.id}</span>`}
                     </div>
-                    <div class="flex gap-0.5">${[1,2,3,4,5].map(i => `<span class="text-[9px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
+                    <div class="flex gap-0.5">${[1,2,3,4,5].map(i => `<span class="text-[14px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
                 </div>
             `).join('');
 
             // Fiches
-            document.getElementById('fiches-content').innerHTML = library.map(book => `
-                <div id="fiche-scroll-${book.id}" class="fiche-container">
-                    <div class="fiche-number">#${book.id}</div>
-                    <div class="flex flex-col md:flex-row gap-10">
-                        <div class="cover-box shrink-0">
-                            ${book.cover ? `<img src="${book.cover}" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
-                        </div>
+            container.innerHTML = library.map(book => `
+    <div id="fiche-scroll-${book.id}" class="fiche-container">
+        <!-- Numéro décalé et Bouton Retour -->
+        <div class="absolute top-6 right-8 flex items-center gap-4">
+            <span class="text-xs font-black text-slate-200">#${book.id}</span>
+            <button onclick="showSection('grille')" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 hover:text-gold-accent rounded-full transition-all group">
+                <span class="text-[10px] font-bold uppercase tracking-widest">Retour</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+        
+        <div class="flex flex-col md:flex-row items-start gap-10">
                         <div class="flex-1">
                             <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
                             <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
