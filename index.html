@@ -367,8 +367,8 @@
     <!-- LOGIQUE AUTHENTIFICATION FIREBASE (SQUELETTE) -->
     <script type="module">
   // Importation des modules nécessaires
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+  import { initializeApp } from "firebase/app";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://firebase.google.com/docs/web/setup#available-libraries";
 
   // TES DONNÉES À COLLER ICI :
   const firebaseConfig = {
