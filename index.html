@@ -283,20 +283,38 @@
         <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
             
-            <!-- SECTION RECHERCHE AUTOMATIQUE -->
+            <!-- SECTION RECHERCHE AUTOMATIQUE OPTIMISÉE -->
             <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
                 <label class="text-[10px] font-bold text-gold-accent uppercase mb-2 block tracking-widest">Remplissage Automatique</label>
-                <div class="flex gap-2">
-                    <input id="in-title" class="modal-input !mb-0 flex-1" placeholder="Tapez le titre exact ici...">
-                    <button onclick="fetchBookInfo()" class="px-4 bg-black text-white rounded-lg text-[10px] font-bold uppercase hover:bg-gold-accent transition-colors">Rechercher 🔍</button>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                    <div class="md:col-span-5">
+                        <input id="in-title" class="modal-input !mb-0" placeholder="Titre de l'œuvre...">
+                    </div>
+                    <div class="md:col-span-5">
+                        <input id="in-author" class="modal-input !mb-0" placeholder="Auteur...">
+                    </div>
+                    <div class="md:col-span-2">
+                        <button onclick="fetchBookInfo()" class="w-full h-full min-h-[44px] bg-black text-white rounded-lg text-sm flex items-center justify-center hover:bg-gold-accent transition-colors" title="Chercher sur Google Books">🔍</button>
+                    </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Auteur</label><input id="in-author" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Genre</label><input id="in-genre" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Note</label>
+                    <select id="in-rating" class="modal-input">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="2.5">2.5</option>
+                        <option value="3">3</option>
+                        <option value="3.5">3.5</option>
+                        <option value="4">4</option>
+                        <option value="4.5">4.5</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
                 <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">URL Couverture</label><input id="in-cover" class="modal-input"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Note</label><select id="in-rating" class="modal-input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Langue</label><input id="in-lang" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Début (ex: 01/05)</label><input id="in-start" class="modal-input"></div>
@@ -331,13 +349,31 @@
         let currentUser = null;
         let readingChart = null;
 
-        // --- FONCTION MAGIQUE GOOGLE BOOKS ---
+        // --- GESTION ÉTOILES (AVEC DEMI-POINTS) ---
+        function getStarsHtml(rating, sizeClass = "text-[10px]") {
+            let html = "";
+            for (let i = 1; i <= 5; i++) {
+                if (rating >= i) {
+                    html += `<span class="${sizeClass} star-filled">★</span>`;
+                } else if (rating >= i - 0.5) {
+                    html += `<span class="${sizeClass} star-filled">⯪</span>`;
+                } else {
+                    html += `<span class="${sizeClass} star-empty">★</span>`;
+                }
+            }
+            return html;
+        }
+
         window.fetchBookInfo = async () => {
             const title = document.getElementById('in-title').value;
+            const author = document.getElementById('in-author').value;
             if (!title) return alert("Entrez un titre d'abord !");
             
+            let query = `intitle:${encodeURIComponent(title)}`;
+            if(author) query += `+inauthor:${encodeURIComponent(author)}`;
+
             try {
-                const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}&maxResults=1`);
+                const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=1`);
                 const data = await response.json();
                 
                 if (data.items && data.items.length > 0) {
@@ -345,8 +381,6 @@
                     document.getElementById('in-author').value = info.authors ? info.authors.join(', ') : '';
                     document.getElementById('in-genre').value = info.categories ? info.categories[0] : '';
                     document.getElementById('in-summary').value = info.description || '';
-                    
-                    // Récupération de l'image en meilleure qualité possible
                     if (info.imageLinks) {
                         let img = info.imageLinks.thumbnail || info.imageLinks.smallThumbnail;
                         img = img.replace('http:', 'https:').replace('&edge=curl', '');
@@ -354,12 +388,9 @@
                     }
                     alert("Informations trouvées !");
                 } else {
-                    alert("Aucun livre trouvé avec ce titre.");
+                    alert("Aucun livre trouvé.");
                 }
-            } catch (err) {
-                console.error(err);
-                alert("Erreur lors de la recherche.");
-            }
+            } catch (err) { alert("Erreur lors de la recherche."); }
         };
 
         window.toggleAuthMode = () => {
@@ -417,7 +448,7 @@
                 title: document.getElementById('in-title').value,
                 author: document.getElementById('in-author').value,
                 cover: document.getElementById('in-cover').value,
-                rating: parseInt(document.getElementById('in-rating').value),
+                rating: parseFloat(document.getElementById('in-rating').value),
                 genre: document.getElementById('in-genre').value,
                 format: document.getElementById('in-format').value,
                 lang: document.getElementById('in-lang').value,
@@ -447,12 +478,14 @@
             const ratingFilter = document.getElementById('filter-rating').value;
 
             const filtered = library.filter(book => {
-                const matchSearch = (book.title || "").toLowerCase().includes(searchTerm) || 
-                                    (book.author || "").toLowerCase().includes(searchTerm) || 
-                                    (book.genre || "").toLowerCase().includes(searchTerm);
+                const titleMatch = (book.title || "").toLowerCase().includes(searchTerm);
+                const authorMatch = (book.author || "").toLowerCase().includes(searchTerm);
+                const genreMatch = (book.genre || "").toLowerCase().includes(searchTerm);
+                const matchSearch = titleMatch || authorMatch || genreMatch;
+                
                 const matchRating = ratingFilter === "all" ? true : 
                                     ratingFilter === "0" ? book.rating === 0 : 
-                                    book.rating >= parseInt(ratingFilter);
+                                    book.rating >= parseFloat(ratingFilter);
                 return matchSearch && matchRating;
             });
 
@@ -487,7 +520,7 @@
                     <div class="grid-thumb">
                         ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-200 font-bold text-xs uppercase tracking-widest">Vide</span>`}
                     </div>
-                    <div class="flex gap-0.5">${[1,2,3,4,5].map(i => `<span class="text-[10px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
+                    <div class="flex gap-0.5">${getStarsHtml(book.rating)}</div>
                 </div>
             `).join('');
 
@@ -506,7 +539,7 @@
                             <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
                             <div class="mb-6">
                                 <p class="section-label">Note :</p>
-                                <div class="flex gap-1">${[1,2,3,4,5].map(i => `<span class="text-2xl ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
+                                <div class="flex gap-1">${getStarsHtml(book.rating, "text-2xl")}</div>
                             </div>
                             <p class="section-label">Résumé :</p>
                             <p class="fiche-summary">${book.summary || 'Aucun résumé.'}</p>
