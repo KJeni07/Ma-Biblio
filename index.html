@@ -161,7 +161,6 @@
         }
         .stat-value { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900; color: var(--gold-accent); }
         
-        /* Podium Genres */
         .podium-item {
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px 15px; background: #fcfbf8; border-radius: 12px; margin-bottom: 8px;
@@ -186,7 +185,6 @@
 </head>
 <body>
 
-    <!-- ÉCRAN D'AUTHENTIFICATION -->
     <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
         <div class="auth-card w-full max-w-md rounded-3xl p-10 text-center">
             <div class="mb-8">
@@ -213,7 +211,6 @@
         </div>
     </div>
 
-    <!-- CONTENU APP -->
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
         <div class="max-w-6xl mx-auto px-6 py-10">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
@@ -224,14 +221,12 @@
                 </div>
             </div>
 
-            <!-- NAVIGATION -->
             <div class="flex gap-10 border-b border-slate-100 mb-8">
                 <button onclick="showSection('stats')" id="btn-stats" class="tab-btn active">Tableau de Bord</button>
                 <button onclick="showSection('grille')" id="btn-grille" class="tab-btn">Ma Grille</button>
                 <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
             </div>
 
-            <!-- BARRE DE RECHERCHE -->
             <div id="search-bar-container" class="mb-8 flex flex-col md:flex-row gap-4 hidden">
                 <div class="relative flex-1">
                     <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
@@ -248,7 +243,6 @@
                 </select>
             </div>
 
-            <!-- SECTIONS -->
             <section id="section-stats" class="view-section active">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                     <div class="stat-card">
@@ -263,9 +257,7 @@
                     </div>
                     <div class="stat-card text-left px-8">
                         <p class="section-label text-center mb-4">Podium des Genres</p>
-                        <div id="genre-podium" class="space-y-2">
-                            <!-- JS Injection -->
-                        </div>
+                        <div id="genre-podium" class="space-y-2"></div>
                     </div>
                 </div>
                 
@@ -287,7 +279,6 @@
         </div>
     </div>
 
-    <!-- MODAL D'ÉDITION -->
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
@@ -400,6 +391,30 @@
             closeModal();
         };
 
+        // NOUVELLE FONCTION SUPPRIMER (Fait remonter les suivantes)
+        window.deleteBook = async (id) => {
+            if (!confirm("Supprimer cette fiche et faire remonter les suivantes ?")) return;
+            
+            const index = library.findIndex(b => b.id === id);
+            if (index === -1) return;
+
+            // On retire l'élément
+            library.splice(index, 1);
+            
+            // On rajoute un élément vide à la fin pour rester à 100
+            library.push({
+                id: 100, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "", format: "-", lang: "", start: "", end: ""
+            });
+
+            // On réassigne les ID pour que la liste reste de 1 à 100
+            library.forEach((book, i) => {
+                book.id = i + 1;
+            });
+
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            render();
+        };
+
         window.render = () => {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const ratingFilter = document.getElementById('filter-rating').value;
@@ -414,7 +429,6 @@
                 return matchSearch && matchRating;
             });
 
-            // LOGIQUE STATS
             const readBooks = library.filter(b => b.title.trim() !== "");
             const totalRead = readBooks.length;
             const avgRating = totalRead > 0 ? (readBooks.reduce((acc, b) => acc + b.rating, 0) / totalRead).toFixed(1) : "0.0";
@@ -422,7 +436,6 @@
             document.getElementById('stat-count').innerText = totalRead;
             document.getElementById('stat-avg').innerText = avgRating;
 
-            // PODIUM GENRES
             const genreCounts = {};
             readBooks.forEach(b => { if(b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1; });
             const sortedGenres = Object.entries(genreCounts).sort((a,b) => b[1] - a[1]).slice(0, 3);
@@ -440,10 +453,8 @@
                 `).join('')
                 : '<p class="text-[10px] text-slate-400 text-center italic py-4">Pas encore de données</p>';
 
-            // GRAPHIQUE
             updateChart(readBooks);
 
-            // GRILLE (Numéros enlevés sur images)
             document.getElementById('grid-content').innerHTML = filtered.map(book => `
                 <div class="grid-item" onclick="jumpToFiche(${book.id})">
                     <div class="grid-thumb">
@@ -453,7 +464,6 @@
                 </div>
             `).join('');
 
-            // FICHES
             document.getElementById('fiches-content').innerHTML = filtered.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
                     <div class="fiche-number">#${book.id}</div>
@@ -486,8 +496,10 @@
                         <p class="section-label">Mon avis personnel :</p>
                         <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire.'}</p></div>
                     </div>
-                    <div class="mt-8 flex justify-end">
-                        <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600">Modifier</button>
+                    <div class="mt-8 flex justify-end gap-3">
+                        <!-- AJOUT DU BOUTON SUPPRIMER -->
+                        <button onclick="deleteBook(${book.id})" class="px-5 py-2 rounded-lg bg-red-50 text-red-400 font-bold uppercase text-[10px] tracking-widest hover:bg-red-100 transition-colors">Supprimer</button>
+                        <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600 transition-colors">Modifier</button>
                     </div>
                 </div>
             `).join('');
