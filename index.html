@@ -106,12 +106,7 @@
             letter-spacing: 0.05em;
         }
 
-        .fiche-summary {
-            font-size: 15px;
-            color: #444;
-            font-style: italic;
-            line-height: 1.6;
-        }
+        .fiche-summary { font-size: 15px; color: #444; font-style: italic; line-height: 1.6; }
 
         .info-grid {
             display: grid;
@@ -121,20 +116,10 @@
             padding-top: 15px;
             border-top: 1px solid #f9f9f9;
         }
-        @media (min-width: 768px) {
-            .info-grid { grid-template-columns: repeat(5, 1fr); }
-        }
+        @media (min-width: 768px) { .info-grid { grid-template-columns: repeat(5, 1fr); } }
 
-        .info-item {
-            border-bottom: 2px solid #f9f9f9;
-            padding-bottom: 8px;
-        }
-
-        .info-value {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--deep-black);
-        }
+        .info-item { border-bottom: 2px solid #f9f9f9; padding-bottom: 8px; }
+        .info-value { font-size: 13px; font-weight: 700; color: var(--deep-black); }
 
         .avis-box {
             background-color: #fcfbf8;
@@ -145,82 +130,46 @@
             border-left: 4px solid var(--gold-accent);
         }
 
-        .avis-text {
-            color: #444;
-            font-style: italic;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
         .cover-box {
-            width: 100%;
-            max-width: 200px;
-            aspect-ratio: 2/3;
-            background: #eee;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%; max-width: 200px; aspect-ratio: 2/3;
+            background: #eee; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             align-self: flex-start;
         }
 
         /* --- STYLE GRILLE --- */
-        .grid-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-        }
+        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .grid-thumb {
-            width: 100%;
-            aspect-ratio: 2/3;
-            background: white;
-            border: 1px solid rgba(0,0,0,0.05);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            transition: all 0.3s;
-            overflow: hidden;
+            width: 100%; aspect-ratio: 2/3; background: white;
+            border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 12px; transition: all 0.3s; overflow: hidden;
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .grid-thumb:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15);
-        }
-        .grid-placeholder {
-            font-size: 11px;
-            font-weight: 900;
-            color: #ddd;
-            text-transform: uppercase;
-        }
+        .grid-thumb:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15); }
 
+        /* --- DASHBOARD STATS --- */
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(197, 160, 89, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-value { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 900; color: var(--gold-accent); }
+
+        /* --- UI UTILS --- */
         .modal-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            font-size: 14px;
-            background-color: #fff;
+            width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px;
+            margin-bottom: 12px; font-size: 14px; background-color: #fff;
         }
-        
-        .modal-input:focus {
-            outline: none;
-            border-color: var(--gold-accent);
-        }
-
+        .modal-input:focus { outline: none; border-color: var(--gold-accent); }
         .star-filled { color: var(--gold-accent); }
         .star-empty { color: #e5e7eb; }
-
-        .btn-gold-main {
-            background-color: var(--gold-accent);
-            color: white;
-            transition: all 0.2s;
-        }
+        .btn-gold-main { background-color: var(--gold-accent); color: white; transition: all 0.2s; }
         .btn-gold-main:hover { background-color: #A68548; }
     </style>
 </head>
@@ -235,7 +184,6 @@
                 </h1>
                 <p id="auth-mode-title" class="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">Connexion Membre</p>
             </div>
-
             <form id="auth-form" class="space-y-5 text-left">
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Adresse Email</label>
@@ -245,25 +193,18 @@
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Mot de passe</label>
                     <input type="password" id="password" required class="modal-input !mb-0" placeholder="••••••••">
                 </div>
-                <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg shadow-yellow-900/20 mt-4">
-                    Ouvrir ma collection
-                </button>
+                <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg mt-4">Ouvrir ma collection</button>
             </form>
-            
             <p id="auth-error" class="text-red-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
-            
             <div class="mt-6">
-                <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent">
-                    Pas encore de compte ? S'inscrire
-                </button>
+                <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent">Pas encore de compte ? S'inscrire</button>
             </div>
         </div>
     </div>
 
-    <!-- CONTENU DE L'APPLICATION -->
+    <!-- CONTENU APP -->
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
         <div class="max-w-6xl mx-auto px-6 py-10">
-            <!-- Header -->
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
                 <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
                 <div class="flex items-center gap-3">
@@ -272,22 +213,21 @@
                 </div>
             </div>
 
-            <!-- Navigation -->
+            <!-- NAVIGATION -->
             <div class="flex gap-10 border-b border-slate-100 mb-8">
                 <button onclick="showSection('grille')" id="btn-grille" class="tab-btn active">Ma Grille</button>
                 <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
+                <button onclick="showSection('stats')" id="btn-stats" class="tab-btn">Tableau de Bord</button>
             </div>
 
-            <!-- RECHERCHE ET FILTRES -->
-            <div class="mb-8 flex flex-col md:flex-row gap-4">
+            <!-- BARRE DE RECHERCHE (cachée sur l'onglet stats) -->
+            <div id="search-bar-container" class="mb-8 flex flex-col md:flex-row gap-4">
                 <div class="relative flex-1">
                     <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </span>
-                    <input type="text" id="search-input" oninput="render()" placeholder="Titre, auteur, genre..." 
-                        class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold-accent/20 focus:border-gold-accent transition-all">
+                    <input type="text" id="search-input" oninput="render()" placeholder="Titre, auteur, genre..." class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent transition-all">
                 </div>
-                
                 <select id="filter-rating" onchange="render()" class="px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none font-medium text-slate-600">
                     <option value="all">Toutes les notes</option>
                     <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
@@ -297,14 +237,33 @@
                 </select>
             </div>
 
-            <!-- SECTION GRILLE -->
+            <!-- SECTIONS -->
             <section id="section-grille" class="view-section active">
                 <div id="grid-content" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10"></div>
             </section>
 
-            <!-- SECTION FICHES -->
             <section id="section-fiches" class="view-section">
                 <div id="fiches-content" class="space-y-20"></div>
+            </section>
+
+            <section id="section-stats" class="view-section">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="stat-card">
+                        <p class="section-label">Livres Lus</p>
+                        <div id="stat-count" class="stat-value">0</div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sur un objectif de 100</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="section-label">Note Moyenne</p>
+                        <div id="stat-avg" class="stat-value">0.0</div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Étoiles sur 5</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="section-label">Genre Préféré</p>
+                        <div id="stat-genre" class="stat-value text-2xl mt-4">—</div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Plus grand nombre de fiches</p>
+                    </div>
+                </div>
             </section>
         </div>
     </div>
@@ -313,75 +272,23 @@
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
-            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Titre du livre</label>
-                    <input id="in-title" placeholder="Ex: Le Petit Prince" class="modal-input">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Auteur</label>
-                    <input id="in-author" placeholder="Ex: Saint-Exupéry" class="modal-input">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">URL de la couverture</label>
-                    <input id="in-cover" placeholder="Lien vers l'image .jpg ou .png" class="modal-input">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Note</label>
-                    <select id="in-rating" class="modal-input">
-                        <option value="0">Aucune étoile</option>
-                        <option value="1">1 Étoile</option>
-                        <option value="2">2 Étoiles</option>
-                        <option value="3">3 Étoiles</option>
-                        <option value="4">4 Étoiles</option>
-                        <option value="5">5 Étoiles</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Format</label>
-                    <select id="in-format" class="modal-input">
-                        <option value="-">-</option>
-                        <option value="Livre">Livre</option>
-                        <option value="Ebook">Ebook</option>
-                        <option value="Audiobook">Audiobook</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Genre</label>
-                    <input id="in-genre" class="modal-input">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Langue</label>
-                    <input id="in-lang" class="modal-input">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Début</label>
-                    <input id="in-start" class="modal-input">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Fin</label>
-                    <input id="in-end" class="modal-input">
-                </div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Titre</label><input id="in-title" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Auteur</label><input id="in-author" class="modal-input"></div>
+                <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">URL Couverture</label><input id="in-cover" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Note</label><select id="in-rating" class="modal-input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Genre</label><input id="in-genre" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Langue</label><input id="in-lang" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Début</label><input id="in-start" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fin</label><input id="in-end" class="modal-input"></div>
             </div>
-
-            <div class="mt-2">
-                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Résumé</label>
-                <textarea id="in-summary" class="modal-input h-24"></textarea>
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Mon avis personnel</label>
-                <textarea id="in-comment" class="modal-input h-24"></textarea>
-            </div>
-            
-            <div class="flex gap-3 mt-6">
-                <button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest bg-slate-50 rounded-xl">Annuler</button>
-                <button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest btn-gold-main rounded-xl">Enregistrer</button>
-            </div>
+            <textarea id="in-summary" class="modal-input h-24" placeholder="Résumé..."></textarea>
+            <textarea id="in-comment" class="modal-input h-24" placeholder="Avis..."></textarea>
+            <div class="flex gap-3 mt-4"><button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Annuler</button><button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl">Enregistrer</button></div>
         </div>
     </div>
 
-    <!-- SCRIPTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -415,15 +322,10 @@
             e.preventDefault();
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            const errorEl = document.getElementById('auth-error');
-            errorEl.classList.add('hidden');
             try {
                 if (isSignUp) await createUserWithEmailAndPassword(auth, email, pass);
                 else await signInWithEmailAndPassword(auth, email, pass);
-            } catch (err) {
-                errorEl.innerText = "Erreur : " + err.message;
-                errorEl.classList.remove('hidden');
-            }
+            } catch (err) { alert(err.message); }
         });
 
         onAuthStateChanged(auth, async (user) => {
@@ -492,26 +394,36 @@
                 return matchSearch && matchRating;
             });
 
+            // LOGIQUE STATS (Toujours basée sur TOUTE la bibliothèque pour plus de sens)
+            const readBooks = library.filter(b => b.title.trim() !== "");
+            const totalRead = readBooks.length;
+            const avgRating = totalRead > 0 ? (readBooks.reduce((acc, b) => acc + b.rating, 0) / totalRead).toFixed(1) : "0.0";
+            
+            const genreCounts = {};
+            readBooks.forEach(b => {
+                if(b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1;
+            });
+            const topGenre = Object.keys(genreCounts).reduce((a, b) => genreCounts[a] > genreCounts[b] ? a : b, "—");
+
+            document.getElementById('stat-count').innerText = totalRead;
+            document.getElementById('stat-avg').innerText = avgRating;
+            document.getElementById('stat-genre').innerText = topGenre;
+
             // GRILLE
-            const gridEl = document.getElementById('grid-content');
-            if(filtered.length === 0) {
-                gridEl.innerHTML = `<div class="col-span-full py-20 text-center text-slate-400">Aucun résultat trouvé.</div>`;
-            } else {
-                gridEl.innerHTML = filtered.map(book => `
-                    <div class="grid-item" onclick="jumpToFiche(${book.id})">
-                        <div class="grid-thumb">
-                            ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="grid-placeholder">#${book.id}</span>`}
-                        </div>
-                        <div class="flex gap-1">${[1,2,3,4,5].map(i => `<span class="text-[14px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
+            document.getElementById('grid-content').innerHTML = filtered.map(book => `
+                <div class="grid-item" onclick="jumpToFiche(${book.id})">
+                    <div class="grid-thumb">
+                        ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="grid-placeholder">#${book.id}</span>`}
                     </div>
-                `).join('');
-            }
+                    <div class="flex gap-1">${[1,2,3,4,5].map(i => `<span class="text-[14px] ${i <= book.rating ? 'star-filled' : 'star-empty'}">★</span>`).join('')}</div>
+                </div>
+            `).join('');
 
             // FICHES
             document.getElementById('fiches-content').innerHTML = filtered.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
                     <div class="fiche-number">#${book.id}</div>
-                    <button onclick="showSection('grille')" class="mb-6 flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 hover:text-gold-accent rounded-full transition-all">
+                    <button onclick="showSection('grille')" class="mb-6 flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
                          <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Grille</span>
                     </button>
                     <div class="flex flex-col md:flex-row gap-10">
@@ -552,6 +464,12 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
             document.getElementById('btn-' + id).classList.add('active');
+            
+            // On cache la recherche si on est sur les stats
+            const searchBar = document.getElementById('search-bar-container');
+            if(id === 'stats') searchBar.classList.add('hidden');
+            else searchBar.classList.remove('hidden');
+            
             window.scrollTo({top: 0, behavior: 'smooth'});
         };
 
