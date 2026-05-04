@@ -181,19 +181,6 @@
         .star-empty { color: #e5e7eb; }
         .btn-gold-main { background-color: var(--gold-accent); color: white; transition: all 0.2s; }
         .btn-gold-main:hover { background-color: #A68548; }
-
-        /* Loader pour l'automatisation */
-        .loader {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid var(--gold-accent);
-            border-radius: 50%;
-            width: 14px;
-            height: 14px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -294,36 +281,21 @@
 
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-start mb-6">
-                <h2 class="text-2xl font-black uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
-                <button onclick="fetchBookData()" class="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-blue-100 transition-all">
-                    <span id="loader-icon" class="hidden"><i class="loader"></i></span>
-                    Auto-Remplir
-                </button>
-            </div>
-
+            <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Titre du livre (pour recherche)</label>
-                    <input id="in-title" class="modal-input" placeholder="Titre exact ou partiel...">
-                </div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Titre</label><input id="in-title" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Auteur</label><input id="in-author" class="modal-input"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Genre</label><input id="in-genre" class="modal-input"></div>
                 <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">URL Couverture</label><input id="in-cover" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Note</label><select id="in-rating" class="modal-input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Genre</label><input id="in-genre" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Langue</label><input id="in-lang" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Début (ex: 01/05)</label><input id="in-start" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fin (ex: 15/05)</label><input id="in-end" class="modal-input"></div>
             </div>
-            <p class="text-[9px] font-bold text-gray-400 uppercase mb-1">Résumé Officiel</p>
             <textarea id="in-summary" class="modal-input h-24" placeholder="Résumé..."></textarea>
-            <p class="text-[9px] font-bold text-gray-400 uppercase mb-1">Mon Avis Personnel</p>
             <textarea id="in-comment" class="modal-input h-24" placeholder="Avis..."></textarea>
-            <div class="flex gap-3 mt-4">
-                <button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Annuler</button>
-                <button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl">Enregistrer</button>
-            </div>
+            <div class="flex gap-3 mt-4"><button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Annuler</button><button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl">Enregistrer</button></div>
         </div>
     </div>
 
@@ -349,46 +321,6 @@
         let isSignUp = false;
         let currentUser = null;
         let readingChart = null;
-
-        // --- AUTOMATISATION GOOGLE BOOKS ---
-        window.fetchBookData = async () => {
-            const titleInput = document.getElementById('in-title').value;
-            if (!titleInput) return alert("Veuillez saisir un titre avant de lancer la recherche.");
-
-            const loader = document.getElementById('loader-icon');
-            loader.classList.remove('hidden');
-
-            try {
-                const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(titleInput)}&maxResults=1&langRestrict=fr`);
-                const data = await response.json();
-
-                if (data.items && data.items.length > 0) {
-                    const info = data.items[0].volumeInfo;
-                    
-                    // Remplissage des champs
-                    document.getElementById('in-title').value = info.title || titleInput;
-                    document.getElementById('in-author').value = info.authors ? info.authors.join(', ') : "Inconnu";
-                    document.getElementById('in-genre').value = info.categories ? info.categories[0] : "";
-                    document.getElementById('in-lang').value = (info.language || "").toUpperCase();
-                    document.getElementById('in-summary').value = info.description || "Pas de résumé disponible.";
-                    
-                    // Gestion Image (On cherche la meilleure qualité)
-                    if (info.imageLinks) {
-                        let imgUrl = info.imageLinks.thumbnail || info.imageLinks.smallThumbnail;
-                        // On force le HTTPS pour éviter les erreurs de chargement
-                        imgUrl = imgUrl.replace('http://', 'https://');
-                        document.getElementById('in-cover').value = imgUrl;
-                    }
-                } else {
-                    alert("Aucun livre trouvé correspondant à ce titre.");
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Erreur lors de la récupération des données.");
-            } finally {
-                loader.classList.add('hidden');
-            }
-        };
 
         window.toggleAuthMode = () => {
             isSignUp = !isSignUp;
@@ -459,15 +391,26 @@
             closeModal();
         };
 
+        // NOUVELLE FONCTION SUPPRIMER (Fait remonter les suivantes)
         window.deleteBook = async (id) => {
             if (!confirm("Supprimer cette fiche et faire remonter les suivantes ?")) return;
+            
             const index = library.findIndex(b => b.id === id);
             if (index === -1) return;
+
+            // On retire l'élément
             library.splice(index, 1);
+            
+            // On rajoute un élément vide à la fin pour rester à 100
             library.push({
                 id: 100, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "", format: "-", lang: "", start: "", end: ""
             });
-            library.forEach((book, i) => { book.id = i + 1; });
+
+            // On réassigne les ID pour que la liste reste de 1 à 100
+            library.forEach((book, i) => {
+                book.id = i + 1;
+            });
+
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             render();
         };
@@ -554,6 +497,7 @@
                         <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire.'}</p></div>
                     </div>
                     <div class="mt-8 flex justify-end gap-3">
+                        <!-- AJOUT DU BOUTON SUPPRIMER -->
                         <button onclick="deleteBook(${book.id})" class="px-5 py-2 rounded-lg bg-red-50 text-red-400 font-bold uppercase text-[10px] tracking-widest hover:bg-red-100 transition-colors">Supprimer</button>
                         <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600 transition-colors">Modifier</button>
                     </div>
@@ -564,14 +508,17 @@
         function updateChart(books) {
             const months = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"];
             const counts = new Array(12).fill(0);
+            
             books.forEach(b => {
                 if(b.end && b.end.includes('/')) {
                     const monthPart = parseInt(b.end.split('/')[1]);
                     if(monthPart >= 1 && monthPart <= 12) counts[monthPart - 1]++;
                 }
             });
+
             const ctx = document.getElementById('readingChart').getContext('2d');
             if(readingChart) readingChart.destroy();
+            
             readingChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -606,9 +553,11 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
             document.getElementById('btn-' + id).classList.add('active');
+            
             const searchBar = document.getElementById('search-bar-container');
             if(id === 'stats') searchBar.classList.add('hidden');
             else searchBar.classList.remove('hidden');
+            
             window.scrollTo({top: 0, behavior: 'smooth'});
         };
 
