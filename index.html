@@ -181,6 +181,25 @@
         .star-empty { color: #e5e7eb; }
         .btn-gold-main { background-color: var(--gold-accent); color: white; transition: all 0.2s; }
         .btn-gold-main:hover { background-color: #A68548; }
+        
+        /* Select styling for filters */
+        .filter-select {
+            appearance: none;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 32px 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            outline: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+        }
+        .filter-select:focus { border-color: var(--gold-accent); }
     </style>
 </head>
 <body>
@@ -227,20 +246,57 @@
                 <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
             </div>
 
-            <div id="search-bar-container" class="mb-8 flex flex-col md:flex-row gap-4 hidden">
-                <div class="relative flex-1">
+            <!-- BARRE DE RECHERCHE ET FILTRES AVANCÉS -->
+            <div id="search-bar-container" class="mb-8 space-y-4 hidden">
+                <div class="relative w-full">
                     <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </span>
-                    <input type="text" id="search-input" oninput="render()" placeholder="Titre, auteur, genre..." class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent transition-all">
+                    <input type="text" id="search-input" oninput="render()" placeholder="Recherche rapide (titre, auteur, genre...)" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent transition-all shadow-sm">
                 </div>
-                <select id="filter-rating" onchange="render()" class="px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none font-medium text-slate-600">
-                    <option value="all">Toutes les notes</option>
-                    <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
-                    <option value="4">⭐⭐⭐⭐ (4/5+)</option>
-                    <option value="3">⭐⭐⭐ (3/5+)</option>
-                    <option value="0">Sans note</option>
-                </select>
+                
+                <div class="flex flex-wrap gap-3 items-center">
+                    <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider">Filtrer par :</span>
+                    
+                    <!-- Filtre Note -->
+                    <select id="filter-rating" onchange="render()" class="filter-select">
+                        <option value="all">Toutes les notes</option>
+                        <option value="5">5/5 uniquement</option>
+                        <option value="4.5">4.5 et +</option>
+                        <option value="4">4 et +</option>
+                        <option value="3">3 et +</option>
+                        <option value="0">Sans note</option>
+                    </select>
+
+                    <!-- Filtre Genre (Dynamique) -->
+                    <select id="filter-genre" onchange="render()" class="filter-select">
+                        <option value="all">Tous les genres</option>
+                    </select>
+
+                    <!-- Filtre Auteur (Dynamique) -->
+                    <select id="filter-author" onchange="render()" class="filter-select">
+                        <option value="all">Tous les auteurs</option>
+                    </select>
+
+                    <!-- Filtre Mois de lecture -->
+                    <select id="filter-month" onchange="render()" class="filter-select">
+                        <option value="all">Tous les mois</option>
+                        <option value="01">Janvier</option>
+                        <option value="02">Février</option>
+                        <option value="03">Mars</option>
+                        <option value="04">Avril</option>
+                        <option value="05">Mai</option>
+                        <option value="06">Juin</option>
+                        <option value="07">Juillet</option>
+                        <option value="08">Août</option>
+                        <option value="09">Septembre</option>
+                        <option value="10">Octobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Décembre</option>
+                    </select>
+
+                    <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto">Réinitialiser</button>
+                </div>
             </div>
 
             <section id="section-stats" class="view-section active">
@@ -281,9 +337,11 @@
 
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-black mb-6 uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
+                <button onclick="closeModal()" class="text-slate-300 hover:text-black text-2xl">&times;</button>
+            </div>
             
-            <!-- SECTION RECHERCHE AUTOMATIQUE OPTIMISÉE -->
             <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
                 <label class="text-[10px] font-bold text-gold-accent uppercase mb-2 block tracking-widest">Remplissage Automatique</label>
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
@@ -437,6 +495,30 @@
                 }));
                 await setDoc(docRef, { books: library });
             }
+            updateFilterOptions();
+            render();
+        }
+
+        function updateFilterOptions() {
+            const genres = [...new Set(library.map(b => b.genre).filter(g => g && g.trim() !== ""))].sort();
+            const authors = [...new Set(library.map(b => b.author).filter(a => a && a.trim() !== ""))].sort();
+            
+            const genreSelect = document.getElementById('filter-genre');
+            const authorSelect = document.getElementById('filter-author');
+            
+            genreSelect.innerHTML = '<option value="all">Tous les genres</option>' + 
+                genres.map(g => `<option value="${g}">${g}</option>`).join('');
+                
+            authorSelect.innerHTML = '<option value="all">Tous les auteurs</option>' + 
+                authors.map(a => `<option value="${a}">${a}</option>`).join('');
+        }
+
+        window.resetFilters = () => {
+            document.getElementById('search-input').value = "";
+            document.getElementById('filter-rating').value = "all";
+            document.getElementById('filter-genre').value = "all";
+            document.getElementById('filter-author').value = "all";
+            document.getElementById('filter-month').value = "all";
             render();
         }
 
@@ -458,6 +540,7 @@
                 comment: document.getElementById('in-comment').value
             };
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            updateFilterOptions();
             render();
             closeModal();
         };
@@ -470,23 +553,41 @@
             library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "", format: "-", lang: "", start: "", end: "" });
             library.forEach((book, i) => { book.id = i + 1; });
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            updateFilterOptions();
             render();
         };
 
         window.render = () => {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const ratingFilter = document.getElementById('filter-rating').value;
+            const genreFilter = document.getElementById('filter-genre').value;
+            const authorFilter = document.getElementById('filter-author').value;
+            const monthFilter = document.getElementById('filter-month').value;
 
             const filtered = library.filter(book => {
                 const titleMatch = (book.title || "").toLowerCase().includes(searchTerm);
-                const authorMatch = (book.author || "").toLowerCase().includes(searchTerm);
-                const genreMatch = (book.genre || "").toLowerCase().includes(searchTerm);
-                const matchSearch = titleMatch || authorMatch || genreMatch;
+                const authorSearchMatch = (book.author || "").toLowerCase().includes(searchTerm);
+                const genreSearchMatch = (book.genre || "").toLowerCase().includes(searchTerm);
+                const matchSearch = titleMatch || authorSearchMatch || genreSearchMatch;
                 
                 const matchRating = ratingFilter === "all" ? true : 
                                     ratingFilter === "0" ? book.rating === 0 : 
                                     book.rating >= parseFloat(ratingFilter);
-                return matchSearch && matchRating;
+                                    
+                const matchGenre = genreFilter === "all" ? true : book.genre === genreFilter;
+                const matchAuthor = authorFilter === "all" ? true : book.author === authorFilter;
+                
+                let matchMonth = true;
+                if (monthFilter !== "all") {
+                    if (book.end && book.end.includes('/')) {
+                        const m = book.end.split('/')[1];
+                        matchMonth = (m === monthFilter);
+                    } else {
+                        matchMonth = false;
+                    }
+                }
+                
+                return matchSearch && matchRating && matchGenre && matchAuthor && matchMonth;
             });
 
             const readBooks = library.filter(b => b.title.trim() !== "");
@@ -520,7 +621,7 @@
                     <div class="grid-thumb">
                         ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-200 font-bold text-xs uppercase tracking-widest">Vide</span>`}
                     </div>
-                    <div class="flex gap-0.5">${getStarsHtml(book.rating)}</div>
+                    <div class="flex gap-1">${getStarsHtml(book.rating, "text-base")}</div>
                 </div>
             `).join('');
 
