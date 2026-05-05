@@ -258,18 +258,14 @@
                 <div class="flex flex-wrap gap-3 items-center">
                     <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider">Filtrer par :</span>
                     
-                    <!-- Filtre Note Exacte -->
+                    <!-- Filtre Note -->
                     <select id="filter-rating" onchange="render()" class="filter-select">
                         <option value="all">Toutes les notes</option>
-                        <option value="0">0 étoile</option>
-                        <option value="1">1 étoile</option>
-                        <option value="2">2 étoiles</option>
-                        <option value="2.5">2.5 étoiles</option>
-                        <option value="3">3 étoiles</option>
-                        <option value="3.5">3.5 étoiles</option>
-                        <option value="4">4 étoiles</option>
-                        <option value="4.5">4.5 étoiles</option>
-                        <option value="5">5 étoiles</option>
+                        <option value="5">5/5 uniquement</option>
+                        <option value="4.5">4.5 et +</option>
+                        <option value="4">4 et +</option>
+                        <option value="3">3 et +</option>
+                        <option value="0">Sans note</option>
                     </select>
 
                     <!-- Filtre Genre (Dynamique) -->
@@ -411,7 +407,7 @@
         let currentUser = null;
         let readingChart = null;
 
-        // --- GESTION ÉTOILES ---
+        // --- GESTION ÉTOILES (AVEC DEMI-POINTS) ---
         function getStarsHtml(rating, sizeClass = "text-[10px]") {
             let html = "";
             for (let i = 1; i <= 5; i++) {
@@ -506,10 +502,15 @@
         function updateFilterOptions() {
             const genres = [...new Set(library.map(b => b.genre).filter(g => g && g.trim() !== ""))].sort();
             const authors = [...new Set(library.map(b => b.author).filter(a => a && a.trim() !== ""))].sort();
+            
             const genreSelect = document.getElementById('filter-genre');
             const authorSelect = document.getElementById('filter-author');
-            genreSelect.innerHTML = '<option value="all">Tous les genres</option>' + genres.map(g => `<option value="${g}">${g}</option>`).join('');
-            authorSelect.innerHTML = '<option value="all">Tous les auteurs</option>' + authors.map(a => `<option value="${a}">${a}</option>`).join('');
+            
+            genreSelect.innerHTML = '<option value="all">Tous les genres</option>' + 
+                genres.map(g => `<option value="${g}">${g}</option>`).join('');
+                
+            authorSelect.innerHTML = '<option value="all">Tous les auteurs</option>' + 
+                authors.map(a => `<option value="${a}">${a}</option>`).join('');
         }
 
         window.resetFilters = () => {
@@ -569,8 +570,9 @@
                 const genreSearchMatch = (book.genre || "").toLowerCase().includes(searchTerm);
                 const matchSearch = titleMatch || authorSearchMatch || genreSearchMatch;
                 
-                // LOGIQUE MODIFIÉE ICI : Comparaison exacte au lieu de ">="
-                const matchRating = ratingFilter === "all" ? true : book.rating === parseFloat(ratingFilter);
+                const matchRating = ratingFilter === "all" ? true : 
+                                    ratingFilter === "0" ? book.rating === 0 : 
+                                    book.rating >= parseFloat(ratingFilter);
                                     
                 const matchGenre = genreFilter === "all" ? true : book.genre === genreFilter;
                 const matchAuthor = authorFilter === "all" ? true : book.author === authorFilter;
