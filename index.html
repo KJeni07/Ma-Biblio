@@ -13,6 +13,7 @@
             --paper-bg: #FAF9F6;
             --gold-accent: #C5A059;
             --deep-black: #1A1A1A;
+            --muted-gold: #D4AF37;
         }
 
         body { 
@@ -177,21 +178,32 @@
         .btn-gold-main:hover { background-color: #A68548; }
         
         .filter-select {
-            appearance: none; background-color: white; border: 1px solid #e2e8f0;
-            border-radius: 10px; padding: 8px 32px 8px 12px; font-size: 12px;
-            font-weight: 600; color: #64748b; cursor: pointer; outline: none;
+            appearance: none;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 32px 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            outline: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 10px center; background-size: 14px;
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
         }
     </style>
 </head>
 <body>
 
-    <!-- AUTH SCREEN -->
+    <!-- SCREEN AUTHENTIFICATION -->
     <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
         <div class="auth-card w-full max-w-md rounded-3xl p-10 text-center">
             <div class="mb-8">
-                <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif mb-2">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
+                <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif mb-2">
+                    Ma Biblio <span style="color: var(--gold-accent)">100</span>
+                </h1>
                 <p id="auth-mode-title" class="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">Connexion Membre</p>
             </div>
             <form id="auth-form" class="space-y-5 text-left">
@@ -205,107 +217,139 @@
                 </div>
                 <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg mt-4">Ouvrir ma collection</button>
             </form>
-            <div class="mt-6">
-                <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent">Pas encore de compte ? S'inscrire</button>
+            
+            <div class="mt-6 space-y-3">
+                <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent block w-full text-center">Pas encore de compte ? S'inscrire</button>
+                <button onclick="forgotPassword()" class="text-[9px] text-slate-300 font-bold uppercase tracking-widest hover:text-gold-accent block w-full text-center italic">Mot de passe oublié ?</button>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- MAIN APP CONTENT -->
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
         <div class="max-w-6xl mx-auto px-6 py-10">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
                 <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
-                <div class="flex items-center gap-4">
-                    <div onclick="showSection('profil')" class="flex items-center gap-2 cursor-pointer group">
-                        <div id="user-initials" class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black text-gold-accent uppercase group-hover:border-gold-accent transition-all">?</div>
-                        <span id="user-display" class="text-[10px] font-bold text-gray-400 uppercase group-hover:text-gold-accent transition-all"></span>
-                    </div>
+                <div class="flex items-center gap-3">
+                    <!-- ICONE PROFIL CLIQUABLE -->
+                    <button onclick="openProfileModal()" class="flex items-center gap-3 group border border-slate-100 rounded-full pl-1 pr-4 py-1 hover:border-gold-accent transition-all">
+                        <div id="user-initial" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-gold-accent uppercase">?</div>
+                        <span id="user-display" class="text-[10px] font-bold text-gray-400 uppercase group-hover:text-gold-accent"></span>
+                    </button>
                     <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-red-400 hover:text-red-600 border border-red-100 rounded-lg">Quitter</button>
                 </div>
             </div>
 
-            <div class="flex gap-10 border-b border-slate-100 mb-8 overflow-x-auto">
-                <button onclick="showSection('stats')" id="btn-stats" class="tab-btn active shrink-0">Tableau de Bord</button>
-                <button onclick="showSection('grille')" id="btn-grille" class="tab-btn shrink-0">Ma Grille</button>
-                <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn shrink-0">Mes Fiches</button>
-                <button onclick="showSection('profil')" id="btn-profil" class="tab-btn shrink-0">Mon Profil</button>
+            <div class="flex gap-10 border-b border-slate-100 mb-8">
+                <button onclick="showSection('stats')" id="btn-stats" class="tab-btn active">Tableau de Bord</button>
+                <button onclick="showSection('grille')" id="btn-grille" class="tab-btn">Ma Grille</button>
+                <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
             </div>
 
-            <!-- SEARCH BAR (Cachée sur Stats/Profil) -->
             <div id="search-bar-container" class="mb-8 space-y-4 hidden">
-                <input type="text" id="search-input" oninput="render()" placeholder="Recherche rapide..." class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent shadow-sm">
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
+                    <input type="text" id="search-input" oninput="render()" placeholder="Recherche rapide (titre, auteur, genre...)" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent transition-all shadow-sm">
+                </div>
+                <div class="flex flex-wrap gap-3 items-center">
+                    <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider">Filtrer par :</span>
+                    <select id="filter-rating" onchange="render()" class="filter-select">
+                        <option value="all">Toutes les notes</option>
+                        <option value="0">0 ★</option><option value="1">1 ★</option><option value="2">2 ★</option><option value="2.5">2.5 ★</option><option value="3">3 ★</option><option value="3.5">3.5 ★</option><option value="4">4 ★</option><option value="4.5">4.5 ★</option><option value="5">5 ★</option>
+                    </select>
+                    <select id="filter-genre" onchange="render()" class="filter-select"><option value="all">Tous les genres</option></select>
+                    <select id="filter-author" onchange="render()" class="filter-select"><option value="all">Tous les auteurs</option></select>
+                    <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto">Réinitialiser</button>
+                </div>
             </div>
 
-            <!-- SECTION STATS -->
             <section id="section-stats" class="view-section active">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div class="stat-card"><p class="section-label">Livres Lus</p><div id="stat-count" class="stat-value">0</div></div>
-                    <div class="stat-card"><p class="section-label">Note Moyenne</p><div id="stat-avg" class="stat-value">0.0</div></div>
-                    <div class="stat-card text-left px-8"><p class="section-label text-center mb-4">Podium Genres</p><div id="genre-podium" class="space-y-2"></div></div>
+                    <div class="stat-card"><p class="section-label">Livres Lus</p><div id="stat-count" class="stat-value">0</div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sur un objectif de 100</p></div>
+                    <div class="stat-card"><p class="section-label">Note Moyenne</p><div id="stat-avg" class="stat-value">0.0</div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Étoiles sur 5</p></div>
+                    <div class="stat-card text-left px-8">
+                        <p class="section-label text-center mb-4">Podium des Genres</p>
+                        <div id="genre-podium" class="space-y-2 text-[11px] font-bold uppercase"></div>
+                    </div>
                 </div>
                 <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                    <canvas id="readingChart" class="h-64"></canvas>
+                    <p class="section-label mb-6">Rythme de lecture (Livres par mois)</p>
+                    <div class="h-64 w-full"><canvas id="readingChart"></canvas></div>
                 </div>
             </section>
 
-            <!-- SECTION GRILLE -->
             <section id="section-grille" class="view-section">
                 <div id="grid-content" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10"></div>
             </section>
 
-            <!-- SECTION FICHES -->
             <section id="section-fiches" class="view-section">
                 <div id="fiches-content" class="space-y-20"></div>
-            </section>
-
-            <!-- SECTION PROFIL -->
-            <section id="section-profil" class="view-section">
-                <div class="fiche-container !max-w-2xl">
-                    <h2 class="fiche-title mb-8">Paramètres Profil</h2>
-                    <div class="space-y-6">
-                        <div>
-                            <label class="section-label">Nom d'utilisateur public</label>
-                            <input type="text" id="prof-name" class="modal-input" placeholder="Ton nom...">
-                        </div>
-                        <div>
-                            <label class="section-label">Email (non modifiable ici)</label>
-                            <input type="text" id="prof-email" class="modal-input bg-slate-50 cursor-not-allowed" disabled>
-                        </div>
-                        <div>
-                            <label class="section-label">Ma Bio / Défi 2026</label>
-                            <textarea id="prof-bio" class="modal-input h-32" placeholder="Ex: Lire 50 classiques..."></textarea>
-                        </div>
-                        <button onclick="saveUserProfile()" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs">Mettre à jour le profil</button>
-                    </div>
-                </div>
             </section>
         </div>
     </div>
 
-    <!-- MODAL EDIT FICHE -->
+    <!-- MODAL EDIT BOOK -->
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black uppercase font-serif">Fiche #<span id="modal-id"></span></h2>
+                <h2 class="text-2xl font-black uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
                 <button onclick="closeModal()" class="text-slate-300 hover:text-black text-2xl">&times;</button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input id="in-title" class="modal-input" placeholder="Titre">
-                <input id="in-author" class="modal-input" placeholder="Auteur">
-                <input id="in-genre" class="modal-input" placeholder="Genre">
-                <select id="in-rating" class="modal-input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
-                <input id="in-cover" class="modal-input col-span-2" placeholder="URL Image Couverture">
+            
+            <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                <label class="text-[10px] font-bold text-gold-accent uppercase mb-2 block tracking-widest">Remplissage Automatique</label>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                    <div class="md:col-span-10"><input id="in-title" class="modal-input !mb-0" placeholder="Titre de l'œuvre..."></div>
+                    <div class="md:col-span-2"><button onclick="fetchBookInfo()" class="w-full h-full min-h-[44px] bg-black text-white rounded-lg text-sm flex items-center justify-center hover:bg-gold-accent transition-colors">🔍</button></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Auteur</label><input id="in-author" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Genre</label><input id="in-genre" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Note</label><select id="in-rating" class="modal-input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="2.5">2.5</option><option value="3">3</option><option value="3.5">3.5</option><option value="4">4</option><option value="4.5">4.5</option><option value="5">5</option></select></div>
+                <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">URL Couverture</label><input id="in-cover" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Début (ex: 01/05)</label><input id="in-start" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fin (ex: 15/05)</label><input id="in-end" class="modal-input"></div>
             </div>
             <textarea id="in-summary" class="modal-input h-24" placeholder="Résumé..."></textarea>
-            <textarea id="in-comment" class="modal-input h-24" placeholder="Avis..."></textarea>
-            <div class="flex gap-3"><button onclick="closeModal()" class="flex-1 py-4 uppercase bg-slate-100 rounded-xl font-bold text-[10px]">Annuler</button><button onclick="saveToFirebase()" class="flex-1 py-4 uppercase btn-gold-main rounded-xl font-bold text-[10px]">Sauvegarder</button></div>
+            <textarea id="in-comment" class="modal-input h-24" placeholder="Mon avis..."></textarea>
+            <div class="flex gap-3 mt-4"><button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Annuler</button><button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl">Enregistrer</button></div>
+        </div>
+    </div>
+
+    <!-- MODAL PROFIL (S'ouvre via l'icone) -->
+    <div id="profile-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[120] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl border-t-4 border-gold-accent">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black uppercase tracking-tight font-serif">Mon Profil</h2>
+                <button onclick="closeProfileModal()" class="text-slate-300 hover:text-black text-2xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="section-label">Pseudo</label>
+                    <input type="text" id="prof-name" class="modal-input" placeholder="Comment doit-on t'appeler ?">
+                </div>
+                <div>
+                    <label class="section-label">Bio / Objectif</label>
+                    <textarea id="prof-bio" class="modal-input h-20" placeholder="Ma devise de lecteur..."></textarea>
+                </div>
+                <div class="pt-4 border-t border-slate-50">
+                    <button onclick="resetPasswordEmail()" class="text-[10px] font-bold text-gold-accent uppercase tracking-widest hover:underline">Réinitialiser mon mot de passe</button>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeProfileModal()" class="flex-1 py-3 text-[10px] font-black uppercase bg-slate-50 rounded-xl text-slate-400">Fermer</button>
+                    <button onclick="saveProfile()" class="flex-1 py-3 text-[10px] font-black uppercase btn-gold-main rounded-xl">Enregistrer</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -322,29 +366,16 @@
         const db = getFirestore(app);
 
         let library = [];
-        let currentUser = null;
         let isSignUp = false;
+        let currentUser = null;
+        let readingChart = null;
 
-        // --- AUTH LOGIC ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-content').classList.remove('hidden');
-                setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
-                await loadUserProfile();
-                await loadUserLibrary();
-                initDragAndDrop();
-            } else {
-                document.getElementById('app-content').classList.add('hidden');
-                document.getElementById('auth-screen').classList.remove('hidden');
-            }
-        });
-
+        // --- AUTHENTIFICATION ---
         window.toggleAuthMode = () => {
             isSignUp = !isSignUp;
-            document.getElementById('auth-mode-title').innerText = isSignUp ? "Inscription" : "Connexion Membre";
-            document.getElementById('auth-submit-btn').innerText = isSignUp ? "Créer mon compte" : "Ouvrir ma collection";
+            document.getElementById('auth-mode-title').innerText = isSignUp ? "Création de Compte" : "Connexion Membre";
+            document.getElementById('auth-submit-btn').innerText = isSignUp ? "Créer ma bibliothèque" : "Ouvrir ma collection";
+            document.getElementById('toggle-auth-btn').innerText = isSignUp ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? S'inscrire";
         };
 
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
@@ -357,31 +388,62 @@
             } catch (err) { alert(err.message); }
         });
 
+        window.forgotPassword = async () => {
+            const email = document.getElementById('email').value;
+            if(!email) return alert("Veuillez saisir votre email dans le champ ci-dessus.");
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("Email de réinitialisation envoyé !");
+            } catch (err) { alert(err.message); }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('hidden');
+                setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
+                await loadProfile();
+                await loadUserLibrary();
+                initDragAndDrop();
+            } else {
+                document.getElementById('app-content').classList.add('hidden');
+                document.getElementById('auth-screen').classList.remove('hidden');
+            }
+        });
+
         window.logout = () => signOut(auth);
 
-        // --- PROFILE LOGIC ---
-        async function loadUserProfile() {
+        // --- PROFIL ---
+        async function loadProfile() {
             const docRef = doc(db, "users_profiles", currentUser.uid);
             const docSnap = await getDoc(docRef);
             let profile = { name: currentUser.email.split('@')[0], bio: "" };
-            
             if (docSnap.exists()) profile = docSnap.data();
-            else await setDoc(docRef, profile);
-
-            document.getElementById('prof-name').value = profile.name;
-            document.getElementById('prof-email').value = currentUser.email;
-            document.getElementById('prof-bio').value = profile.bio;
+            
             document.getElementById('user-display').innerText = profile.name;
-            document.getElementById('user-initials').innerText = profile.name.charAt(0);
+            document.getElementById('user-initial').innerText = profile.name.charAt(0);
+            document.getElementById('prof-name').value = profile.name;
+            document.getElementById('prof-bio').value = profile.bio;
         }
 
-        window.saveUserProfile = async () => {
+        window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
+        window.closeProfileModal = () => document.getElementById('profile-modal').classList.add('hidden');
+
+        window.saveProfile = async () => {
             const name = document.getElementById('prof-name').value;
             const bio = document.getElementById('prof-bio').value;
             await setDoc(doc(db, "users_profiles", currentUser.uid), { name, bio });
             document.getElementById('user-display').innerText = name;
-            document.getElementById('user-initials').innerText = name.charAt(0);
-            alert("Profil enregistré !");
+            document.getElementById('user-initial').innerText = name.charAt(0);
+            closeProfileModal();
+        };
+
+        window.resetPasswordEmail = async () => {
+            if(confirm("Envoyer un email pour changer votre mot de passe ?")) {
+                await sendPasswordResetEmail(auth, currentUser.email);
+                alert("Lien envoyé sur " + currentUser.email);
+            }
         };
 
         // --- LIBRARY LOGIC ---
@@ -390,20 +452,22 @@
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) library = docSnap.data().books;
             else {
-                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "" }));
+                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "", start: "", end: "" }));
                 await setDoc(docRef, { books: library });
             }
+            updateFilters();
             render();
         }
 
         function initDragAndDrop() {
-            Sortable.create(document.getElementById('grid-content'), {
+            const el = document.getElementById('grid-content');
+            Sortable.create(el, {
                 animation: 200, ghostClass: 'sortable-ghost',
-                onEnd: async function() {
-                    const items = Array.from(document.getElementById('grid-content').querySelectorAll('.grid-item'));
+                onEnd: async () => {
+                    const items = Array.from(el.querySelectorAll('.grid-item'));
                     library = items.map((el, index) => {
-                        const b = library.find(x => x.id === parseInt(el.dataset.id));
-                        return { ...b, id: index + 1 };
+                        const original = library.find(b => b.id === parseInt(el.dataset.id));
+                        return { ...original, id: index + 1 };
                     });
                     await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
                     render();
@@ -411,46 +475,149 @@
             });
         }
 
+        window.saveToFirebase = async () => {
+            const id = parseInt(document.getElementById('modal-id').innerText);
+            const idx = library.findIndex(b => b.id === id);
+            library[idx] = {
+                id: id,
+                title: document.getElementById('in-title').value,
+                author: document.getElementById('in-author').value,
+                cover: document.getElementById('in-cover').value,
+                rating: parseFloat(document.getElementById('in-rating').value),
+                genre: document.getElementById('in-genre').value,
+                start: document.getElementById('in-start').value,
+                end: document.getElementById('in-end').value,
+                summary: document.getElementById('in-summary').value,
+                comment: document.getElementById('in-comment').value
+            };
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            updateFilters();
+            render();
+            closeModal();
+        };
+
+        // --- RENDERING ---
+        function getStarsHtml(rating, sizeClass = "text-[10px]") {
+            let html = "";
+            for (let i = 1; i <= 5; i++) {
+                if (rating >= i) html += `<span class="${sizeClass} star-filled">★</span>`;
+                else if (rating >= i - 0.5) html += `<span class="${sizeClass} star-filled">⯪</span>`;
+                else html += `<span class="${sizeClass} star-empty">★</span>`;
+            }
+            return html;
+        }
+
         window.render = () => {
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const filtered = library.filter(b => b.title.toLowerCase().includes(search) || b.author.toLowerCase().includes(search));
+            const s = document.getElementById('search-input').value.toLowerCase();
+            const rF = document.getElementById('filter-rating').value;
+            const gF = document.getElementById('filter-genre').value;
+            const aF = document.getElementById('filter-author').value;
+
+            const filtered = library.filter(b => {
+                const matchS = (b.title||"").toLowerCase().includes(s) || (b.author||"").toLowerCase().includes(s);
+                const matchR = rF === "all" ? true : b.rating === parseFloat(rF);
+                const matchG = gF === "all" ? true : b.genre === gF;
+                const matchA = aF === "all" ? true : b.author === aF;
+                return matchS && matchR && matchG && matchA;
+            });
 
             document.getElementById('grid-content').innerHTML = filtered.map(b => `
                 <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
-                    <div class="grid-thumb">${b.cover ? `<img src="${b.cover}" class="w-full h-full object-cover">` : '<span>Vide</span>'}</div>
-                    <div class="text-[10px] text-gold-accent">${"★".repeat(Math.floor(b.rating))}</div>
+                    <div class="grid-thumb">
+                        ${b.cover ? `<img src="${b.cover}" class="w-full h-full object-cover">` : `<span class="text-slate-200 font-bold text-[10px]">VIDE</span>`}
+                    </div>
+                    <div class="flex gap-0.5">${getStarsHtml(b.rating)}</div>
                 </div>
             `).join('');
 
             document.getElementById('fiches-content').innerHTML = filtered.map(b => `
                 <div id="fiche-scroll-${b.id}" class="fiche-container">
                     <div class="fiche-number">#${b.id}</div>
-                    <h2 class="fiche-title">${b.title || 'SANS TITRE'}</h2>
-                    <h3 class="fiche-author">${b.author || 'AUTEUR'}</h3>
-                    <p class="fiche-summary">${b.summary || 'Pas de résumé.'}</p>
-                    <div class="mt-6 flex justify-end gap-2">
-                        <button onclick="openEdit(${b.id})" class="px-4 py-2 bg-slate-100 rounded text-[10px] font-bold uppercase">Modifier</button>
+                    <div class="flex flex-col md:flex-row gap-10">
+                        <div class="cover-box">
+                            ${b.cover ? `<img src="${b.cover}" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="fiche-title">${b.title || 'SANS TITRE'}</h2>
+                            <h3 class="fiche-author">${b.author || 'AUTEUR INCONNU'}</h3>
+                            <div class="mb-6"><div class="flex gap-1">${getStarsHtml(b.rating, "text-2xl")}</div></div>
+                            <p class="section-label">Résumé :</p><p class="fiche-summary">${b.summary || 'Aucun résumé.'}</p>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item"><p class="section-label">Genre</p><p class="info-value">${b.genre || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Fin</p><p class="info-value">${b.end || '—'}</p></div>
+                    </div>
+                    <div class="mt-8 flex justify-end">
+                        <button onclick="openEdit(${b.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px]">Modifier</button>
                     </div>
                 </div>
             `).join('');
-            
-            const readCount = library.filter(b => b.title !== "").length;
-            document.getElementById('stat-count').innerText = readCount;
+
+            const read = library.filter(b => b.title.trim() !== "");
+            document.getElementById('stat-count').innerText = read.length;
+            document.getElementById('stat-avg').innerText = read.length > 0 ? (read.reduce((a,b) => a+b.rating, 0)/read.length).toFixed(1) : "0.0";
+            updateStats(read);
         };
+
+        function updateFilters() {
+            const gs = [...new Set(library.map(b => b.genre).filter(g => g))].sort();
+            const as = [...new Set(library.map(b => b.author).filter(a => a))].sort();
+            document.getElementById('filter-genre').innerHTML = '<option value="all">Tous les genres</option>' + gs.map(g => `<option value="${g}">${g}</option>`).join('');
+            document.getElementById('filter-author').innerHTML = '<option value="all">Tous les auteurs</option>' + as.map(a => `<option value="${a}">${a}</option>`).join('');
+        }
+
+        function updateStats(read) {
+            const ctx = document.getElementById('readingChart').getContext('2d');
+            if(readingChart) readingChart.destroy();
+            const counts = new Array(12).fill(0);
+            read.forEach(b => { if(b.end.includes('/')) { let m = parseInt(b.end.split('/')[1]); if(m) counts[m-1]++; }});
+            readingChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: ["J","F","M","A","M","J","J","A","S","O","N","D"], datasets: [{ label: 'Livres', data: counts, borderColor: '#C5A059', tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
 
         window.showSection = (id) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('section-' + id).classList.add('active');
-            document.getElementById('btn-' + id).classList.add('active');
-            document.getElementById('search-bar-container').style.display = (id==='stats' || id==='profil') ? 'none' : 'block';
+            document.getElementById('section-'+id).classList.add('active');
+            document.getElementById('btn-'+id).classList.add('active');
+            document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats');
         };
 
-        window.jumpToFiche = (id) => { showSection('fiches'); setTimeout(() => { document.getElementById('fiche-scroll-'+id).scrollIntoView({behavior:'smooth'}); }, 100); };
-        window.openEdit = (id) => { const b = library.find(x => x.id === id); document.getElementById('modal-id').innerText = id; document.getElementById('in-title').value = b.title; document.getElementById('edit-modal').classList.remove('hidden'); };
+        window.jumpToFiche = (id) => { showSection('fiches'); setTimeout(() => document.getElementById('fiche-scroll-'+id)?.scrollIntoView({behavior:'smooth', block:'center'}), 100); };
+        window.openEdit = (id) => {
+            const b = library.find(x => x.id === id);
+            document.getElementById('modal-id').innerText = id;
+            document.getElementById('in-title').value = b.title;
+            document.getElementById('in-author').value = b.author;
+            document.getElementById('in-rating').value = b.rating;
+            document.getElementById('in-genre').value = b.genre;
+            document.getElementById('in-cover').value = b.cover;
+            document.getElementById('in-start').value = b.start;
+            document.getElementById('in-end').value = b.end;
+            document.getElementById('in-summary').value = b.summary;
+            document.getElementById('in-comment').value = b.comment;
+            document.getElementById('edit-modal').classList.remove('hidden');
+        };
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
-        window.saveToFirebase = async () => { /* Logique de sauvegarde identique à précédemment */ closeModal(); render(); };
-
+        window.resetFilters = () => { document.getElementById('search-input').value = ""; document.getElementById('filter-rating').value="all"; document.getElementById('filter-genre').value="all"; render(); };
+        
+        window.fetchBookInfo = async () => {
+            const t = document.getElementById('in-title').value;
+            if(!t) return;
+            const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(t)}&maxResults=1`);
+            const data = await res.json();
+            if(data.items) {
+                const info = data.items[0].volumeInfo;
+                document.getElementById('in-author').value = info.authors?.join(', ') || '';
+                document.getElementById('in-genre').value = info.categories?.[0] || '';
+                document.getElementById('in-summary').value = info.description || '';
+                document.getElementById('in-cover').value = info.imageLinks?.thumbnail.replace('http:','https:') || '';
+            }
+        };
     </script>
 </body>
 </html>
