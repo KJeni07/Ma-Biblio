@@ -258,18 +258,18 @@
                 <div class="flex flex-wrap gap-3 items-center">
                     <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider">Filtrer par :</span>
                     
-                    <!-- Filtre Note Exacte -->
+                    <!-- Filtre Note Exacte avec Symbole -->
                     <select id="filter-rating" onchange="render()" class="filter-select">
                         <option value="all">Toutes les notes</option>
-                        <option value="0">0 étoile</option>
-                        <option value="1">1 étoile</option>
-                        <option value="2">2 étoiles</option>
-                        <option value="2.5">2.5 étoiles</option>
-                        <option value="3">3 étoiles</option>
-                        <option value="3.5">3.5 étoiles</option>
-                        <option value="4">4 étoiles</option>
-                        <option value="4.5">4.5 étoiles</option>
-                        <option value="5">5 étoiles</option>
+                        <option value="0">0 ★</option>
+                        <option value="1">1 ★</option>
+                        <option value="2">2 ★</option>
+                        <option value="2.5">2.5 ★</option>
+                        <option value="3">3 ★</option>
+                        <option value="3.5">3.5 ★</option>
+                        <option value="4">4 ★</option>
+                        <option value="4.5">4.5 ★</option>
+                        <option value="5">5 ★</option>
                     </select>
 
                     <!-- Filtre Genre (Dynamique) -->
@@ -569,7 +569,6 @@
                 const genreSearchMatch = (book.genre || "").toLowerCase().includes(searchTerm);
                 const matchSearch = titleMatch || authorSearchMatch || genreSearchMatch;
                 
-                // LOGIQUE MODIFIÉE ICI : Comparaison exacte au lieu de ">="
                 const matchRating = ratingFilter === "all" ? true : book.rating === parseFloat(ratingFilter);
                                     
                 const matchGenre = genreFilter === "all" ? true : book.genre === genreFilter;
