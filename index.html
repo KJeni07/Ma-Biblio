@@ -6,8 +6,6 @@
     <title>Ma Biblio 100 - Édition Prestige</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Ajout de SortableJS uniquement -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -141,18 +139,16 @@
             align-self: flex-start;
         }
 
-        /* --- STYLE GRILLE (Modifié pour le Drag) --- */
-        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: grab; }
-        .grid-item:active { cursor: grabbing; }
-        .sortable-ghost { opacity: 0.4; filter: grayscale(1); }
-
+        /* --- STYLE GRILLE --- */
+        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: opacity 0.2s; }
+        .grid-item.dragging { opacity: 0.4; }
         .grid-thumb {
             width: 100%; aspect-ratio: 2/3; background: white;
             border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 12px; transition: all 0.3s; overflow: hidden;
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-            pointer-events: none; /* Crucial pour le drag & drop sur mobile/desktop */
+            pointer-events: none; /* Permet au drag de mieux fonctionner sur le parent */
         }
         .grid-item:hover .grid-thumb { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15); }
 
@@ -263,13 +259,36 @@
                     <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider">Filtrer par :</span>
                     <select id="filter-rating" onchange="render()" class="filter-select">
                         <option value="all">Toutes les notes</option>
-                        <option value="0">0 ★</option><option value="1">1 ★</option><option value="2">2 ★</option><option value="2.5">2.5 ★</option><option value="3">3 ★</option><option value="3.5">3.5 ★</option><option value="4">4 ★</option><option value="4.5">4.5 ★</option><option value="5">5 ★</option>
+                        <option value="0">0 ★</option>
+                        <option value="1">1 ★</option>
+                        <option value="2">2 ★</option>
+                        <option value="2.5">2.5 ★</option>
+                        <option value="3">3 ★</option>
+                        <option value="3.5">3.5 ★</option>
+                        <option value="4">4 ★</option>
+                        <option value="4.5">4.5 ★</option>
+                        <option value="5">5 ★</option>
                     </select>
-                    <select id="filter-genre" onchange="render()" class="filter-select"><option value="all">Tous les genres</option></select>
-                    <select id="filter-author" onchange="render()" class="filter-select"><option value="all">Tous les auteurs</option></select>
+                    <select id="filter-genre" onchange="render()" class="filter-select">
+                        <option value="all">Tous les genres</option>
+                    </select>
+                    <select id="filter-author" onchange="render()" class="filter-select">
+                        <option value="all">Tous les auteurs</option>
+                    </select>
                     <select id="filter-month" onchange="render()" class="filter-select">
                         <option value="all">Tous les mois</option>
-                        <option value="01">Janvier</option><option value="02">Février</option><option value="03">Mars</option><option value="04">Avril</option><option value="05">Mai</option><option value="06">Juin</option><option value="07">Juillet</option><option value="08">Août</option><option value="09">Septembre</option><option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option>
+                        <option value="01">Janvier</option>
+                        <option value="02">Février</option>
+                        <option value="03">Mars</option>
+                        <option value="04">Avril</option>
+                        <option value="05">Mai</option>
+                        <option value="06">Juin</option>
+                        <option value="07">Juillet</option>
+                        <option value="08">Août</option>
+                        <option value="09">Septembre</option>
+                        <option value="10">Octobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Décembre</option>
                     </select>
                     <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto">Réinitialiser</button>
                 </div>
@@ -277,13 +296,27 @@
 
             <section id="section-stats" class="view-section active">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div class="stat-card"><p class="section-label">Livres Lus</p><div id="stat-count" class="stat-value">0</div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sur un objectif de 100</p></div>
-                    <div class="stat-card"><p class="section-label">Note Moyenne</p><div id="stat-avg" class="stat-value">0.0</div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Étoiles sur 5</p></div>
-                    <div class="stat-card text-left px-8"><p class="section-label text-center mb-4">Podium des Genres</p><div id="genre-podium" class="space-y-2"></div></div>
+                    <div class="stat-card">
+                        <p class="section-label">Livres Lus</p>
+                        <div id="stat-count" class="stat-value">0</div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sur un objectif de 100</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="section-label">Note Moyenne</p>
+                        <div id="stat-avg" class="stat-value">0.0</div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Étoiles sur 5</p>
+                    </div>
+                    <div class="stat-card text-left px-8">
+                        <p class="section-label text-center mb-4">Podium des Genres</p>
+                        <div id="genre-podium" class="space-y-2"></div>
+                    </div>
                 </div>
+                
                 <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
                     <p class="section-label mb-6">Rythme de lecture (Livres par mois)</p>
-                    <div class="h-64 w-full"><canvas id="readingChart"></canvas></div>
+                    <div class="h-64 w-full">
+                        <canvas id="readingChart"></canvas>
+                    </div>
                 </div>
             </section>
 
@@ -307,15 +340,33 @@
             <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
                 <label class="text-[10px] font-bold text-gold-accent uppercase mb-2 block tracking-widest">Remplissage Automatique</label>
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                    <div class="md:col-span-5"><input id="in-title" class="modal-input !mb-0" placeholder="Titre de l'œuvre..."></div>
-                    <div class="md:col-span-5"><input id="in-author" class="modal-input !mb-0" placeholder="Auteur..."></div>
-                    <div class="md:col-span-2"><button onclick="fetchBookInfo()" class="w-full h-full min-h-[44px] bg-black text-white rounded-lg text-sm flex items-center justify-center hover:bg-gold-accent transition-colors">🔍</button></div>
+                    <div class="md:col-span-5">
+                        <input id="in-title" class="modal-input !mb-0" placeholder="Titre de l'œuvre...">
+                    </div>
+                    <div class="md:col-span-5">
+                        <input id="in-author" class="modal-input !mb-0" placeholder="Auteur...">
+                    </div>
+                    <div class="md:col-span-2">
+                        <button onclick="fetchBookInfo()" class="w-full h-full min-h-[44px] bg-black text-white rounded-lg text-sm flex items-center justify-center hover:bg-gold-accent transition-colors" title="Chercher sur Google Books">🔍</button>
+                    </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Genre</label><input id="in-genre" class="modal-input"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Note</label><select id="in-rating" class="modal-input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="2.5">2.5</option><option value="3">3</option><option value="3.5">3.5</option><option value="4">4</option><option value="4.5">4.5</option><option value="5">5</option></select></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Note</label>
+                    <select id="in-rating" class="modal-input">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="2.5">2.5</option>
+                        <option value="3">3</option>
+                        <option value="3.5">3.5</option>
+                        <option value="4">4</option>
+                        <option value="4.5">4.5</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
                 <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">URL Couverture</label><input id="in-cover" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Langue</label><input id="in-lang" class="modal-input"></div>
@@ -350,13 +401,14 @@
         let isSignUp = false;
         let currentUser = null;
         let readingChart = null;
+        let draggedId = null;
 
         function getStarsHtml(rating, sizeClass = "text-[10px]") {
             let html = "";
             for (let i = 1; i <= 5; i++) {
-                if (rating >= i) html += `<span class="${sizeClass} star-filled">★</span>`;
-                else if (rating >= i - 0.5) html += `<span class="${sizeClass} star-filled">⯪</span>`;
-                else html += `<span class="${sizeClass} star-empty">★</span>`;
+                if (rating >= i) { html += `<span class="${sizeClass} star-filled">★</span>`; }
+                else if (rating >= i - 0.5) { html += `<span class="${sizeClass} star-filled">⯪</span>`; }
+                else { html += `<span class="${sizeClass} star-empty">★</span>`; }
             }
             return html;
         }
@@ -377,11 +429,12 @@
                     document.getElementById('in-summary').value = info.description || '';
                     if (info.imageLinks) {
                         let img = info.imageLinks.thumbnail || info.imageLinks.smallThumbnail;
-                        document.getElementById('in-cover').value = img.replace('http:', 'https:');
+                        img = img.replace('http:', 'https:').replace('&edge=curl', '');
+                        document.getElementById('in-cover').value = img;
                     }
                     alert("Informations trouvées !");
-                } else alert("Aucun livre trouvé.");
-            } catch (err) { alert("Erreur recherche."); }
+                } else { alert("Aucun livre trouvé."); }
+            } catch (err) { alert("Erreur lors de la recherche."); }
         };
 
         window.toggleAuthMode = () => {
@@ -409,7 +462,6 @@
                 document.getElementById('app-content').classList.remove('hidden');
                 setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
                 await loadUserLibrary();
-                initDragAndDrop(); // Initialisation du Drag
             } else {
                 document.getElementById('app-content').classList.add('hidden');
                 document.getElementById('auth-screen').classList.remove('hidden');
@@ -433,29 +485,32 @@
             render();
         }
 
-        // --- NOUVELLE FONCTION DRAG & DROP ---
-        function initDragAndDrop() {
-            const gridEl = document.getElementById('grid-content');
-            Sortable.create(gridEl, {
-                animation: 200,
-                ghostClass: 'sortable-ghost',
-                onEnd: async function() {
-                    // On reconstruit la bibliothèque selon l'ordre visuel de la grille
-                    const items = Array.from(gridEl.querySelectorAll('.grid-item'));
-                    const newLibrary = items.map((el, index) => {
-                        const originalId = parseInt(el.dataset.id);
-                        const bookData = library.find(b => b.id === originalId);
-                        return { ...bookData, id: index + 1 }; // On ré-indexe de 1 à 100
-                    });
+        // --- DRAG & DROP FUNCTIONS ---
+        window.handleDragStart = (e, id) => {
+            draggedId = id;
+            e.currentTarget.classList.add('dragging');
+        };
 
-                    library = newLibrary;
-                    // Sauvegarde Firebase
-                    await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
-                    // Mise à jour de l'affichage (fiches incluses)
-                    render();
-                }
-            });
-        }
+        window.handleDragOver = (e) => {
+            e.preventDefault();
+        };
+
+        window.handleDrop = async (e, targetId) => {
+            e.preventDefault();
+            if (draggedId === targetId) return;
+
+            const fromIndex = library.findIndex(b => b.id === draggedId);
+            const toIndex = library.findIndex(b => b.id === targetId);
+            
+            const [movedBook] = library.splice(fromIndex, 1);
+            library.splice(toIndex, 0, movedBook);
+            
+            // Re-assigner les IDs pour garder l'ordre 1-100
+            library.forEach((book, i) => book.id = i + 1);
+            
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            render();
+        };
 
         function updateFilterOptions() {
             const genres = [...new Set(library.map(b => b.genre).filter(g => g && g.trim() !== ""))].sort();
@@ -466,7 +521,10 @@
 
         window.resetFilters = () => {
             document.getElementById('search-input').value = "";
-            ['filter-rating', 'filter-genre', 'filter-author', 'filter-month'].forEach(id => document.getElementById(id).value = "all");
+            document.getElementById('filter-rating').value = "all";
+            document.getElementById('filter-genre').value = "all";
+            document.getElementById('filter-author').value = "all";
+            document.getElementById('filter-month').value = "all";
             render();
         }
 
@@ -496,9 +554,10 @@
         window.deleteBook = async (id) => {
             if (!confirm("Supprimer cette fiche et faire remonter les suivantes ?")) return;
             const index = library.findIndex(b => b.id === id);
+            if (index === -1) return;
             library.splice(index, 1);
             library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", comment: "", genre: "", format: "-", lang: "", start: "", end: "" });
-            library.forEach((book, i) => book.id = i + 1);
+            library.forEach((book, i) => { book.id = i + 1; });
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             updateFilterOptions();
             render();
@@ -506,39 +565,72 @@
 
         window.render = () => {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const ratingF = document.getElementById('filter-rating').value;
-            const genreF = document.getElementById('filter-genre').value;
-            const authorF = document.getElementById('filter-author').value;
-            const monthF = document.getElementById('filter-month').value;
+            const ratingFilter = document.getElementById('filter-rating').value;
+            const genreFilter = document.getElementById('filter-genre').value;
+            const authorFilter = document.getElementById('filter-author').value;
+            const monthFilter = document.getElementById('filter-month').value;
 
             const filtered = library.filter(book => {
-                const matchSearch = (book.title||"").toLowerCase().includes(searchTerm) || (book.author||"").toLowerCase().includes(searchTerm);
-                const matchRating = ratingF === "all" ? true : book.rating === parseFloat(ratingF);
-                const matchGenre = genreF === "all" ? true : book.genre === genreF;
-                const matchAuthor = authorF === "all" ? true : book.author === authorF;
-                let matchMonth = monthF === "all" ? true : (book.end && book.end.split('/')[1] === monthF);
+                const titleMatch = (book.title || "").toLowerCase().includes(searchTerm);
+                const authorSearchMatch = (book.author || "").toLowerCase().includes(searchTerm);
+                const genreSearchMatch = (book.genre || "").toLowerCase().includes(searchTerm);
+                const matchSearch = titleMatch || authorSearchMatch || genreSearchMatch;
+                const matchRating = ratingFilter === "all" ? true : book.rating === parseFloat(ratingFilter);
+                const matchGenre = genreFilter === "all" ? true : book.genre === genreFilter;
+                const matchAuthor = authorFilter === "all" ? true : book.author === authorFilter;
+                let matchMonth = true;
+                if (monthFilter !== "all") {
+                    if (book.end && book.end.includes('/')) {
+                        const m = book.end.split('/')[1];
+                        matchMonth = (m === monthFilter);
+                    } else { matchMonth = false; }
+                }
                 return matchSearch && matchRating && matchGenre && matchAuthor && matchMonth;
             });
 
             const readBooks = library.filter(b => b.title.trim() !== "");
-            document.getElementById('stat-count').innerText = readBooks.length;
-            document.getElementById('stat-avg').innerText = readBooks.length > 0 ? (readBooks.reduce((acc, b) => acc + b.rating, 0) / readBooks.length).toFixed(1) : "0.0";
+            const totalRead = readBooks.length;
+            const avgRating = totalRead > 0 ? (readBooks.reduce((acc, b) => acc + b.rating, 0) / totalRead).toFixed(1) : "0.0";
+            
+            document.getElementById('stat-count').innerText = totalRead;
+            document.getElementById('stat-avg').innerText = avgRating;
 
-            // Grid Render (avec dataset-id pour Sortable)
+            const genreCounts = {};
+            readBooks.forEach(b => { if(b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1; });
+            const sortedGenres = Object.entries(genreCounts).sort((a,b) => b[1] - a[1]).slice(0, 3);
+            const podiumColors = ['#C5A059', '#A8A8A8', '#CD7F32'];
+            document.getElementById('genre-podium').innerHTML = sortedGenres.length > 0 
+                ? sortedGenres.map((g, i) => `
+                    <div class="podium-item">
+                        <div class="flex items-center gap-3">
+                            <span class="rank-badge" style="background:${podiumColors[i]}">${i+1}</span>
+                            <span class="text-xs font-bold uppercase truncate w-24">${g[0]}</span>
+                        </div>
+                        <span class="text-[10px] font-black text-slate-300">${g[1]} livres</span>
+                    </div>
+                `).join('')
+                : '<p class="text-[10px] text-slate-400 text-center italic py-4">Pas encore de données</p>';
+
+            updateChart(readBooks);
+
             document.getElementById('grid-content').innerHTML = filtered.map(book => `
-                <div class="grid-item" data-id="${book.id}" onclick="jumpToFiche(${book.id})">
+                <div class="grid-item" 
+                     draggable="true" 
+                     ondragstart="handleDragStart(event, ${book.id})" 
+                     ondragover="handleDragOver(event)" 
+                     ondrop="handleDrop(event, ${book.id})"
+                     onclick="jumpToFiche(${book.id})">
                     <div class="grid-thumb">
-                        ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-200 font-bold text-xs uppercase">Vide</span>`}
+                        ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-200 font-bold text-xs uppercase tracking-widest">Vide</span>`}
                     </div>
                     <div class="flex gap-1">${getStarsHtml(book.rating, "text-base")}</div>
                 </div>
             `).join('');
 
-            // Fiches Render
             document.getElementById('fiches-content').innerHTML = filtered.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
                     <div class="fiche-number">#${book.id}</div>
-                    <button onclick="showSection('grille')" class="mb-6 flex items-center gap-2 px-3 py-1.5 bg-slate-50 text-slate-400 rounded-full hover:bg-gold-50">
+                    <button onclick="showSection('grille')" class="mb-6 flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
                          <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Grille</span>
                     </button>
                     <div class="flex flex-col md:flex-row gap-10">
@@ -548,8 +640,12 @@
                         <div class="flex-1">
                             <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
                             <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
-                            <div class="mb-6"><p class="section-label">Note :</p><div class="flex gap-1">${getStarsHtml(book.rating, "text-2xl")}</div></div>
-                            <p class="section-label">Résumé :</p><p class="fiche-summary">${book.summary || 'Aucun résumé.'}</p>
+                            <div class="mb-6">
+                                <p class="section-label">Note :</p>
+                                <div class="flex gap-1">${getStarsHtml(book.rating, "text-2xl")}</div>
+                            </div>
+                            <p class="section-label">Résumé :</p>
+                            <p class="fiche-summary">${book.summary || 'Aucun résumé.'}</p>
                         </div>
                     </div>
                     <div class="info-grid">
@@ -559,26 +655,55 @@
                         <div class="info-item"><p class="section-label">Format :</p><p class="info-value">${book.format || '—'}</p></div>
                         <div class="info-item"><p class="section-label">Langue :</p><p class="info-value">${book.lang || '—'}</p></div>
                     </div>
-                    <div class="mt-8"><p class="section-label">Mon avis personnel :</p><div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire.'}</p></div></div>
+                    <div class="mt-8">
+                        <p class="section-label">Mon avis personnel :</p>
+                        <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire.'}</p></div>
+                    </div>
                     <div class="mt-8 flex justify-end gap-3">
-                        <button onclick="deleteBook(${book.id})" class="px-5 py-2 rounded-lg bg-red-50 text-red-400 font-bold uppercase text-[10px] tracking-widest">Supprimer</button>
-                        <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest">Modifier</button>
+                        <button onclick="deleteBook(${book.id})" class="px-5 py-2 rounded-lg bg-red-50 text-red-400 font-bold uppercase text-[10px] tracking-widest hover:bg-red-100 transition-colors">Supprimer</button>
+                        <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600 transition-colors">Modifier</button>
                     </div>
                 </div>
             `).join('');
-
-            updateChart(readBooks);
         };
 
         function updateChart(books) {
+            const months = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"];
             const counts = new Array(12).fill(0);
-            books.forEach(b => { if(b.end && b.end.includes('/')) { const m = parseInt(b.end.split('/')[1]); if(m>=1 && m<=12) counts[m-1]++; } });
+            books.forEach(b => {
+                if(b.end && b.end.includes('/')) {
+                    const monthPart = parseInt(b.end.split('/')[1]);
+                    if(monthPart >= 1 && monthPart <= 12) counts[monthPart - 1]++;
+                }
+            });
             const ctx = document.getElementById('readingChart').getContext('2d');
             if(readingChart) readingChart.destroy();
             readingChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"], datasets: [{ label: 'Livres', data: counts, borderColor: '#C5A059', tension: 0.4, fill: true, backgroundColor: 'rgba(197, 160, 89, 0.1)' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Livres lus',
+                        data: counts,
+                        borderColor: '#C5A059',
+                        backgroundColor: 'rgba(197, 160, 89, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#C5A059',
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1, font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
             });
         }
 
@@ -587,8 +712,9 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
             document.getElementById('btn-' + id).classList.add('active');
-            const sb = document.getElementById('search-bar-container');
-            if(id === 'stats') sb.classList.add('hidden'); else sb.classList.remove('hidden');
+            const searchBar = document.getElementById('search-bar-container');
+            if(id === 'stats') searchBar.classList.add('hidden');
+            else searchBar.classList.remove('hidden');
             window.scrollTo({top: 0, behavior: 'smooth'});
         };
 
