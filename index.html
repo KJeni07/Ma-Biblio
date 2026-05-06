@@ -6,6 +6,8 @@
     <title>Ma Biblio 100 - Édition Prestige</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Ajout de SortableJS pour le mouvement des livres -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -140,17 +142,18 @@
         }
 
         /* --- STYLE GRILLE --- */
-        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: opacity 0.2s; }
-        .grid-item.dragging { opacity: 0.4; }
+        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .grid-thumb {
             width: 100%; aspect-ratio: 2/3; background: white;
             border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 12px; transition: all 0.3s; overflow: hidden;
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-            pointer-events: none; /* Permet au drag de mieux fonctionner sur le parent */
         }
-        .grid-item:hover .grid-thumb { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15); }
+        .grid-thumb:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15); }
+        
+        /* Classe fantôme pour le drag & drop */
+        .sortable-ghost { opacity: 0.3; }
 
         /* --- DASHBOARD STATS --- */
         .stat-card {
@@ -257,6 +260,7 @@
                 
                 <div class="flex flex-wrap gap-3 items-center">
                     <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider">Filtrer par :</span>
+                    
                     <select id="filter-rating" onchange="render()" class="filter-select">
                         <option value="all">Toutes les notes</option>
                         <option value="0">0 ★</option>
@@ -269,12 +273,15 @@
                         <option value="4.5">4.5 ★</option>
                         <option value="5">5 ★</option>
                     </select>
+
                     <select id="filter-genre" onchange="render()" class="filter-select">
                         <option value="all">Tous les genres</option>
                     </select>
+
                     <select id="filter-author" onchange="render()" class="filter-select">
                         <option value="all">Tous les auteurs</option>
                     </select>
+
                     <select id="filter-month" onchange="render()" class="filter-select">
                         <option value="all">Tous les mois</option>
                         <option value="01">Janvier</option>
@@ -290,6 +297,7 @@
                         <option value="11">Novembre</option>
                         <option value="12">Décembre</option>
                     </select>
+
                     <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto">Réinitialiser</button>
                 </div>
             </div>
@@ -321,6 +329,7 @@
             </section>
 
             <section id="section-grille" class="view-section">
+                <!-- ID grid-content utilisé par SortableJS -->
                 <div id="grid-content" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10"></div>
             </section>
 
@@ -401,14 +410,38 @@
         let isSignUp = false;
         let currentUser = null;
         let readingChart = null;
-        let draggedId = null;
+
+        // --- INITIALISATION DU DRAG & DROP ---
+        const gridEl = document.getElementById('grid-content');
+        Sortable.create(gridEl, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: async function () {
+                // On récupère le nouvel ordre des IDs basé sur les attributs data-id
+                const newOrder = Array.from(gridEl.children).map(el => parseInt(el.getAttribute('data-id')));
+                
+                // On crée une nouvelle liste basée sur cet ordre
+                let newLibrary = newOrder.map(id => library.find(b => b.id === id));
+                
+                // On ré-indexe les IDs de 1 à 100
+                newLibrary.forEach((book, i) => { book.id = i + 1; });
+                
+                library = newLibrary;
+                await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+                render(); // On re-rend pour mettre à jour les fiches aussi
+            }
+        });
 
         function getStarsHtml(rating, sizeClass = "text-[10px]") {
             let html = "";
             for (let i = 1; i <= 5; i++) {
-                if (rating >= i) { html += `<span class="${sizeClass} star-filled">★</span>`; }
-                else if (rating >= i - 0.5) { html += `<span class="${sizeClass} star-filled">⯪</span>`; }
-                else { html += `<span class="${sizeClass} star-empty">★</span>`; }
+                if (rating >= i) {
+                    html += `<span class="${sizeClass} star-filled">★</span>`;
+                } else if (rating >= i - 0.5) {
+                    html += `<span class="${sizeClass} star-filled">⯪</span>`;
+                } else {
+                    html += `<span class="${sizeClass} star-empty">★</span>`;
+                }
             }
             return html;
         }
@@ -417,11 +450,14 @@
             const title = document.getElementById('in-title').value;
             const author = document.getElementById('in-author').value;
             if (!title) return alert("Entrez un titre d'abord !");
+            
             let query = `intitle:${encodeURIComponent(title)}`;
             if(author) query += `+inauthor:${encodeURIComponent(author)}`;
+
             try {
                 const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=1`);
                 const data = await response.json();
+                
                 if (data.items && data.items.length > 0) {
                     const info = data.items[0].volumeInfo;
                     document.getElementById('in-author').value = info.authors ? info.authors.join(', ') : '';
@@ -433,7 +469,9 @@
                         document.getElementById('in-cover').value = img;
                     }
                     alert("Informations trouvées !");
-                } else { alert("Aucun livre trouvé."); }
+                } else {
+                    alert("Aucun livre trouvé.");
+                }
             } catch (err) { alert("Erreur lors de la recherche."); }
         };
 
@@ -485,38 +523,13 @@
             render();
         }
 
-        // --- DRAG & DROP FUNCTIONS ---
-        window.handleDragStart = (e, id) => {
-            draggedId = id;
-            e.currentTarget.classList.add('dragging');
-        };
-
-        window.handleDragOver = (e) => {
-            e.preventDefault();
-        };
-
-        window.handleDrop = async (e, targetId) => {
-            e.preventDefault();
-            if (draggedId === targetId) return;
-
-            const fromIndex = library.findIndex(b => b.id === draggedId);
-            const toIndex = library.findIndex(b => b.id === targetId);
-            
-            const [movedBook] = library.splice(fromIndex, 1);
-            library.splice(toIndex, 0, movedBook);
-            
-            // Re-assigner les IDs pour garder l'ordre 1-100
-            library.forEach((book, i) => book.id = i + 1);
-            
-            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
-            render();
-        };
-
         function updateFilterOptions() {
             const genres = [...new Set(library.map(b => b.genre).filter(g => g && g.trim() !== ""))].sort();
             const authors = [...new Set(library.map(b => b.author).filter(a => a && a.trim() !== ""))].sort();
-            document.getElementById('filter-genre').innerHTML = '<option value="all">Tous les genres</option>' + genres.map(g => `<option value="${g}">${g}</option>`).join('');
-            document.getElementById('filter-author').innerHTML = '<option value="all">Tous les auteurs</option>' + authors.map(a => `<option value="${a}">${a}</option>`).join('');
+            const genreSelect = document.getElementById('filter-genre');
+            const authorSelect = document.getElementById('filter-author');
+            genreSelect.innerHTML = '<option value="all">Tous les genres</option>' + genres.map(g => `<option value="${g}">${g}</option>`).join('');
+            authorSelect.innerHTML = '<option value="all">Tous les auteurs</option>' + authors.map(a => `<option value="${a}">${a}</option>`).join('');
         }
 
         window.resetFilters = () => {
@@ -598,6 +611,7 @@
             const genreCounts = {};
             readBooks.forEach(b => { if(b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1; });
             const sortedGenres = Object.entries(genreCounts).sort((a,b) => b[1] - a[1]).slice(0, 3);
+            
             const podiumColors = ['#C5A059', '#A8A8A8', '#CD7F32'];
             document.getElementById('genre-podium').innerHTML = sortedGenres.length > 0 
                 ? sortedGenres.map((g, i) => `
@@ -613,13 +627,9 @@
 
             updateChart(readBooks);
 
+            // RENDER GRILLE (data-id important pour le drag and drop)
             document.getElementById('grid-content').innerHTML = filtered.map(book => `
-                <div class="grid-item" 
-                     draggable="true" 
-                     ondragstart="handleDragStart(event, ${book.id})" 
-                     ondragover="handleDragOver(event)" 
-                     ondrop="handleDrop(event, ${book.id})"
-                     onclick="jumpToFiche(${book.id})">
+                <div class="grid-item" data-id="${book.id}" onclick="jumpToFiche(${book.id})">
                     <div class="grid-thumb">
                         ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-200 font-bold text-xs uppercase tracking-widest">Vide</span>`}
                     </div>
@@ -627,6 +637,7 @@
                 </div>
             `).join('');
 
+            // RENDER FICHES
             document.getElementById('fiches-content').innerHTML = filtered.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
                     <div class="fiche-number">#${book.id}</div>
