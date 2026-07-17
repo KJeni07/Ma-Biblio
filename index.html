@@ -497,30 +497,44 @@
 
             document.querySelectorAll('.display-year').forEach(el => el.innerText = yStatsF);
 
-            // LOGIQUE DE FILTRAGE GRILLE
-            const filteredGrid = library.filter(b => {
-                const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
+            // LOGIQUE DE FILTRAGE COMMUNE AUX LIVRES QUI ONT UN TITRE EN CAS DE FILTRE ACTIF
+            const checkFilters = (b) => {
+                const matchSearch = !searchTerm || (b.title + b.author + b.genre).toLowerCase().includes(searchTerm);
                 const matchRating = rF === "all" || b.rating == rF;
-                const matchYear = yGridF === "all" || (b.end && b.end.includes(yGridF));
+                const matchYear = yGridF === "all" || (b.end && b.end.includes('/' + yGridF));
                 const matchGenre = gF === "all" || b.genre === gF;
                 const matchAuthor = aF === "all" || b.author === aF;
-                if (yGridF === "all" && !searchTerm && rF === "all" && gF === "all" && aF === "all" && mF === "all") return true; 
-                return b.title && matchSearch && matchRating && matchYear && matchGenre && matchAuthor; 
+                
+                // Extraction et vérification du mois s'il y a une date de fin au format JJ/MM/AAAA
+                let matchMonth = true;
+                if (mF !== "all") {
+                    if (b.end && b.end.includes('/')) {
+                        const parts = b.end.split('/');
+                        matchMonth = parts[1] === mF;
+                    } else {
+                        matchMonth = false;
+                    }
+                }
+
+                return matchSearch && matchRating && matchYear && matchGenre && matchAuthor && matchMonth;
+            };
+
+            const hasActiveFilters = searchTerm || rF !== "all" || gF !== "all" || aF !== "all" || mF !== "all" || yGridF !== "all";
+
+            // LOGIQUE DE FILTRAGE GRILLE (Si aucun filtre, on montre les 100 cases, sinon on filtre les livres remplis)
+            const filteredGrid = library.filter(b => {
+                if (!hasActiveFilters) return true; // Mode Grille par défaut : montre tout (cases vides incluses)
+                return b.title && checkFilters(b);   // Mode Recherche : montre que les résultats valides remplis
             });
 
             // FILTRE FICHES
             const filteredFiches = library.filter(b => {
                 if(!b.title) return false;
-                const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
-                const matchRating = rF === "all" || b.rating == rF;
-                const matchYear = yGridF === "all" || (b.end && b.end.includes(yGridF));
-                const matchGenre = gF === "all" || b.genre === gF;
-                const matchAuthor = aF === "all" || b.author === aF;
-                return matchSearch && matchRating && matchYear && matchGenre && matchAuthor;
+                return checkFilters(b);
             });
 
             // STATS
-            const statLib = library.filter(b => b.title && b.end && b.end.includes(yStatsF));
+            const statLib = library.filter(b => b.title && b.end && b.end.includes('/' + yStatsF));
             document.getElementById('stat-count').innerText = statLib.length;
             document.getElementById('stat-avg').innerText = statLib.length ? (statLib.reduce((a,b)=>a+b.rating,0)/statLib.length).toFixed(1) : "0.0";
 
@@ -541,9 +555,9 @@
             document.getElementById('grid-content').innerHTML = filteredGrid.map(b => `
                 <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
                     <div class="grid-thumb">
-                        ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-200 font-bold text-xs uppercase">#${b.id}</span>`}
+                        ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-300 font-bold text-xs uppercase">#${b.id}</span>`}
                     </div>
-                    <div class="flex gap-1">${getStarsHtml(b.rating, "text-base")}</div>
+                    <div class="flex gap-1">${b.title ? getStarsHtml(b.rating, "text-base") : '<span class="text-[10px] text-slate-300 italic">Vide</span>'}</div>
                 </div>
             `).join('');
 
