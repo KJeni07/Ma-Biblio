@@ -13,7 +13,9 @@
             --paper-bg: #FAF9F6;
             --gold-accent: #C5A059;
             --deep-black: #1A1A1A;
+            --muted-gold: #D4AF37;
         }
+
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: var(--paper-bg);
@@ -21,19 +23,26 @@
             margin: 0;
             overflow-x: hidden;
         }
+
         h1, h2, .font-serif { font-family: 'Playfair Display', serif; }
+
+        /* --- AUTHENTIFICATION --- */
         #auth-screen {
             background-color: var(--paper-bg);
             background-image: radial-gradient(rgba(197, 160, 89, 0.1) 1px, transparent 1px);
             background-size: 30px 30px;
         }
+
         .auth-card {
             background: white;
             border: 1px solid rgba(197, 160, 89, 0.2);
             box-shadow: 0 20px 50px rgba(0,0,0,0.05);
         }
+
+        /* --- APP STYLE --- */
         .view-section { display: none; }
         .view-section.active { display: block; }
+
         .tab-btn {
             padding-bottom: 12px;
             font-size: 11px;
@@ -49,6 +58,8 @@
             color: var(--gold-accent);
             border-bottom: 3px solid var(--gold-accent);
         }
+
+        /* --- STYLE FICHE --- */
         .fiche-container {
             background: white;
             border-radius: 12px;
@@ -59,22 +70,27 @@
             position: relative;
             border: 1px solid rgba(197, 160, 89, 0.1);
         }
+
         .fiche-number {
             position: absolute;
             top: 25px;
             right: 30px;
             font-size: 16px;
             font-weight: 900;
-            color: #e2e8f0;
+            color: #f1f1f1;
         }
+
         .fiche-title {
+            font-family: 'Playfair Display', serif;
             font-size: 32px;
             font-weight: 900;
             text-transform: uppercase;
             color: var(--deep-black);
             line-height: 1.1;
             margin-bottom: 4px;
+            letter-spacing: -0.02em;
         }
+
         .fiche-author {
             font-size: 16px;
             font-weight: 700;
@@ -82,6 +98,7 @@
             color: var(--gold-accent);
             margin-bottom: 30px;
         }
+
         .section-label {
             font-size: 10px;
             font-weight: 800;
@@ -90,7 +107,9 @@
             margin-bottom: 8px;
             letter-spacing: 0.05em;
         }
+
         .fiche-summary { font-size: 15px; color: #444; font-style: italic; line-height: 1.6; }
+
         .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -100,46 +119,93 @@
             border-top: 1px solid #f9f9f9;
         }
         @media (min-width: 768px) { .info-grid { grid-template-columns: repeat(5, 1fr); } }
+
         .info-item { border-bottom: 2px solid #f9f9f9; padding-bottom: 8px; }
         .info-value { font-size: 13px; font-weight: 700; color: var(--deep-black); }
+
         .avis-box {
             background-color: #fcfbf8;
             border-radius: 12px;
             padding: 20px;
             margin-top: 10px;
+            min-height: 60px;
             border-left: 4px solid var(--gold-accent);
         }
+
+        .cover-box {
+            width: 100%; max-width: 200px; aspect-ratio: 2/3;
+            background: #eee; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            align-self: flex-start;
+        }
+
+        /* --- STYLE GRILLE --- */
+        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .grid-thumb {
             width: 100%; aspect-ratio: 2/3; background: white;
-            border: 1px solid rgba(0,0,0,0.08); border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 12px; transition: all 0.3s; overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
         .grid-thumb:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15); }
+        
+        .sortable-ghost { opacity: 0.3; }
+
+        /* --- DASHBOARD STATS --- */
         .stat-card {
             background: white;
             padding: 25px;
             border-radius: 20px;
             border: 1px solid rgba(197, 160, 89, 0.1);
             text-align: center;
+            transition: transform 0.3s;
         }
         .stat-value { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900; color: var(--gold-accent); }
+        
+        .podium-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 15px; background: #fcfbf8; border-radius: 12px; margin-bottom: 8px;
+            border: 1px solid #f0f0f0;
+        }
+        .rank-badge {
+            width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; font-size: 10px; font-weight: 900; color: white;
+        }
+
+        /* --- UI UTILS --- */
         .modal-input {
             width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px;
             margin-bottom: 12px; font-size: 14px; background-color: #fff;
         }
-        .btn-gold-main { background-color: var(--gold-accent); color: white; }
+        .modal-input:focus { outline: none; border-color: var(--gold-accent); }
+        .star-filled { color: var(--gold-accent); }
+        .star-empty { color: #e5e7eb; }
+        .btn-gold-main { background-color: var(--gold-accent); color: white; transition: all 0.2s; }
+        .btn-gold-main:hover { background-color: #A68548; }
+        
         .filter-select {
-            appearance: none; background-color: white; border: 1px solid #e2e8f0; border-radius: 10px;
-            padding: 8px 32px 8px 12px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer; outline: none;
+            appearance: none;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 32px 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            outline: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 10px center; background-size: 14px;
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
         }
+        .filter-select:focus { border-color: var(--gold-accent); }
     </style>
 </head>
 <body>
 
-    <!-- ÉCRAN D'AUTHENTIFICATION -->
     <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
         <div class="auth-card w-full max-w-md rounded-3xl p-10 text-center">
             <div class="mb-8">
@@ -157,15 +223,15 @@
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Mot de passe</label>
                     <input type="password" id="password" required class="modal-input !mb-0" placeholder="••••••••">
                 </div>
-                <button type="submit" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg mt-4">Ouvrir ma collection</button>
+                <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg mt-4">Ouvrir ma collection</button>
             </form>
+            <p id="auth-error" class="text-red-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
             <div class="mt-6">
                 <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent">Pas encore de compte ? S'inscrire</button>
             </div>
         </div>
     </div>
 
-    <!-- APPLICATION PRINCIPALE -->
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
         <div class="max-w-6xl mx-auto px-6 py-10">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
@@ -184,58 +250,151 @@
                 </div>
 
                 <div id="search-bar-container" class="space-y-4 hidden">
-                    <input type="text" id="search-input" oninput="render()" placeholder="Recherche rapide (titre, auteur, genre...)" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent shadow-sm">
+                    <div class="relative w-full">
+                        <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </span>
+                        <input type="text" id="search-input" oninput="render()" placeholder="Recherche rapide (titre, auteur, genre...)" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent transition-all shadow-sm">
+                    </div>
+                    
                     <div class="flex flex-wrap gap-3 items-center">
-                        <select id="filter-year-grid" onchange="render()" class="filter-select !bg-black !text-white font-bold"><option value="all">Toutes les années</option></select>
-                        <select id="filter-rating" onchange="render()" class="filter-select"><option value="all">Toutes les notes</option><option value="5">5 ★</option><option value="4">4 ★</option><option value="3">3 ★</option></select>
-                        <select id="filter-genre" onchange="render()" class="filter-select"><option value="all">Tous les genres</option></select>
-                        <select id="filter-author" onchange="render()" class="filter-select"><option value="all">Tous les auteurs</option></select>
-                        <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest ml-auto">Réinitialiser</button>
+                        <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider">Filtrer par :</span>
+                        
+                        <select id="filter-year-grid" onchange="render()" class="filter-select !bg-black !text-white font-bold">
+                            <option value="all">Toutes les années</option>
+                        </select>
+
+                        <select id="filter-rating" onchange="render()" class="filter-select">
+                            <option value="all">Toutes les notes</option>
+                            <option value="0">0 ★</option>
+                            <option value="1">1 ★</option>
+                            <option value="2">2 ★</option>
+                            <option value="2.5">2.5 ★</option>
+                            <option value="3">3 ★</option>
+                            <option value="3.5">3.5 ★</option>
+                            <option value="4">4 ★</option>
+                            <option value="4.5">4.5 ★</option>
+                            <option value="5">5 ★</option>
+                        </select>
+
+                        <select id="filter-genre" onchange="render()" class="filter-select">
+                            <option value="all">Tous les genres</option>
+                        </select>
+
+                        <select id="filter-author" onchange="render()" class="filter-select">
+                            <option value="all">Tous les auteurs</option>
+                        </select>
+
+                        <select id="filter-month" onchange="render()" class="filter-select">
+                            <option value="all">Tous les mois</option>
+                            <option value="01">Janvier</option>
+                            <option value="02">Février</option>
+                            <option value="03">Mars</option>
+                            <option value="04">Avril</option>
+                            <option value="05">Mai</option>
+                            <option value="06">Juin</option>
+                            <option value="07">Juillet</option>
+                            <option value="08">Août</option>
+                            <option value="09">Septembre</option>
+                            <option value="10">Octobre</option>
+                            <option value="11">Novembre</option>
+                            <option value="12">Décembre</option>
+                        </select>
+
+                        <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto">Réinitialiser</button>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION DASHBOARD -->
             <section id="section-stats" class="view-section active">
                 <div class="flex justify-center mb-8 mt-10">
-                    <select id="filter-year-stats" onchange="render()" class="filter-select font-black text-lg text-gold-accent"></select>
+                    <div class="flex items-center gap-3 bg-white px-6 py-3 rounded-full border border-slate-100 shadow-sm">
+                        <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Bilan de l'année :</span>
+                        <select id="filter-year-stats" onchange="render()" class="filter-select !border-none !bg-transparent font-black text-lg text-gold-accent">
+                        </select>
+                    </div>
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div class="stat-card"><p class="section-label">Livres Lus</p><div id="stat-count" class="stat-value">0</div></div>
-                    <div class="stat-card"><p class="section-label">Note Moyenne</p><div id="stat-avg" class="stat-value">0.0</div></div>
-                    <div class="stat-card text-left px-8"><p class="section-label text-center mb-4">Podium Genres</p><div id="genre-podium" class="space-y-2"></div></div>
+                    <div class="stat-card">
+                        <p class="section-label">Livres Lus en <span class="display-year">...</span></p>
+                        <div id="stat-count" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <p class="section-label">Note Moyenne</p>
+                        <div id="stat-avg" class="stat-value">0.0</div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Étoiles sur 5</p>
+                    </div>
+                    <div class="stat-card text-left px-8">
+                        <p class="section-label text-center mb-4">Podium des Genres</p>
+                        <div id="genre-podium" class="space-y-2"></div>
+                    </div>
                 </div>
+                
                 <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                    <div class="h-64 w-full"><canvas id="readingChart"></canvas></div>
+                    <p class="section-label mb-6">Rythme de lecture (Livres par mois en <span class="display-year">...</span>)</p>
+                    <div class="h-64 w-full">
+                        <canvas id="readingChart"></canvas>
+                    </div>
                 </div>
             </section>
 
-            <!-- SECTION GRILLE -->
             <section id="section-grille" class="view-section mt-10">
                 <div id="grid-content" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10"></div>
             </section>
 
-            <!-- SECTION FICHES -->
             <section id="section-fiches" class="view-section mt-10">
                 <div id="fiches-content" class="space-y-20"></div>
             </section>
         </div>
     </div>
 
-    <!-- MODAL EDITION -->
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-black font-serif mb-4">Modifier la Fiche #<span id="modal-id"></span></h2>
-            <input id="in-title" class="modal-input" placeholder="Titre...">
-            <input id="in-author" class="modal-input" placeholder="Auteur...">
-            <input id="in-genre" class="modal-input" placeholder="Genre...">
-            <input id="in-cover" class="modal-input" placeholder="URL Image de Couverture...">
-            <select id="in-rating" class="modal-input"><option value="0">Aucune note</option><option value="3">3 ★</option><option value="4">4 ★</option><option value="5">5 ★</option></select>
-            <input id="in-start" class="modal-input" placeholder="Début (JJ/MM/AAAA)">
-            <input id="in-end" class="modal-input" placeholder="Fin (JJ/MM/AAAA)">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
+                <button onclick="closeModal()" class="text-slate-300 hover:text-black text-2xl">&times;</button>
+            </div>
+            
+            <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                <label class="text-[10px] font-bold text-gold-accent uppercase mb-2 block tracking-widest">Remplissage Automatique</label>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                    <div class="md:col-span-5">
+                        <input id="in-title" class="modal-input !mb-0" placeholder="Titre de l'œuvre...">
+                    </div>
+                    <div class="md:col-span-5">
+                        <input id="in-author" class="modal-input !mb-0" placeholder="Auteur...">
+                    </div>
+                    <div class="md:col-span-2">
+                        <button onclick="fetchBookInfo()" class="w-full h-full min-h-[44px] bg-black text-white rounded-lg text-sm flex items-center justify-center hover:bg-gold-accent transition-colors" title="Chercher sur Google Books">🔍</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Genre</label><input id="in-genre" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Note</label>
+                    <select id="in-rating" class="modal-input">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="2.5">2.5</option>
+                        <option value="3">3</option>
+                        <option value="3.5">3.5</option>
+                        <option value="4">4</option>
+                        <option value="4.5">4.5</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">URL Couverture</label><input id="in-cover" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Langue</label><input id="in-lang" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Début (ex: 01/05/2025)</label><input id="in-start" class="modal-input" placeholder="JJ/MM/AAAA"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fin (ex: 15/05/2025)</label><input id="in-end" class="modal-input" placeholder="JJ/MM/AAAA"></div>
+            </div>
             <textarea id="in-summary" class="modal-input h-24" placeholder="Résumé..."></textarea>
-            <textarea id="in-comment" class="modal-input h-24" placeholder="Avis..."></textarea>
-            <div class="flex gap-3"><button onclick="closeModal()" class="flex-1 py-3 bg-slate-100 rounded-xl">Annuler</button><button onclick="saveToFirebase()" class="flex-1 py-3 btn-gold-main rounded-xl text-white">Enregistrer</button></div>
+            <textarea id="in-comment" class="modal-input h-24" placeholder="Mon avis..."></textarea>
+            <div class="flex gap-3 mt-4"><button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Annuler</button><button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl">Enregistrer</button></div>
         </div>
     </div>
 
@@ -262,22 +421,37 @@
         let readingChart = null;
         let isSignUp = false;
 
+        // Init years
         function initYearFilters() {
+            const currentYear = new Date().getFullYear();
             const yearGrid = document.getElementById('filter-year-grid');
             const yearStats = document.getElementById('filter-year-stats');
-            if(!yearGrid || !yearStats) return;
-            
-            yearGrid.innerHTML = '<option value="all">Toutes les années</option>';
-            yearStats.innerHTML = '';
-
-            for(let y = 2027; y >= 2020; y--) {
-                const optGrid = document.createElement('option'); optGrid.value = y; optGrid.innerText = y;
+            for(let y = 2027; y >= 2000; y--) {
+                const optGrid = document.createElement('option');
+                optGrid.value = y; optGrid.innerText = y;
                 yearGrid.appendChild(optGrid);
-                const optStats = document.createElement('option'); optStats.value = y; optStats.innerText = y;
-                if(y === 2024) optStats.selected = true;
+
+                const optStats = document.createElement('option');
+                optStats.value = y; optStats.innerText = y;
+                if(y === currentYear) optStats.selected = true;
                 yearStats.appendChild(optStats);
             }
         }
+        initYearFilters();
+
+        const gridEl = document.getElementById('grid-content');
+        Sortable.create(gridEl, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: async function () {
+                const newOrder = Array.from(gridEl.children).map(el => parseInt(el.getAttribute('data-id')));
+                let newLibrary = newOrder.map(id => library.find(b => b.id === id));
+                newLibrary.forEach((book, i) => { book.id = i + 1; });
+                library = newLibrary;
+                await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+                render();
+            }
+        });
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -285,9 +459,7 @@
                 document.getElementById('user-display').innerText = user.email;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
-                document.getElementById('app-content').classList.add('opacity-100');
-                
-                initYearFilters();
+                setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
                 await loadUserLibrary();
             } else {
                 document.getElementById('app-content').classList.add('hidden');
@@ -296,247 +468,240 @@
         });
 
         async function loadUserLibrary() {
-            try {
-                const docRef = doc(db, "users_libs", currentUser.uid);
-                const docSnap = await getDoc(docRef);
-                let fetchedBooks = [];
-                if (docSnap.exists()) {
-                    fetchedBooks = docSnap.data().books || [];
+            const docRef = doc(db, "users_libs", currentUser.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                library = docSnap.data().books;
+                if (library.length < 100) {
+                    while (library.length < 100) {
+                        library.push({ id: library.length + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" });
+                    }
+                    await setDoc(docRef, { books: library });
                 }
-                
-                // Remplit la liste locale de 1 à 100 avec les données Firestore s'il y en a
-                library = Array.from({length: 100}, (_, i) => {
-                    const existingBook = fetchedBooks.find(b => b.id === (i + 1));
-                    return existingBook ? existingBook : { id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" };
-                });
-                updateFilterOptions();
-                render();
-            } catch (e) {
-                console.error("Erreur de chargement Firebase:", e);
+            } else {
+                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" }));
+                await setDoc(docRef, { books: library });
             }
+            updateFilterOptions();
+            render();
         }
 
         window.render = () => {
-            const gridContent = document.getElementById('grid-content');
-            if(!gridContent) return;
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const rF = document.getElementById('filter-rating').value;
+            const gF = document.getElementById('filter-genre').value;
+            const aF = document.getElementById('filter-author').value;
+            const mF = document.getElementById('filter-month').value;
+            const yGridF = document.getElementById('filter-year-grid').value;
+            const yStatsF = document.getElementById('filter-year-stats').value;
 
-            const searchEl = document.getElementById('search-input');
-            const ygEl = document.getElementById('filter-year-grid');
-            const rEl = document.getElementById('filter-rating');
-            const gEl = document.getElementById('filter-genre');
-            const aEl = document.getElementById('filter-author');
-            const ysEl = document.getElementById('filter-year-stats');
+            document.querySelectorAll('.display-year').forEach(el => el.innerText = yStatsF);
 
-            const searchTerm = searchEl ? searchEl.value.toLowerCase() : "";
-            const yGridF = ygEl ? ygEl.value : "all";
-            const rFilter = rEl ? rEl.value : "all";
-            const gFilter = gEl ? gEl.value : "all";
-            const aFilter = aEl ? aEl.value : "all";
-            const yStatsF = ysEl ? ysEl.value : "2024";
+            // LOGIQUE DE FILTRAGE GRILLE
+            const filteredGrid = library.filter(b => {
+                const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
+                const matchRating = rF === "all" || b.rating == rF;
+                const matchYear = yGridF === "all" || (b.end && b.end.includes(yGridF));
+                const matchGenre = gF === "all" || b.genre === gF;
+                const matchAuthor = aF === "all" || b.author === aF;
+                if (yGridF === "all" && !searchTerm && rF === "all" && gF === "all" && aF === "all" && mF === "all") return true; 
+                return b.title && matchSearch && matchRating && matchYear && matchGenre && matchAuthor; 
+            });
 
-            // FIX ABSOLU : On force l'affichage de CHAQUE élément de la bibliothèque (les 100 emplacements fixes)
-            gridContent.innerHTML = library.map(b => {
-                const matchesSearch = !searchTerm || (b.title + b.author + b.genre).toLowerCase().includes(searchTerm);
-                const matchesYear = yGridF === "all" || (b.end && b.end.includes(yGridF));
-                const matchesRating = rFilter === "all" || b.rating === parseInt(rFilter);
-                const matchesGenre = gFilter === "all" || b.genre === gFilter;
-                const matchesAuthor = aFilter === "all" || b.author === aFilter;
-                
-                // Si l'utilisateur tape une recherche ou applique un filtre, on n'affiche que ce qui correspond.
-                // Sinon (au repos), on laisse TOUS les cadres visibles (vides ou remplis).
-                let visible = true;
-                if (searchTerm || yGridF !== "all" || rFilter !== "all" || gFilter !== "all" || aFilter !== "all") {
-                    visible = b.title && matchesSearch && matchesYear && matchesRating && matchesGenre && matchesAuthor;
-                }
+            // FILTRE FICHES
+            const filteredFiches = library.filter(b => {
+                if(!b.title) return false;
+                const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
+                const matchRating = rF === "all" || b.rating == rF;
+                const matchYear = yGridF === "all" || (b.end && b.end.includes(yGridF));
+                const matchGenre = gF === "all" || b.genre === gF;
+                const matchAuthor = aF === "all" || b.author === aF;
+                return matchSearch && matchRating && matchYear && matchGenre && matchAuthor;
+            });
 
-                if(!visible) return '';
-
-                return `
-                    <div class="flex flex-col items-center cursor-pointer" onclick="jumpToFiche(${b.id})">
-                        <div class="grid-thumb bg-white border border-slate-200 shadow-sm flex items-center justify-center rounded-xl aspect-[2/3] relative w-full min-h-[150px]">
-                            ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover rounded-xl absolute inset-0">` : `<span class="text-slate-300 font-bold text-sm">#${b.id}</span>`}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            // ENTIÈREMENT CONSERVÉ : RENDER DES 100 FICHES
-            const fichesContent = document.getElementById('fiches-content');
-            if (fichesContent) {
-                fichesContent.innerHTML = library.map(book => {
-                    const stars = '★'.repeat(book.rating) + '☆'.repeat(5 - book.rating);
-                    return `
-                        <div id="fiche-scroll-${book.id}" class="fiche-container">
-                            <div class="fiche-number">#${book.id}</div>
-                            <h2 class="fiche-title">${book.title || `Fiche Vierge #${book.id}`}</h2>
-                            <h3 class="fiche-author">${book.author || 'Aucun auteur renseigné'}</h3>
-                            
-                            <div class="info-grid mb-6">
-                                <div class="info-item"><p class="section-label">Genre</p><p class="info-value">${book.genre || 'Non défini'}</p></div>
-                                <div class="info-item"><p class="section-label">Note</p><p class="info-value text-amber-500">${book.rating ? stars : 'Non noté'}</p></div>
-                                <div class="info-item"><p class="section-label">Début</p><p class="info-value">${book.start || '-'}</p></div>
-                                <div class="info-item"><p class="section-label">Fin</p><p class="info-value">${book.end || '-'}</p></div>
-                            </div>
-
-                            <p class="section-label">Résumé</p>
-                            <p class="fiche-summary mb-6">${book.summary || 'Aucun résumé pour le moment.'}</p>
-
-                            ${book.comment ? `
-                                <p class="section-label">Mon Avis</p>
-                                <div class="avis-box"><p class="text-sm text-slate-600 italic">"${book.comment}"</p></div>
-                            ` : ''}
-
-                            <div class="mt-6 flex gap-2">
-                                <button onclick="openEdit(${book.id})" class="text-xs bg-amber-50 hover:bg-amber-100 text-gold-accent font-bold px-4 py-2 rounded-lg transition-colors">Modifier la Fiche</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            // STATS 
+            // STATS
             const statLib = library.filter(b => b.title && b.end && b.end.includes(yStatsF));
-            const countEl = document.getElementById('stat-count');
-            if(countEl) countEl.innerText = statLib.length;
-            
-            const ratings = statLib.map(b => b.rating).filter(r => r > 0);
-            const avg = ratings.length ? (ratings.reduce((a,b) => a+b, 0) / ratings.length).toFixed(1) : "0.0";
-            const avgEl = document.getElementById('stat-avg');
-            if(avgEl) avgEl.innerText = avg;
+            document.getElementById('stat-count').innerText = statLib.length;
+            document.getElementById('stat-avg').innerText = statLib.length ? (statLib.reduce((a,b)=>a+b.rating,0)/statLib.length).toFixed(1) : "0.0";
 
-            const genresCount = {};
-            statLib.forEach(b => { if(b.genre) genresCount[b.genre] = (genresCount[b.genre] || 0) + 1; });
-            const topGenres = Object.entries(genresCount).sort((a,b) => b[1] - a[1]).slice(0, 3);
-            const podiumEl = document.getElementById('genre-podium');
-            if(podiumEl) {
-                podiumEl.innerHTML = topGenres.length ? topGenres.map(([g, c]) => `
-                    <div class="flex justify-between items-center text-xs border-b border-slate-50 py-1">
-                        <span class="font-bold text-slate-700">${g}</span>
-                        <span class="bg-amber-100 text-gold-accent font-black px-2 py-0.5 rounded-full">${c}</span>
-                    </div>
-                `).join('') : '<p class="text-xs text-gray-400 text-center">Aucune donnée</p>';
-            }
+            const genreCounts = {};
+            statLib.forEach(b => { if(b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1; });
+            const sortedGenres = Object.entries(genreCounts).sort((a,b) => b[1] - a[1]).slice(0, 3);
+            const podiumColors = ['#C5A059', '#A8A8A8', '#CD7F32'];
+            document.getElementById('genre-podium').innerHTML = sortedGenres.map((g, i) => `
+                <div class="podium-item"><div class="flex items-center gap-3">
+                <span class="rank-badge" style="background:${podiumColors[i]}">${i+1}</span>
+                <span class="text-xs font-bold uppercase truncate w-24">${g[0]}</span></div>
+                <span class="text-[10px] font-black text-slate-300">${g[1]} livres</span></div>
+            `).join('') || '<p class="text-[10px] text-slate-400 text-center italic py-4">Aucun bilan pour '+yStatsF+'</p>';
 
             updateChart(statLib);
+
+            // HTML GRILLE
+            document.getElementById('grid-content').innerHTML = filteredGrid.map(b => `
+                <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
+                    <div class="grid-thumb">
+                        ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-200 font-bold text-xs uppercase">#${b.id}</span>`}
+                    </div>
+                    <div class="flex gap-1">${getStarsHtml(b.rating, "text-base")}</div>
+                </div>
+            `).join('');
+
+            // HTML FICHES
+            document.getElementById('fiches-content').innerHTML = filteredFiches.map(book => `
+                <div id="fiche-scroll-${book.id}" class="fiche-container">
+                    <div class="fiche-number">#${book.id}</div>
+                    <button onclick="showSection('grille', true)" class="mb-6 flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
+                         <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Grille</span>
+                    </button>
+                    <div class="flex flex-col md:flex-row gap-10">
+                        <div class="cover-box shrink-0">
+                            ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
+                            <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
+                            <div class="mb-6">
+                                <p class="section-label">Note :</p>
+                                <div class="flex gap-1">${getStarsHtml(book.rating, "text-2xl")}</div>
+                            </div>
+                            <p class="section-label">Résumé :</p>
+                            <p class="fiche-summary">${book.summary || 'Aucun résumé.'}</p>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item"><p class="section-label">Début :</p><p class="info-value">${book.start || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Fin :</p><p class="info-value">${book.end || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Genre :</p><p class="info-value">${book.genre || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Format :</p><p class="info-value">${book.format || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Langue :</p><p class="info-value">${book.lang || '—'}</p></div>
+                    </div>
+                    <div class="mt-8">
+                        <p class="section-label">Mon avis personnel :</p>
+                        <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire.'}</p></div>
+                    </div>
+                    <div class="mt-8 flex justify-end gap-3">
+                        <button onclick="deleteBook(${book.id})" class="px-5 py-2 rounded-lg bg-red-50 text-red-400 font-bold uppercase text-[10px] tracking-widest hover:bg-red-100 transition-colors">Supprimer</button>
+                        <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600 transition-colors">Modifier</button>
+                    </div>
+                </div>
+            `).join('');
         };
 
         function updateChart(books) {
             const counts = new Array(12).fill(0);
             books.forEach(b => {
                 if(b.end && b.end.includes('/')) {
-                    const parts = b.end.split('/');
-                    if(parts.length >= 2) {
-                        const m = parseInt(parts[1]);
-                        if(m >= 1 && m <= 12) counts[m - 1]++;
-                    }
+                    const m = parseInt(b.end.split('/')[1]);
+                    if(m >= 1 && m <= 12) counts[m - 1]++;
                 }
             });
-            const canvas = document.getElementById('readingChart');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
+            const ctx = document.getElementById('readingChart').getContext('2d');
             if(readingChart) readingChart.destroy();
             readingChart = new Chart(ctx, {
                 type: 'line',
-                data: { 
-                    labels: ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"], 
-                    datasets: [{ 
-                        data: counts, 
-                        borderColor: '#C5A059', 
-                        backgroundColor: 'rgba(197, 160, 89, 0.1)',
-                        fill: true,
-                        tension: 0.3
-                    }] 
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                data: { labels: ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"], datasets: [{ label: 'Livres', data: counts, borderColor: '#C5A059', backgroundColor: 'rgba(197, 160, 89, 0.1)', fill: true, tension: 0.4 }] },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { display: false },
+                            ticks: { 
+                                stepSize: 1,
+                                callback: function(value) { if (value % 1 === 0) {return value;} }
+                            } 
+                        },
+                        x: { grid: { display: false } }
+                    } 
+                }
             });
         }
+
+        window.getStarsHtml = (rating, sizeClass = "text-[10px]") => {
+            let html = "";
+            for (let i = 1; i <= 5; i++) {
+                if (rating >= i) html += `<span class="${sizeClass} star-filled">★</span>`;
+                else if (rating >= i - 0.5) html += `<span class="${sizeClass} star-filled">⯪</span>`;
+                else html += `<span class="${sizeClass} star-empty">★</span>`;
+            }
+            return html;
+        };
 
         window.updateFilterOptions = () => {
             const genres = [...new Set(library.map(b => b.genre).filter(g => g))].sort();
             const authors = [...new Set(library.map(b => b.author).filter(a => a))].sort();
-            const fg = document.getElementById('filter-genre');
-            const fa = document.getElementById('filter-author');
-            if(fg) fg.innerHTML = '<option value="all">Tous les genres</option>' + genres.map(g => `<option value="${g}">${g}</option>`).join('');
-            if(fa) fa.innerHTML = '<option value="all">Tous les auteurs</option>' + authors.map(a => `<option value="${a}">${a}</option>`).join('');
+            document.getElementById('filter-genre').innerHTML = '<option value="all">Tous les genres</option>' + genres.map(g => `<option value="${g}">${g}</option>`).join('');
+            document.getElementById('filter-author').innerHTML = '<option value="all">Tous les auteurs</option>' + authors.map(a => `<option value="${a}">${a}</option>`).join('');
         };
 
-        window.resetFilters = () => {
-            document.getElementById('search-input').value = '';
-            document.getElementById('filter-year-grid').value = 'all';
-            document.getElementById('filter-rating').value = 'all';
-            document.getElementById('filter-genre').value = 'all';
-            document.getElementById('filter-author').value = 'all';
-            render();
+        window.saveToFirebase = async () => {
+            const id = parseInt(document.getElementById('modal-id').innerText);
+            const idx = library.findIndex(b => b.id === id);
+            library[idx] = { id, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: document.getElementById('in-start').value, end: document.getElementById('in-end').value, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value };
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            updateFilterOptions(); render(); closeModal();
+        };
+
+        window.showSection = (id, forceScrollTop = false) => {
+            if(forceScrollTop) window.scrollTo({top: 0});
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            document.getElementById('btn-' + id).classList.add('active');
+            document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats');
+        };
+
+        window.jumpToFiche = (id) => { 
+            const b = library.find(x => x.id === id);
+            if(!b.title) return openEdit(id);
+            showSection('fiches'); 
+            setTimeout(() => { document.getElementById('fiche-scroll-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100); 
         };
 
         window.openEdit = (id) => {
             const b = library.find(x => x.id === id);
             document.getElementById('modal-id').innerText = id;
-            ['title', 'author', 'cover', 'genre', 'start', 'end', 'summary', 'comment'].forEach(f => {
-                document.getElementById('in-' + f).value = b[f] || "";
+            ['title', 'author', 'cover', 'rating', 'genre', 'format', 'lang', 'start', 'end', 'summary', 'comment'].forEach(f => {
+                document.getElementById('in-' + f).value = b[f] || (f === 'rating' ? 0 : "");
             });
-            document.getElementById('in-rating').value = b.rating || 0;
             document.getElementById('edit-modal').classList.remove('hidden');
         };
-
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
-
-        window.saveToFirebase = async () => {
-            const id = parseInt(document.getElementById('modal-id').innerText);
-            const idx = library.findIndex(b => b.id === id);
-            library[idx] = {
-                id,
-                title: document.getElementById('in-title').value,
-                author: document.getElementById('in-author').value,
-                cover: document.getElementById('in-cover').value,
-                genre: document.getElementById('in-genre').value,
-                start: document.getElementById('in-start').value,
-                end: document.getElementById('in-end').value,
-                summary: document.getElementById('in-summary').value,
-                comment: document.getElementById('in-comment').value,
-                rating: parseInt(document.getElementById('in-rating').value) || 0
-            };
-            // Sauvegarde TOUTE la liste proprement
-            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
-            closeModal(); 
-            updateFilterOptions(); 
-            render();
-        };
-
-        window.showSection = (id) => {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            
-            const targetSection = document.getElementById('section-' + id);
-            const targetBtn = document.getElementById('btn-' + id);
-            
-            if (targetSection) targetSection.classList.add('active');
-            if (targetBtn) targetBtn.classList.add('active');
-            
-            const searchBar = document.getElementById('search-bar-container');
-            if (searchBar) {
-                searchBar.classList.toggle('hidden', id === 'stats');
-            }
-        };
-
-        window.jumpToFiche = (id) => {
-            const b = library.find(x => x.id === id);
-            if(!b || !b.title) return openEdit(id);
-            
-            showSection('fiches');
-            setTimeout(() => { 
-                document.getElementById('fiche-scroll-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-            }, 100);
-        };
-
+        window.resetFilters = () => { document.getElementById('search-input').value = ""; document.getElementById('filter-rating').value = "all"; document.getElementById('filter-genre').value = "all"; document.getElementById('filter-author').value = "all"; document.getElementById('filter-month').value = "all"; document.getElementById('filter-year-grid').value = "all"; render(); };
+        window.logout = () => signOut(auth);
+        window.toggleAuthMode = () => { isSignUp = !isSignUp; document.getElementById('auth-mode-title').innerText = isSignUp ? "Création" : "Connexion"; };
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value, pass = document.getElementById('password').value;
             try { isSignUp ? await createUserWithEmailAndPassword(auth, email, pass) : await signInWithEmailAndPassword(auth, email, pass); } catch (err) { alert(err.message); }
         });
-        
-        window.toggleAuthMode = () => { isSignUp = !isSignUp; document.getElementById('auth-mode-title').innerText = isSignUp ? "Création" : "Connexion"; };
-        window.logout = () => signOut(auth);
+        window.fetchBookInfo = async () => {
+            const title = document.getElementById('in-title').value;
+            if (!title) return;
+            try {
+                const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(title)}&maxResults=1`);
+                const data = await response.json();
+                if (data.items) {
+                    const info = data.items[0].volumeInfo;
+                    document.getElementById('in-author').value = info.authors?.join(', ') || '';
+                    document.getElementById('in-genre').value = info.categories?.[0] || '';
+                    document.getElementById('in-summary').value = info.description || '';
+                    if (info.imageLinks) document.getElementById('in-cover').value = info.imageLinks.thumbnail.replace('http:', 'https:');
+                }
+            } catch (e) {}
+        };
+        window.deleteBook = async (id) => {
+            if (!confirm("Supprimer ?")) return;
+            const idx = library.findIndex(b => b.id === id);
+            library.splice(idx, 1);
+            library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" });
+            library.forEach((b, i) => b.id = i + 1);
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            render();
+        };
     </script>
 </body>
 </html>
