@@ -44,7 +44,7 @@
         .view-section.active { display: block; }
 
         .tab-btn {
-            padding-bottom: 12px;
+            padding-bottom: 8px;
             font-size: 11px;
             font-weight: 900;
             text-transform: uppercase;
@@ -71,13 +71,19 @@
             border: 1px solid rgba(197, 160, 89, 0.1);
         }
 
-        .fiche-number {
+        .fiche-header-actions {
             position: absolute;
             top: 25px;
             right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .fiche-number {
             font-size: 16px;
             font-weight: 900;
-            color: #f1f1f1;
+            color: #e2e8f0;
         }
 
         .fiche-title {
@@ -141,7 +147,7 @@
         }
 
         /* --- STYLE GRILLE --- */
-        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative; }
         .grid-thumb {
             width: 100%; aspect-ratio: 2/3; background: white;
             border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;
@@ -202,6 +208,26 @@
             background-size: 14px;
         }
         .filter-select:focus { border-color: var(--gold-accent); }
+
+        .dashboard-year-select {
+            appearance: none;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            padding: 8px 36px 8px 20px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #475569;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 14px;
+            transition: all 0.2s;
+        }
+        .dashboard-year-select:focus { border-color: var(--gold-accent); }
     </style>
 </head>
 <body>
@@ -233,31 +259,33 @@
     </div>
 
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
-        <div class="max-w-6xl mx-auto px-6 py-10">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
-                <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
-                <div class="flex items-center gap-3">
-                    <span id="user-display" class="text-[10px] font-bold text-gray-400 uppercase mr-2"></span>
-                    <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-red-400 hover:text-red-600 border border-red-100 rounded-lg">Déconnexion</button>
-                </div>
-            </div>
+        
+        <div class="sticky top-0 z-50 bg-[#FAF9F6]/95 backdrop-blur-md shadow-sm border-b border-slate-100">
+            <div class="max-w-6xl mx-auto px-6 py-4">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <h1 class="text-2xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
+                    
+                    <div class="flex gap-8 items-center">
+                        <button onclick="showSection('stats')" id="btn-stats" class="tab-btn active">Tableau de Bord</button>
+                        <button onclick="showSection('grille')" id="btn-grille" class="tab-btn">Ma Grille</button>
+                        <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
+                    </div>
 
-            <div class="sticky top-0 z-50 bg-[#FAF9F6] pt-2 pb-4 shadow-sm -mx-6 px-6">
-                <div class="flex gap-10 border-b border-slate-100 mb-6">
-                    <button onclick="showSection('stats')" id="btn-stats" class="tab-btn active">Tableau de Bord</button>
-                    <button onclick="showSection('grille')" id="btn-grille" class="tab-btn">Ma Grille</button>
-                    <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
+                    <div class="flex items-center gap-3">
+                        <span id="user-display" class="text-[10px] font-bold text-gray-400 uppercase mr-2"></span>
+                        <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-red-400 hover:text-red-600 border border-red-100 rounded-lg">Déconnexion</button>
+                    </div>
                 </div>
 
-                <div id="search-bar-container" class="space-y-4 hidden">
+                <div id="search-bar-container" class="mt-4 space-y-3 hidden">
                     <div class="relative w-full">
                         <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </span>
-                        <input type="text" id="search-input" oninput="render()" placeholder="Recherche rapide (titre, auteur, genre...)" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent transition-all shadow-sm">
+                        <input type="text" id="search-input" oninput="render()" placeholder="Recherche rapide (titre, auteur, genre...)" class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent transition-all shadow-sm">
                     </div>
                     
-                    <div class="flex flex-wrap gap-3 items-center">
+                    <div class="flex flex-wrap gap-2 items-center text-xs">
                         <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider">Filtrer par :</span>
                         
                         <select id="filter-year-grid" onchange="render()" class="filter-select !bg-black !text-white font-bold">
@@ -305,13 +333,28 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div class="max-w-6xl mx-auto px-6 py-8">
+            
             <section id="section-stats" class="view-section active">
-                <div class="flex justify-center mb-8 mt-10">
-                    <div class="flex items-center gap-3 bg-white px-6 py-3 rounded-full border border-slate-100 shadow-sm">
-                        <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Bilan de l'année :</span>
-                        <select id="filter-year-stats" onchange="render()" class="filter-select !border-none !bg-transparent font-black text-lg text-gold-accent">
-                        </select>
+                <div class="flex flex-col sm:flex-row gap-6 items-center justify-between mb-8 w-full">
+                    <div class="shrink-0">
+                        <select id="filter-year-stats" onchange="render()" class="dashboard-year-select"></select>
+                    </div>
+
+                    <div id="best-book-card" class="flex-1 w-full hidden">
+                        <div class="bg-gradient-to-r from-amber-50 to-amber-100/50 rounded-2xl p-4 border border-amber-200/60 shadow-sm flex items-center gap-4 h-[58px] w-full">
+                            <div class="w-8 h-11 bg-white rounded shadow-sm overflow-hidden shrink-0 flex items-center justify-center border border-amber-200">
+                                <img id="best-book-img" src="" class="w-full h-full object-cover hidden">
+                                <span id="best-book-fallback" class="text-amber-400 text-sm font-black">👑</span>
+                            </div>
+                            <div class="text-left truncate flex-1">
+                                <span class="block text-[8px] font-black tracking-[0.2em] uppercase text-amber-600">👑 LIVRE DE L'ANNÉE <span class="display-year">...</span></span>
+                                <h3 id="best-book-title" class="font-serif text-sm font-bold uppercase tracking-tight text-slate-800 truncate leading-tight mt-0.5"></h3>
+                                <p id="best-book-author" class="text-[9px] font-bold text-amber-700 uppercase tracking-wider truncate"></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -339,18 +382,23 @@
                 </div>
             </section>
 
-            <section id="section-grille" class="view-section mt-10">
+            <section id="section-grille" class="view-section">
                 <div id="grid-content" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10"></div>
             </section>
 
-            <section id="section-fiches" class="view-section mt-10">
+            <section id="section-fiches" class="view-section">
                 <div id="fiches-content" class="space-y-20"></div>
             </section>
         </div>
     </div>
 
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="mb-4 flex items-center gap-3">
+    <input type="checkbox" id="in-bookclub" class="w-5 h-5 accent-[#C5A059]">
+    <label for="in-bookclub" class="text-[10px] font-bold text-gray-700 uppercase tracking-widest">Ajouter au Book Club</label>
+           </div>
+
+           <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-black uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
                 <button onclick="closeModal()" class="text-slate-300 hover:text-black text-2xl">&times;</button>
@@ -421,7 +469,6 @@
         let readingChart = null;
         let isSignUp = false;
 
-        // Init years
         function initYearFilters() {
             const currentYear = new Date().getFullYear();
             const yearGrid = document.getElementById('filter-year-grid');
@@ -474,12 +521,12 @@
                 library = docSnap.data().books;
                 if (library.length < 100) {
                     while (library.length < 100) {
-                        library.push({ id: library.length + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" });
+                        library.push({ id: library.length + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false });
                     }
                     await setDoc(docRef, { books: library });
                 }
             } else {
-                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" }));
+                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false }));
                 await setDoc(docRef, { books: library });
             }
             updateFilterOptions();
@@ -497,7 +544,6 @@
 
             document.querySelectorAll('.display-year').forEach(el => el.innerText = yStatsF);
 
-            // LOGIQUE DE FILTRAGE GRILLE
             const filteredGrid = library.filter(b => {
                 const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
                 const matchRating = rF === "all" || b.rating == rF;
@@ -508,7 +554,6 @@
                 return b.title && matchSearch && matchRating && matchYear && matchGenre && matchAuthor; 
             });
 
-            // FILTRE FICHES
             const filteredFiches = library.filter(b => {
                 if(!b.title) return false;
                 const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
@@ -519,10 +564,29 @@
                 return matchSearch && matchRating && matchYear && matchGenre && matchAuthor;
             });
 
-            // STATS
             const statLib = library.filter(b => b.title && b.end && b.end.includes(yStatsF));
             document.getElementById('stat-count').innerText = statLib.length;
             document.getElementById('stat-avg').innerText = statLib.length ? (statLib.reduce((a,b)=>a+b.rating,0)/statLib.length).toFixed(1) : "0.0";
+
+            const bestBook = statLib.find(b => b.isFavorite === true);
+            const bestBookCard = document.getElementById('best-book-card');
+            if (bestBook) {
+                bestBookCard.classList.remove('hidden');
+                document.getElementById('best-book-title').innerText = bestBook.title;
+                document.getElementById('best-book-author').innerText = bestBook.author || 'AUTEUR INCONNU';
+                const imgEl = document.getElementById('best-book-img');
+                const fallbackEl = document.getElementById('best-book-fallback');
+                if (bestBook.cover) {
+                    imgEl.src = bestBook.cover;
+                    imgEl.classList.remove('hidden');
+                    fallbackEl.classList.add('hidden');
+                } else {
+                    imgEl.classList.add('hidden');
+                    fallbackEl.classList.remove('hidden');
+                }
+            } else {
+                bestBookCard.classList.add('hidden');
+            }
 
             const genreCounts = {};
             statLib.forEach(b => { if(b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1; });
@@ -540,9 +604,16 @@
             // HTML GRILLE
             document.getElementById('grid-content').innerHTML = filteredGrid.map(b => `
                 <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
-                    <div class="grid-thumb">
+                    <div class="grid-thumb relative">
                         ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-200 font-bold text-xs uppercase">#${b.id}</span>`}
+                        
+                        <!-- Badge Favori -->
+                        ${b.isFavorite ? `<span class="absolute top-2 right-2 bg-[#C5A059]/25 backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg border border-[#C5A059]/40">👑</span>` : ''}
+                        
+                        <!-- Badge Book Club -->
+    ${b.isBookClub ? `<span class="absolute bottom-2 left-2 bg-blue-500/80 backdrop-blur-md text-white text-[10px] w-6 h-6 flex items-center justify-center rounded-full shadow-lg border border-white/20">📖</span>` : ''}
                     </div>
+
                     <div class="flex gap-1">${getStarsHtml(b.rating, "text-base")}</div>
                 </div>
             `).join('');
@@ -550,7 +621,16 @@
             // HTML FICHES
             document.getElementById('fiches-content').innerHTML = filteredFiches.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
-                    <div class="fiche-number">#${book.id}</div>
+                    <div class="fiche-header-actions">
+                        <button onclick="toggleBookClub(${book.id})" class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${book.isBookClub ? 'bg-blue-500 text-white shadow-md' : 'bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-500'}">
+        <span class="${book.isBookClub ? '' : 'grayscale opacity-40'}">📖</span> Book Club
+                           </button>
+
+                           <button onclick="toggleFavorite(${book.id})" class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${book.isFavorite ? 'bg-amber-400 text-white shadow-md' : 'bg-slate-50 text-slate-400 hover:bg-amber-50 hover:text-amber-500'}" title="${book.isFavorite ? "Livre de l'année" : "Élire Livre de l'année"}">
+                            <span class="${book.isFavorite ? '' : 'grayscale opacity-40'}">👑</span> ${book.isFavorite ? "Livre de l'année" : "Élire"}
+                        </button>
+                        <div class="fiche-number">#${book.id}</div>
+                    </div>
                     <button onclick="showSection('grille', true)" class="mb-6 flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
                          <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Grille</span>
                     </button>
@@ -580,12 +660,46 @@
                         <p class="section-label">Mon avis personnel :</p>
                         <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire.'}</p></div>
                     </div>
-                    <div class="mt-8 flex justify-end gap-3">
+                    <div class="mt-8 flex justify-end gap-3 items-center">
                         <button onclick="deleteBook(${book.id})" class="px-5 py-2 rounded-lg bg-red-50 text-red-400 font-bold uppercase text-[10px] tracking-widest hover:bg-red-100 transition-colors">Supprimer</button>
                         <button onclick="openEdit(${book.id})" class="px-5 py-2 rounded-lg bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest hover:text-yellow-600 transition-colors">Modifier</button>
                     </div>
                 </div>
             `).join('');
+        };
+
+        window.toggleFavorite = async (id) => {
+            const targetBook = library.find(b => b.id === id);
+            if (!targetBook || !targetBook.end) {
+                alert("Veuillez d'abord renseigner une date de fin pour ce livre.");
+                return;
+            }
+            
+            const targetYear = targetBook.end.split('/').pop().trim();
+            const currentState = targetBook.isFavorite;
+
+            if (!currentState) {
+                library.forEach(b => {
+                    if (b.end && b.end.includes(targetYear)) {
+                        b.isFavorite = false;
+                    }
+                });
+            }
+window.toggleBookClub = async (id) => {
+    const targetBook = library.find(b => b.id === id);
+    if (!targetBook) return;
+    
+    // Inverse l'état (true devient false, et inversement)
+    targetBook.isBookClub = !targetBook.isBookClub;
+
+    await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+    render(); // Rafraîchit l'affichage
+};
+
+            targetBook.isFavorite = !currentState;
+
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            render();
         };
 
         function updateChart(books) {
@@ -640,9 +754,12 @@
         window.saveToFirebase = async () => {
             const id = parseInt(document.getElementById('modal-id').innerText);
             const idx = library.findIndex(b => b.id === id);
-            library[idx] = { id, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: document.getElementById('in-start').value, end: document.getElementById('in-end').value, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value };
+            const currentFav = library[idx].isFavorite || false;
+
+            library[idx] = { id, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: document.getElementById('in-start').value, end: document.getElementById('in-end').value, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav };
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             updateFilterOptions(); render(); closeModal();
+            library[idx].isBookClub = document.getElementById('in-bookclub').checked;
         };
 
         window.showSection = (id, forceScrollTop = false) => {
@@ -668,6 +785,7 @@
                 document.getElementById('in-' + f).value = b[f] || (f === 'rating' ? 0 : "");
             });
             document.getElementById('edit-modal').classList.remove('hidden');
+            document.getElementById('in-bookclub').checked = b.isBookClub || false;
         };
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
         window.resetFilters = () => { document.getElementById('search-input').value = ""; document.getElementById('filter-rating').value = "all"; document.getElementById('filter-genre').value = "all"; document.getElementById('filter-author').value = "all"; document.getElementById('filter-month').value = "all"; document.getElementById('filter-year-grid').value = "all"; render(); };
@@ -697,7 +815,7 @@
             if (!confirm("Supprimer ?")) return;
             const idx = library.findIndex(b => b.id === id);
             library.splice(idx, 1);
-            library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" });
+            library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false });
             library.forEach((b, i) => b.id = i + 1);
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             render();
