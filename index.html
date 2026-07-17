@@ -77,7 +77,7 @@
             right: 30px;
             font-size: 16px;
             font-weight: 900;
-            color: #f1f1f1;
+            color: #e2e8f0;
         }
 
         .fiche-title {
@@ -144,7 +144,7 @@
         .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .grid-thumb {
             width: 100%; aspect-ratio: 2/3; background: white;
-            border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08); border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 12px; transition: all 0.3s; overflow: hidden;
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
@@ -389,8 +389,8 @@
                 <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">URL Couverture</label><input id="in-cover" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Langue</label><input id="in-lang" class="modal-input"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Début (ex: 01/05/2025)</label><input id="in-start" class="modal-input" placeholder="JJ/MM/AAAA"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fin (ex: 15/05/2025)</label><input id="in-end" class="modal-input" placeholder="JJ/MM/AAAA"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Début (ex: 01/05/2026)</label><input id="in-start" class="modal-input" placeholder="JJ/MM/AAAA"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fin (ex: 15/05/2026)</label><input id="in-end" class="modal-input" placeholder="JJ/MM/AAAA"></div>
             </div>
             <textarea id="in-summary" class="modal-input h-24" placeholder="Résumé..."></textarea>
             <textarea id="in-comment" class="modal-input h-24" placeholder="Mon avis..."></textarea>
@@ -421,7 +421,6 @@
         let readingChart = null;
         let isSignUp = false;
 
-        // Init years
         function initYearFilters() {
             const currentYear = new Date().getFullYear();
             const yearGrid = document.getElementById('filter-year-grid');
@@ -471,13 +470,12 @@
             const docRef = doc(db, "users_libs", currentUser.uid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                library = docSnap.data().books;
-                if (library.length < 100) {
-                    while (library.length < 100) {
-                        library.push({ id: library.length + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" });
-                    }
-                    await setDoc(docRef, { books: library });
-                }
+                let fetchedBooks = docSnap.data().books || [];
+                // Fusion intelligente pour ne pas écraser les données utilisateur existantes
+                library = Array.from({length: 100}, (_, i) => {
+                    const existingBook = fetchedBooks.find(b => b.id === (i + 1));
+                    return existingBook ? existingBook : { id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" };
+                });
             } else {
                 library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" }));
                 await setDoc(docRef, { books: library });
@@ -497,7 +495,7 @@
 
             document.querySelectorAll('.display-year').forEach(el => el.innerText = yStatsF);
 
-            // LOGIQUE DE FILTRAGE GRILLE (On garde les cadres vides si aucun filtre n'est actif)
+            // LOGIQUE DE FILTRAGE DE LA GRILLE (Affiche toujours 100 cases si pas de recherche active)
             const filteredGrid = library.filter(b => {
                 const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
                 const matchRating = rF === "all" || b.rating == rF;
@@ -505,10 +503,11 @@
                 const matchGenre = gF === "all" || b.genre === gF;
                 const matchAuthor = aF === "all" || b.author === aF;
                 
-                // Si aucune recherche/filtre n'est actif, on affiche TOUT (les 100 cadres blancs)
-                if (yGridF === "all" && !searchTerm && rF === "all" && gF === "all" && aF === "all" && mF === "all") return true; 
-                // Sinon, on n'affiche que les livres remplis qui correspondent aux critères
-                return b.title && matchSearch && matchRating && matchYear && matchGenre && matchAuthor; 
+                // Si aucune recherche textuelle / aucun filtre n'est appliqué -> on préserve les 100 cadres
+                if (yGridF === "all" && !searchTerm && rF === "all" && gF === "all" && aF === "all" && mF === "all") return true;
+                
+                // Sinon on n'affiche que les fiches complétées correspondantes
+                return b.title && matchSearch && matchRating && matchYear && matchGenre && matchAuthor;
             });
 
             // FILTRE FICHES
@@ -540,7 +539,7 @@
 
             updateChart(statLib);
 
-            // HTML GRILLE (Ajout de classes pour forcer le cadre blanc quand il n'y a pas de couverture)
+            // RENDU HTML DE LA GRILLE
             document.getElementById('grid-content').innerHTML = filteredGrid.map(b => `
                 <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
                     <div class="grid-thumb w-full bg-white border border-slate-200 shadow-sm flex items-center justify-center rounded-xl aspect-[2/3]">
@@ -550,7 +549,7 @@
                 </div>
             `).join('');
 
-            // HTML FICHES
+            // RENDU HTML DES FICHES DETAILLEES
             document.getElementById('fiches-content').innerHTML = filteredFiches.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
                     <div class="fiche-number">#${book.id}</div>
@@ -659,13 +658,13 @@
 
         window.jumpToFiche = (id) => { 
             const b = library.find(x => x.id === id);
-            if(!b.title) return openEdit(id);
+            if(!b || !b.title) return openEdit(id);
             showSection('fiches'); 
             setTimeout(() => { document.getElementById('fiche-scroll-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100); 
         };
 
         window.openEdit = (id) => {
-            const b = library.find(x => x.id === id);
+            const b = library.find(x => x.id === id) || { id };
             document.getElementById('modal-id').innerText = id;
             ['title', 'author', 'cover', 'rating', 'genre', 'format', 'lang', 'start', 'end', 'summary', 'comment'].forEach(f => {
                 document.getElementById('in-' + f).value = b[f] || (f === 'rating' ? 0 : "");
@@ -697,13 +696,13 @@
             } catch (e) {}
         };
         window.deleteBook = async (id) => {
-            if (!confirm("Supprimer ?")) return;
+            if (!confirm("Supprimer le contenu de ce livre ?")) return;
             const idx = library.findIndex(b => b.id === id);
-            library.splice(idx, 1);
-            library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" });
-            library.forEach((b, i) => b.id = i + 1);
-            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
-            render();
+            if(idx !== -1) {
+                library[idx] = { id, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" };
+                await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+                render();
+            }
         };
     </script>
 </body>
