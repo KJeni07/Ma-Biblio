@@ -270,13 +270,10 @@
             yearGrid.innerHTML = '<option value="all">Toutes les années</option>';
             yearStats.innerHTML = '';
 
-            // Injection dynamique des années incluant 2024
             for(let y = 2027; y >= 2020; y--) {
                 const optGrid = document.createElement('option'); optGrid.value = y; optGrid.innerText = y;
                 yearGrid.appendChild(optGrid);
                 const optStats = document.createElement('option'); optStats.value = y; optStats.innerText = y;
-                
-                // Si l'année est 2024, on la pré-sélectionne par défaut pour afficher ton livre directement !
                 if(y === 2024) optStats.selected = true;
                 yearStats.appendChild(optStats);
             }
@@ -307,7 +304,7 @@
                     fetchedBooks = docSnap.data().books || [];
                 }
                 
-                // Génère les 100 emplacements fixes
+                // Remplit la liste locale de 1 à 100 avec les données Firestore s'il y en a
                 library = Array.from({length: 100}, (_, i) => {
                     const existingBook = fetchedBooks.find(b => b.id === (i + 1));
                     return existingBook ? existingBook : { id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "" };
@@ -323,7 +320,6 @@
             const gridContent = document.getElementById('grid-content');
             if(!gridContent) return;
 
-            // Protection si les éléments de filtrage ne sont pas encore chargés
             const searchEl = document.getElementById('search-input');
             const ygEl = document.getElementById('filter-year-grid');
             const rEl = document.getElementById('filter-rating');
@@ -338,7 +334,7 @@
             const aFilter = aEl ? aEl.value : "all";
             const yStatsF = ysEl ? ysEl.value : "2024";
 
-            // RENDER LA GRILLE : Affiche TOUJOURS les cadres blancs (1 à 100)
+            // FIX ABSOLU : On force l'affichage de CHAQUE élément de la bibliothèque (les 100 emplacements fixes)
             gridContent.innerHTML = library.map(b => {
                 const matchesSearch = !searchTerm || (b.title + b.author + b.genre).toLowerCase().includes(searchTerm);
                 const matchesYear = yGridF === "all" || (b.end && b.end.includes(yGridF));
@@ -346,6 +342,8 @@
                 const matchesGenre = gFilter === "all" || b.genre === gFilter;
                 const matchesAuthor = aFilter === "all" || b.author === aFilter;
                 
+                // Si l'utilisateur tape une recherche ou applique un filtre, on n'affiche que ce qui correspond.
+                // Sinon (au repos), on laisse TOUS les cadres visibles (vides ou remplis).
                 let visible = true;
                 if (searchTerm || yGridF !== "all" || rFilter !== "all" || gFilter !== "all" || aFilter !== "all") {
                     visible = b.title && matchesSearch && matchesYear && matchesRating && matchesGenre && matchesAuthor;
@@ -362,7 +360,7 @@
                 `;
             }).join('');
 
-            // RENDER LES 100 FICHES
+            // ENTIÈREMENT CONSERVÉ : RENDER DES 100 FICHES
             const fichesContent = document.getElementById('fiches-content');
             if (fichesContent) {
                 fichesContent.innerHTML = library.map(book => {
@@ -396,22 +394,19 @@
                 }).join('');
             }
 
-            // STATS TABLEAU DE BORD
+            // STATS 
             const statLib = library.filter(b => b.title && b.end && b.end.includes(yStatsF));
-            
             const countEl = document.getElementById('stat-count');
             if(countEl) countEl.innerText = statLib.length;
             
             const ratings = statLib.map(b => b.rating).filter(r => r > 0);
             const avg = ratings.length ? (ratings.reduce((a,b) => a+b, 0) / ratings.length).toFixed(1) : "0.0";
-            
             const avgEl = document.getElementById('stat-avg');
             if(avgEl) avgEl.innerText = avg;
 
             const genresCount = {};
             statLib.forEach(b => { if(b.genre) genresCount[b.genre] = (genresCount[b.genre] || 0) + 1; });
             const topGenres = Object.entries(genresCount).sort((a,b) => b[1] - a[1]).slice(0, 3);
-            
             const podiumEl = document.getElementById('genre-podium');
             if(podiumEl) {
                 podiumEl.innerHTML = topGenres.length ? topGenres.map(([g, c]) => `
@@ -501,7 +496,8 @@
                 comment: document.getElementById('in-comment').value,
                 rating: parseInt(document.getElementById('in-rating').value) || 0
             };
-            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library.filter(b => b.title !== "") });
+            // Sauvegarde TOUTE la liste proprement
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             closeModal(); 
             updateFilterOptions(); 
             render();
