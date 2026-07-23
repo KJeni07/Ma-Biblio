@@ -1227,18 +1227,24 @@
 
         async function searchOpenLibrary(query) {
             try {
-                const response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&fields=key,title,author_name,cover_i,first_publish_year,subject&limit=6`);
+                const fields = 'key,title,author_name,cover_i,first_publish_year,subject,editions,editions.key,editions.cover_i,editions.language,editions.first_publish_year';
+                const response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&fields=${fields}&editions.language=fre&limit=6`);
                 const data = await response.json();
-                return (data.docs || []).map(doc => ({
-                    title: doc.title || query,
-                    author: doc.author_name?.join(', ') || '',
-                    year: doc.first_publish_year ? String(doc.first_publish_year) : '',
-                    genre: doc.subject?.[0] || '',
-                    cover: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg` : '',
-                    thumb: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-S.jpg` : '',
-                    summarySource: 'openlibrary',
-                    olKey: doc.key
-                }));
+                return (data.docs || []).map(doc => {
+                    const frenchEdition = doc.editions?.docs?.find(e => e.cover_i);
+                    const coverId = frenchEdition?.cover_i || doc.cover_i;
+                    return {
+                        title: doc.title || query,
+                        author: doc.author_name?.join(', ') || '',
+                        year: doc.first_publish_year ? String(doc.first_publish_year) : '',
+                        genre: doc.subject?.[0] || '',
+                        cover: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : '',
+                        thumb: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-S.jpg` : '',
+                        summarySource: 'openlibrary',
+                        olKey: doc.key,
+                        hasFrenchEdition: !!frenchEdition
+                    };
+                }).sort((a, b) => (b.hasFrenchEdition ? 1 : 0) - (a.hasFrenchEdition ? 1 : 0));
             } catch (e) { return []; }
         }
 
@@ -1275,7 +1281,7 @@
                     ${b.thumb ? `<img src="${b.thumb}" class="w-8 h-11 object-cover rounded shadow-sm shrink-0">` : '<div class="w-8 h-11 bg-slate-100 rounded shrink-0"></div>'}
                     <div class="min-w-0">
                         <p class="text-xs font-bold truncate">${b.title}</p>
-                        <p class="text-[10px] text-slate-400 truncate">${b.author || 'Auteur inconnu'}${b.year ? ' · ' + b.year : ''}</p>
+                        <p class="text-[10px] text-slate-400 truncate">${b.hasFrenchEdition ? '🇫🇷 ' : ''}${b.author || 'Auteur inconnu'}${b.year ? ' · ' + b.year : ''}</p>
                     </div>
                 </div>`).join('');
             dropdown.classList.remove('hidden');
