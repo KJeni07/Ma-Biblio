@@ -256,6 +256,7 @@
         html.dark .grid-thumb, html.dark .avis-box, html.dark .podium-item { background-color: #242424 !important; border-color: #2f2f2f !important; }
         html.dark .modal-input { background-color: #242424 !important; border-color: #3a3a3a !important; color: #eee; }
         html.dark .fiche-title, html.dark h1, html.dark h2, html.dark h3 { color: #F2F0EA !important; }
+        html.dark #best-book-title { color: #292118 !important; }
         html.dark .fiche-summary { color: #cfcfcf; }
         html.dark .info-item { border-color: #2a2a2a !important; }
         html.dark .info-value { color: #F2F0EA !important; }
@@ -271,6 +272,7 @@
             border: 1px solid rgba(197, 160, 89, 0.3);
             background: transparent; cursor: pointer; transition: all 0.2s;
             font-size: 16px;
+            color: var(--gold-accent);
         }
         .theme-toggle-btn:hover { background: rgba(197, 160, 89, 0.1); }
 
@@ -338,9 +340,8 @@
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <button onclick="toggleTheme()" id="theme-toggle-btn" class="theme-toggle-btn" title="Changer de thème">🌙</button>
+                        <button onclick="toggleTheme()" id="theme-toggle-btn" class="theme-toggle-btn" title="Changer de thème"></button>
                         <button onclick="openProfile()" id="profile-avatar-btn" class="profile-avatar-btn" title="Mon profil"></button>
-                        <button onclick="logout()" class="text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-red-400 hover:text-red-600 border border-red-100 rounded-lg">Déconnexion</button>
                     </div>
                 </div>
 
@@ -427,13 +428,17 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div class="stat-card flex flex-col justify-center items-center">
+                        <span class="text-xl mb-1" style="opacity:0.5">📚</span>
                         <p class="section-label">Livres Lus en <span class="display-year">...</span></p>
                         <div id="stat-count" class="stat-value">0</div>
+                        <p id="stat-count-compare" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">&nbsp;</p>
                     </div>
                     <div class="stat-card flex flex-col justify-center items-center">
+                        <span class="text-xl mb-1" style="opacity:0.5">⭐</span>
                         <p class="section-label">Note Moyenne</p>
                         <div id="stat-avg" class="stat-value">0.0</div>
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Étoiles sur 5</p>
+                        <p id="stat-avg-range" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">&nbsp;</p>
                     </div>
                     <div class="stat-card text-left px-8">
                         <p class="section-label text-center mb-2">Podium des Genres</p>
@@ -562,10 +567,12 @@
         let isSignUp = false;
 
         // --- MODE SOMBRE ---
+        const MOON_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+        const SUN_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>';
         function applyTheme(theme) {
             document.documentElement.classList.toggle('dark', theme === 'dark');
             const btn = document.getElementById('theme-toggle-btn');
-            if (btn) btn.innerText = theme === 'dark' ? '☀️' : '🌙';
+            if (btn) btn.innerHTML = theme === 'dark' ? SUN_ICON : MOON_ICON;
         }
         window.toggleTheme = () => {
             const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
@@ -790,6 +797,25 @@
             document.getElementById('stat-count').innerText = statLib.length;
             document.getElementById('stat-avg').innerText = statLib.length ? (statLib.reduce((a,b)=>a+b.rating,0)/statLib.length).toFixed(1) : "0.0";
 
+            const prevYear = String(parseInt(yStatsF) - 1);
+            const prevYearLib = library.filter(b => b.title && b.end && b.end.includes(prevYear));
+            const compareEl = document.getElementById('stat-count-compare');
+            if (prevYearLib.length > 0 || statLib.length > 0) {
+                const diff = statLib.length - prevYearLib.length;
+                const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '=';
+                compareEl.innerText = `${arrow} vs ${prevYearLib.length} en ${prevYear}`;
+            } else {
+                compareEl.innerHTML = '&nbsp;';
+            }
+
+            const rangeEl = document.getElementById('stat-avg-range');
+            if (statLib.length > 0) {
+                const ratings = statLib.map(b => b.rating).filter(r => r != null);
+                rangeEl.innerText = `Min ${Math.min(...ratings)} · Max ${Math.max(...ratings)}`;
+            } else {
+                rangeEl.innerHTML = '&nbsp;';
+            }
+
             const bestBook = statLib.find(b => b.isFavorite === true);
             const bestBookCard = document.getElementById('best-book-card');
             if (bestBook) {
@@ -814,9 +840,10 @@
             statLib.forEach(b => { if(b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1; });
             const sortedGenres = Object.entries(genreCounts).sort((a,b) => b[1] - a[1]).slice(0, 3);
             const podiumColors = ['#C5A059', '#A8A8A8', '#CD7F32'];
+            const podiumMedals = ['🥇', '🥈', '🥉'];
             document.getElementById('genre-podium').innerHTML = sortedGenres.map((g, i) => `
                 <div class="podium-item"><div class="flex items-center gap-3">
-                <span class="rank-badge" style="background:${podiumColors[i]}">${i+1}</span>
+                <span class="rank-badge" style="background:transparent; font-size: 20px;">${podiumMedals[i]}</span>
                 <span class="text-xs font-bold uppercase truncate w-24">${g[0]}</span></div>
                 <span class="text-[10px] font-black text-slate-300">${g[1]} livres</span></div>
             `).join('') || '<p class="text-[10px] text-slate-400 text-center italic py-4">Aucun bilan pour '+yStatsF+'</p>';
