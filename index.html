@@ -156,23 +156,33 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
         .grid-thumb:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(197, 160, 89, 0.15); }
-        
+
+        .grid-thumb-add {
+            background: transparent;
+            border: 2px dashed rgba(197, 160, 89, 0.35);
+            box-shadow: none;
+        }
+        .grid-thumb-add:hover { background: rgba(197, 160, 89, 0.06); border-color: var(--gold-accent); }
+        html.dark .grid-thumb-add { background: transparent !important; }
+
         .sortable-ghost { opacity: 0.3; }
 
         /* --- DASHBOARD STATS --- */
         .stat-card {
             background: white;
-            padding: 25px;
-            border-radius: 20px;
+            padding: 16px;
+            border-radius: 16px;
             border: 1px solid rgba(197, 160, 89, 0.1);
             text-align: center;
             transition: transform 0.3s;
+            height: 190px;
+            overflow: hidden;
         }
-        .stat-value { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900; color: var(--gold-accent); }
+        .stat-value { font-family: 'Playfair Display', serif; font-size: 2.1rem; font-weight: 900; color: var(--gold-accent); }
         
         .podium-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 15px; background: #fcfbf8; border-radius: 12px; margin-bottom: 8px;
+            padding: 6px 12px; background: #fcfbf8; border-radius: 10px; margin-bottom: 4px;
             border: 1px solid #f0f0f0;
         }
         .rank-badge {
@@ -392,15 +402,15 @@
             </div>
         </div>
 
-        <div class="max-w-6xl mx-auto px-6 py-8">
+        <div class="max-w-6xl mx-auto px-6 py-4">
             
             <section id="section-stats" class="view-section active">
-                <div class="flex flex-col sm:flex-row gap-6 items-center justify-between mb-8 w-full">
+                <div class="flex flex-col sm:flex-row gap-6 items-center justify-between mb-4 w-full">
                     <div class="shrink-0">
                         <select id="filter-year-stats" onchange="render()" class="dashboard-year-select"></select>
                     </div>
 
-                    <div id="best-book-card" class="flex-1 w-full hidden">
+                    <div id="best-book-card" class="flex-1 w-full invisible">
                         <div class="bg-gradient-to-r from-amber-50 to-amber-100/50 rounded-2xl p-4 border border-amber-200/60 shadow-sm flex items-center gap-4 h-[58px] w-full">
                             <div class="w-8 h-11 bg-white rounded shadow-sm overflow-hidden shrink-0 flex items-center justify-center border border-amber-200">
                                 <img id="best-book-img" src="" class="w-full h-full object-cover hidden">
@@ -415,24 +425,24 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div class="stat-card">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="stat-card flex flex-col justify-center items-center">
                         <p class="section-label">Livres Lus en <span class="display-year">...</span></p>
                         <div id="stat-count" class="stat-value">0</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card flex flex-col justify-center items-center">
                         <p class="section-label">Note Moyenne</p>
                         <div id="stat-avg" class="stat-value">0.0</div>
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Étoiles sur 5</p>
                     </div>
                     <div class="stat-card text-left px-8">
-                        <p class="section-label text-center mb-4">Podium des Genres</p>
-                        <div id="genre-podium" class="space-y-2"></div>
+                        <p class="section-label text-center mb-2">Podium des Genres</p>
+                        <div id="genre-podium" class="space-y-1 overflow-y-auto" style="max-height: 140px;"></div>
                     </div>
                 </div>
                 
-                <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                    <p class="section-label mb-6">Rythme de lecture (Livres par mois en <span class="display-year">...</span>)</p>
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <p class="section-label mb-3">Rythme de lecture (Livres par mois en <span class="display-year">...</span>)</p>
                     <div class="h-64 w-full">
                         <canvas id="readingChart"></canvas>
                     </div>
@@ -479,11 +489,6 @@
     </div>
 
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
-        <div class="mb-4 flex items-center gap-3">
-    <input type="checkbox" id="in-bookclub" class="w-5 h-5 accent-[#C5A059]">
-    <label for="in-bookclub" class="text-[10px] font-bold text-gray-700 uppercase tracking-widest">Ajouter au Book Club</label>
-           </div>
-
            <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-black uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
@@ -693,11 +698,17 @@
         Sortable.create(gridEl, {
             animation: 150,
             ghostClass: 'sortable-ghost',
+            filter: '.add-card',
+            preventOnFilter: true,
             onEnd: async function () {
-                const newOrder = Array.from(gridEl.children).map(el => parseInt(el.getAttribute('data-id')));
-                let newLibrary = newOrder.map(id => library.find(b => b.id === id));
-                newLibrary.forEach((book, i) => { book.id = i + 1; });
-                library = newLibrary;
+                const newOrder = Array.from(gridEl.children)
+                    .filter(el => el.dataset.id !== 'new')
+                    .map(el => parseInt(el.getAttribute('data-id')));
+                const draggedBooks = newOrder.map(id => library.find(b => b.id === id));
+                const emptyBooks = library.filter(b => !b.title);
+                draggedBooks.forEach((book, i) => { book.id = i + 1; });
+                emptyBooks.forEach((book, i) => { book.id = draggedBooks.length + i + 1; });
+                library = [...draggedBooks, ...emptyBooks];
                 await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
                 render();
             }
@@ -762,7 +773,6 @@
                 const matchYear = yGridF === "all" || (b.end && b.end.includes(yGridF));
                 const matchGenre = gF === "all" || b.genre === gF;
                 const matchAuthor = aF === "all" || b.author === aF;
-                if (yGridF === "all" && !searchTerm && rF === "all" && gF === "all" && aF === "all" && mF === "all") return true; 
                 return b.title && matchSearch && matchRating && matchYear && matchGenre && matchAuthor; 
             });
 
@@ -783,7 +793,7 @@
             const bestBook = statLib.find(b => b.isFavorite === true);
             const bestBookCard = document.getElementById('best-book-card');
             if (bestBook) {
-                bestBookCard.classList.remove('hidden');
+                bestBookCard.classList.remove('invisible');
                 document.getElementById('best-book-title').innerText = bestBook.title;
                 document.getElementById('best-book-author').innerText = bestBook.author || 'AUTEUR INCONNU';
                 const imgEl = document.getElementById('best-book-img');
@@ -797,7 +807,7 @@
                     fallbackEl.classList.remove('hidden');
                 }
             } else {
-                bestBookCard.classList.add('hidden');
+                bestBookCard.classList.add('invisible');
             }
 
             const genreCounts = {};
@@ -814,6 +824,7 @@
             updateChart(statLib);
 
             // HTML GRILLE
+            const nextEmptyBook = library.find(b => !b.title);
             document.getElementById('grid-content').innerHTML = filteredGrid.map(b => `
                 <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
                     <div class="grid-thumb relative">
@@ -828,7 +839,14 @@
 
                     <div class="flex gap-1">${getStarsHtml(b.rating, "text-base")}</div>
                 </div>
-            `).join('');
+            `).join('') + (nextEmptyBook ? `
+                <div class="grid-item add-card" data-id="new" onclick="openEdit(${nextEmptyBook.id})">
+                    <div class="grid-thumb grid-thumb-add relative">
+                        <span class="text-4xl leading-none" style="color: var(--gold-accent)">+</span>
+                    </div>
+                    <div class="flex gap-1 justify-center text-[9px] font-bold uppercase tracking-widest text-slate-300">Ajouter</div>
+                </div>
+            ` : '');
 
             // HTML FICHES
             document.getElementById('fiches-content').innerHTML = filteredFiches.map(book => `
@@ -965,11 +983,11 @@
             const id = parseInt(document.getElementById('modal-id').innerText);
             const idx = library.findIndex(b => b.id === id);
             const currentFav = library[idx].isFavorite || false;
+            const currentBookClub = library[idx].isBookClub || false;
 
-            library[idx] = { id, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: document.getElementById('in-start').value, end: document.getElementById('in-end').value, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav };
+            library[idx] = { id, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: document.getElementById('in-start').value, end: document.getElementById('in-end').value, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav, isBookClub: currentBookClub };
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             updateFilterOptions(); render(); closeModal();
-            library[idx].isBookClub = document.getElementById('in-bookclub').checked;
         };
 
         window.showSection = (id, forceScrollTop = false) => {
@@ -995,7 +1013,6 @@
                 document.getElementById('in-' + f).value = b[f] || (f === 'rating' ? 0 : "");
             });
             document.getElementById('edit-modal').classList.remove('hidden');
-            document.getElementById('in-bookclub').checked = b.isBookClub || false;
         };
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
         window.resetFilters = () => { document.getElementById('search-input').value = ""; document.getElementById('filter-rating').value = "all"; document.getElementById('filter-genre').value = "all"; document.getElementById('filter-author').value = "all"; document.getElementById('filter-month').value = "all"; document.getElementById('filter-year-grid').value = "all"; render(); };
