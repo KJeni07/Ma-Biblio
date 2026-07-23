@@ -284,6 +284,55 @@
             background: var(--gold-accent); color: white; font-weight: 800; font-size: 14px;
         }
         .profile-avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+        .profile-menu-wrapper { position: relative; }
+        .profile-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            padding-top: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+            z-index: 60;
+        }
+        .profile-menu-wrapper:hover .profile-dropdown,
+        .profile-menu-wrapper.open .profile-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .profile-dropdown-inner {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            border: 1px solid rgba(197, 160, 89, 0.15);
+            overflow: hidden;
+            width: 200px;
+        }
+        .profile-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            text-align: left;
+            padding: 13px 16px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #475569;
+            transition: background 0.15s;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        .profile-dropdown-item:not(:last-child) { border-bottom: 1px solid #f1f5f9; }
+        .profile-dropdown-item:hover { background: #f8fafc; }
+        .profile-dropdown-item.danger { color: #f87171; }
+        .profile-dropdown-item.danger:hover { background: #fef2f2; }
+        .profile-dropdown-item .icon { font-size: 13px; }
     </style>
 </head>
 <body>
@@ -341,7 +390,19 @@
 
                     <div class="flex items-center gap-3">
                         <button onclick="toggleTheme()" id="theme-toggle-btn" class="theme-toggle-btn" title="Changer de thème"></button>
-                        <button onclick="openProfile()" id="profile-avatar-btn" class="profile-avatar-btn" title="Mon profil"></button>
+                        <div class="profile-menu-wrapper" id="profile-menu-wrapper">
+                            <button id="profile-avatar-btn" class="profile-avatar-btn" title="Mon profil"></button>
+                            <div class="profile-dropdown">
+                                <div class="profile-dropdown-inner">
+                                    <button onclick="openProfile()" class="profile-dropdown-item">
+                                        <span class="icon">👤</span> Compte
+                                    </button>
+                                    <button onclick="logout()" class="profile-dropdown-item danger">
+                                        <span class="icon">↪</span> Déconnexion
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -461,35 +522,36 @@
             <section id="section-fiches" class="view-section">
                 <div id="fiches-content" class="space-y-20"></div>
             </section>
-        </div>
-    </div>
 
-    <div id="profile-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center my-8">
-            <div class="flex justify-end">
-                <button onclick="closeProfile()" class="text-slate-300 hover:text-black text-2xl leading-none">&times;</button>
-            </div>
+            <section id="section-compte" class="view-section">
+                <button onclick="showSection('stats', true)" class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[var(--gold-accent)] transition-colors mb-6">
+                    <span>←</span> Retour
+                </button>
 
-            <div class="relative w-20 h-20 mx-auto -mt-4 mb-4">
-                <div id="profile-photo-wrap" class="w-20 h-20 rounded-full flex items-center justify-center bg-[var(--gold-accent)] text-white text-2xl font-black overflow-hidden border-4 border-[var(--gold-accent)]"></div>
-                <button onclick="document.getElementById('profile-photo-input').click()" class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border-2 border-[var(--gold-accent)] flex items-center justify-center text-xs shadow" title="Changer la photo">✏️</button>
-                <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="handlePhotoChange(event)">
-            </div>
+                <div class="fiche-container !max-w-lg text-center">
+                    <div class="relative w-24 h-24 mx-auto mb-5">
+                        <div id="profile-photo-wrap" class="w-24 h-24 rounded-full flex items-center justify-center bg-[var(--gold-accent)] text-white text-3xl font-black overflow-hidden border-4 border-[var(--gold-accent)]"></div>
+                        <button onclick="document.getElementById('profile-photo-input').click()" class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white border-2 border-[var(--gold-accent)] flex items-center justify-center text-sm shadow" title="Changer la photo">✏️</button>
+                        <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="handlePhotoChange(event)">
+                    </div>
 
-            <h2 id="profile-name" class="text-xl font-black uppercase tracking-tight font-serif mb-1">—</h2>
-            <p id="profile-email" class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">—</p>
-            <p id="profile-provider" class="text-[10px] text-gray-400 uppercase tracking-widest mb-6"></p>
+                    <h2 id="profile-name" class="text-2xl font-black uppercase tracking-tight font-serif mb-1">—</h2>
+                    <p id="profile-email" class="text-[12px] text-gray-400 font-bold uppercase tracking-widest mb-1">—</p>
+                    <p id="profile-provider" class="text-[10px] text-gray-400 uppercase tracking-widest mb-1"></p>
+                    <p id="profile-created" class="text-[10px] text-gray-400 uppercase tracking-widest mb-6"></p>
 
-            <div id="profile-password-section" class="text-left border-t border-slate-100 pt-5 mb-5 hidden">
-                <p class="section-label mb-3">Changer le mot de passe</p>
-                <input type="password" id="profile-current-password" placeholder="Mot de passe actuel" class="modal-input w-full mb-2">
-                <input type="password" id="profile-new-password" placeholder="Nouveau mot de passe" class="modal-input w-full mb-2">
-                <p id="profile-password-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-2"></p>
-                <p id="profile-password-success" class="text-green-500 text-[10px] font-bold uppercase hidden mb-2"></p>
-                <button onclick="handlePasswordChange()" class="w-full py-2.5 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors">Valider</button>
-            </div>
+                    <div id="profile-password-section" class="text-left border-t border-slate-100 pt-6 mb-6 hidden max-w-sm mx-auto">
+                        <p class="section-label mb-3">Changer le mot de passe</p>
+                        <input type="password" id="profile-current-password" placeholder="Mot de passe actuel" class="modal-input w-full mb-2">
+                        <input type="password" id="profile-new-password" placeholder="Nouveau mot de passe" class="modal-input w-full mb-2">
+                        <p id="profile-password-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-2"></p>
+                        <p id="profile-password-success" class="text-green-500 text-[10px] font-bold uppercase hidden mb-2"></p>
+                        <button onclick="handlePasswordChange()" class="w-full py-2.5 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors">Valider</button>
+                    </div>
 
-            <button onclick="logout()" class="w-full py-3 text-[10px] font-black uppercase bg-red-50 text-red-400 rounded-xl hover:bg-red-100 transition-colors">Déconnexion</button>
+                    <button onclick="logout()" class="max-w-sm mx-auto w-full py-3 text-[10px] font-black uppercase bg-red-50 text-red-400 rounded-xl hover:bg-red-100 transition-colors block">Déconnexion</button>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -605,6 +667,14 @@
             const isGoogleAccount = currentUser.providerData[0]?.providerId === 'google.com';
             document.getElementById('profile-provider').innerText = isGoogleAccount ? 'Compte Google' : 'Email & mot de passe';
 
+            const createdEl = document.getElementById('profile-created');
+            if (currentUser.metadata?.creationTime) {
+                const createdDate = new Date(currentUser.metadata.creationTime).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+                createdEl.innerText = 'Membre depuis le ' + createdDate;
+            } else {
+                createdEl.innerText = '';
+            }
+
             document.getElementById('profile-password-section').classList.toggle('hidden', isGoogleAccount);
             document.getElementById('profile-current-password').value = '';
             document.getElementById('profile-new-password').value = '';
@@ -614,9 +684,8 @@
             const initial = (currentUser.displayName || currentUser.email || '?')[0].toUpperCase();
             paintAvatars(customPhotoUrl || currentUser.photoURL, initial);
 
-            document.getElementById('profile-modal').classList.remove('hidden');
+            showSection('compte', true);
         };
-        window.closeProfile = () => document.getElementById('profile-modal').classList.add('hidden');
 
         window.handlePhotoChange = (event) => {
             const file = event.target.files[0];
@@ -1022,8 +1091,8 @@
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
-            document.getElementById('btn-' + id).classList.add('active');
-            document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats');
+            document.getElementById('btn-' + id)?.classList.add('active');
+            document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats' || id === 'compte');
         };
 
         window.jumpToFiche = (id) => { 
@@ -1044,6 +1113,14 @@
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
         window.resetFilters = () => { document.getElementById('search-input').value = ""; document.getElementById('filter-rating').value = "all"; document.getElementById('filter-genre').value = "all"; document.getElementById('filter-author').value = "all"; document.getElementById('filter-month').value = "all"; document.getElementById('filter-year-grid').value = "all"; render(); };
         window.logout = () => signOut(auth);
+        // Menu déroulant profil : clic pour toggle (mobile/tactile), en plus du survol (desktop)
+        document.getElementById('profile-avatar-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('profile-menu-wrapper').classList.toggle('open');
+        });
+        document.addEventListener('click', () => {
+            document.getElementById('profile-menu-wrapper').classList.remove('open');
+        });
         window.toggleAuthMode = () => { isSignUp = !isSignUp; document.getElementById('auth-mode-title').innerText = isSignUp ? "Création" : "Connexion"; };
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
