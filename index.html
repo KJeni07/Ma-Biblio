@@ -630,7 +630,6 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                document.getElementById('user-display').innerText = user.email;
                 const navAvatar = document.getElementById('profile-avatar-btn');
                 if (user.photoURL) {
                     navAvatar.innerHTML = `<img src="${user.photoURL}" referrerpolicy="no-referrer">`;
