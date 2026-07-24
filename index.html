@@ -16,6 +16,11 @@
             --muted-gold: #D4AF37;
         }
 
+        html {
+            overflow-y: scroll;
+            scrollbar-gutter: stable;
+        }
+
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: var(--paper-bg);
@@ -277,7 +282,12 @@
         html.dark .grid-thumb-title { color: #F2F0EA !important; }
         html.dark .modal-input { background-color: #242424 !important; border-color: #3a3a3a !important; color: #eee; }
         html.dark .fiche-title, html.dark h1, html.dark h2, html.dark h3 { color: #F2F0EA !important; }
-        html.dark #best-book-title { color: #292118 !important; }
+        html.dark .fiche-author { color: var(--gold-accent) !important; }
+        html.dark #best-book-title { color: #F2F0EA !important; }
+        html.dark #best-book-banner {
+            background: #1E1E1E !important;
+            border-color: rgba(197, 160, 89, 0.15) !important;
+        }
         html.dark .fiche-summary { color: #cfcfcf; }
         html.dark .info-item { border-color: #2a2a2a !important; }
         html.dark .info-value { color: #F2F0EA !important; }
@@ -286,6 +296,8 @@
         html.dark #edit-modal > div { background-color: #1E1E1E !important; }
         html.dark .bg-slate-50 { background-color: #242424 !important; }
         html.dark .border-dashed { border-color: #3a3a3a !important; }
+        html.dark .bg-red-50 { background-color: rgba(248, 113, 113, 0.12) !important; }
+        html.dark .bg-red-50:hover { background-color: rgba(248, 113, 113, 0.2) !important; }
 
         .theme-toggle-btn {
             width: 36px; height: 36px; border-radius: 50%;
@@ -354,6 +366,13 @@
         .profile-dropdown-item.danger { color: #f87171; }
         .profile-dropdown-item.danger:hover { background: #fef2f2; }
         .profile-dropdown-item .icon { font-size: 13px; }
+
+        html.dark .profile-dropdown-inner { background: #1E1E1E; border-color: rgba(197, 160, 89, 0.2); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+        html.dark .profile-dropdown-item { color: #cbd5e1; }
+        html.dark .profile-dropdown-item:not(:last-child) { border-bottom-color: #2f2f2f; }
+        html.dark .profile-dropdown-item:hover { background: #262626; }
+        html.dark .profile-dropdown-item.danger { color: #f87171; }
+        html.dark .profile-dropdown-item.danger:hover { background: rgba(248, 113, 113, 0.12); }
     </style>
 </head>
 <body>
@@ -374,10 +393,12 @@
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Mot de passe</label>
                     <input type="password" id="password" required class="modal-input !mb-0" placeholder="••••••••">
+                    <button type="button" onclick="handleForgotPassword()" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent mt-2">Mot de passe oublié ?</button>
                 </div>
                 <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg mt-4">Ouvrir ma collection</button>
             </form>
             <p id="auth-error" class="text-red-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
+            <p id="auth-success" class="text-green-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
 
             <div class="flex items-center gap-3 my-6">
                 <div class="flex-1 h-px bg-slate-100"></div>
@@ -415,7 +436,7 @@
                             <button id="profile-avatar-btn" class="profile-avatar-btn" title="Mon profil"></button>
                             <div class="profile-dropdown">
                                 <div class="profile-dropdown-inner">
-                                    <button onclick="openProfile()" class="profile-dropdown-item">
+                                    <button onclick="showSection('compte')" class="profile-dropdown-item">
                                         <span class="icon">👤</span> Compte
                                     </button>
                                     <button onclick="logout()" class="profile-dropdown-item danger">
@@ -500,7 +521,7 @@
                     </div>
 
                     <div id="best-book-card" class="flex-1 w-full invisible">
-                        <div class="bg-gradient-to-r from-amber-50 to-amber-100/50 rounded-2xl p-4 border border-amber-200/60 shadow-sm flex items-center gap-4 h-[58px] w-full">
+                        <div id="best-book-banner" class="bg-gradient-to-r from-amber-50 to-amber-100/50 rounded-2xl p-4 border border-amber-200/60 shadow-sm flex items-center gap-4 h-[58px] w-full">
                             <div class="w-8 h-11 bg-white rounded shadow-sm overflow-hidden shrink-0 flex items-center justify-center border border-amber-200">
                                 <img id="best-book-img" src="" class="w-full h-full object-cover hidden">
                                 <span id="best-book-fallback" class="text-amber-400 text-sm font-black">👑</span>
@@ -562,35 +583,33 @@
             <section id="section-fiches" class="view-section">
                 <div id="fiches-content" class="space-y-20"></div>
             </section>
-        </div>
-    </div>
 
-    <div id="profile-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center my-8">
-            <div class="flex justify-end">
-                <button onclick="closeProfile()" class="text-slate-300 hover:text-black text-2xl leading-none">&times;</button>
-            </div>
+            <section id="section-compte" class="view-section">
+                <button onclick="showSection('stats')" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent mb-6">← Retour au tableau de bord</button>
 
-            <div class="relative w-20 h-20 mx-auto -mt-4 mb-4">
-                <div id="profile-photo-wrap" class="w-20 h-20 rounded-full flex items-center justify-center bg-[var(--gold-accent)] text-white text-2xl font-black overflow-hidden border-4 border-[var(--gold-accent)]"></div>
-                <button onclick="document.getElementById('profile-photo-input').click()" class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border-2 border-[var(--gold-accent)] flex items-center justify-center text-xs shadow" title="Changer la photo">✏️</button>
-                <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="handlePhotoChange(event)">
-            </div>
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 max-w-md mx-auto text-center">
+                    <div class="relative w-28 h-28 mx-auto mb-6">
+                        <div id="profile-photo-wrap" class="w-28 h-28 rounded-full flex items-center justify-center bg-[var(--gold-accent)] text-white text-4xl font-black overflow-hidden border-4 border-[var(--gold-accent)] shadow-md"></div>
+                        <button onclick="document.getElementById('profile-photo-input').click()" class="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-white border-2 border-[var(--gold-accent)] flex items-center justify-center text-sm shadow-md hover:bg-slate-50 transition-colors" title="Changer la photo">✏️</button>
+                        <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="handlePhotoChange(event)">
+                    </div>
 
-            <h2 id="profile-name" class="text-xl font-black uppercase tracking-tight font-serif mb-1">—</h2>
-            <p id="profile-email" class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">—</p>
-            <p id="profile-provider" class="text-[10px] text-gray-400 uppercase tracking-widest mb-6"></p>
+                    <h2 id="profile-name" class="text-2xl font-black uppercase tracking-tight font-serif mb-2">—</h2>
+                    <p id="profile-email" class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-3">—</p>
+                    <p id="profile-joined" class="text-[10px] text-gray-400 uppercase tracking-widest mb-14"></p>
 
-            <div id="profile-password-section" class="text-left border-t border-slate-100 pt-5 mb-5 hidden">
-                <p class="section-label mb-3">Changer le mot de passe</p>
-                <input type="password" id="profile-current-password" placeholder="Mot de passe actuel" class="modal-input w-full mb-2">
-                <input type="password" id="profile-new-password" placeholder="Nouveau mot de passe" class="modal-input w-full mb-2">
-                <p id="profile-password-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-2"></p>
-                <p id="profile-password-success" class="text-green-500 text-[10px] font-bold uppercase hidden mb-2"></p>
-                <button onclick="handlePasswordChange()" class="w-full py-2.5 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors">Valider</button>
-            </div>
-
-            <button onclick="logout()" class="w-full py-3 text-[10px] font-black uppercase bg-red-50 text-red-400 rounded-xl hover:bg-red-100 transition-colors">Déconnexion</button>
+                    <div id="profile-password-section" class="text-left border-t border-slate-200 pt-10 hidden">
+                        <p class="section-label mb-5 text-center">Changer le mot de passe</p>
+                        <div class="max-w-xs mx-auto">
+                            <input type="password" id="profile-current-password" placeholder="Mot de passe actuel" class="modal-input w-full mb-3">
+                            <input type="password" id="profile-new-password" placeholder="Nouveau mot de passe" class="modal-input w-full mb-3">
+                            <p id="profile-password-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-3 text-center"></p>
+                            <p id="profile-password-success" class="text-green-500 text-[10px] font-bold uppercase hidden mb-3 text-center"></p>
+                            <button onclick="handlePasswordChange()" class="w-full py-3 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors">Valider</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -645,7 +664,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -688,6 +707,31 @@
             catch (err) { alert(err.message); }
         };
 
+        // --- MOT DE PASSE OUBLIÉ ---
+        window.handleForgotPassword = async () => {
+            const email = document.getElementById('email').value.trim();
+            const errorEl = document.getElementById('auth-error');
+            const successEl = document.getElementById('auth-success');
+            errorEl.classList.add('hidden');
+            successEl.classList.add('hidden');
+
+            if (!email) {
+                errorEl.innerText = "Renseigne ton email ci-dessus d'abord.";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                successEl.innerText = "Email envoyé ! Vérifie ta boîte de réception (et les spams).";
+                successEl.classList.remove('hidden');
+            } catch (err) {
+                errorEl.innerText = err.code === 'auth/invalid-email'
+                    ? "Adresse email invalide."
+                    : "Impossible d'envoyer l'email pour le moment.";
+                errorEl.classList.remove('hidden');
+            }
+        };
+
         // --- PROFIL ---
         let customPhotoUrl = null;
 
@@ -704,7 +748,11 @@
             document.getElementById('profile-name').innerText = currentUser.displayName || 'Membre';
             document.getElementById('profile-email').innerText = currentUser.email || '';
             const isGoogleAccount = currentUser.providerData[0]?.providerId === 'google.com';
-            document.getElementById('profile-provider').innerText = isGoogleAccount ? 'Compte Google' : 'Email & mot de passe';
+
+            if (currentUser.metadata?.creationTime) {
+                const joinDate = new Date(currentUser.metadata.creationTime);
+                document.getElementById('profile-joined').innerText = 'Membre depuis le ' + joinDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
 
             document.getElementById('profile-password-section').classList.toggle('hidden', isGoogleAccount);
             document.getElementById('profile-current-password').value = '';
@@ -714,10 +762,7 @@
 
             const initial = (currentUser.displayName || currentUser.email || '?')[0].toUpperCase();
             paintAvatars(customPhotoUrl || currentUser.photoURL, initial);
-
-            document.getElementById('profile-modal').classList.remove('hidden');
         };
-        window.closeProfile = () => document.getElementById('profile-modal').classList.add('hidden');
 
         window.handlePhotoChange = (event) => {
             const file = event.target.files[0];
@@ -838,6 +883,7 @@
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
                 setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
+                showSection('stats', true);
                 await loadUserLibrary();
             } else {
                 document.getElementById('app-content').classList.add('hidden');
@@ -1132,8 +1178,17 @@
         window.updateFilterOptions = () => {
             const genres = [...new Set(library.map(b => b.genre).filter(g => g))].sort();
             const authors = [...new Set(library.map(b => b.author).filter(a => a))].sort();
-            document.getElementById('filter-genre').innerHTML = '<option value="all">Tous les genres</option>' + genres.map(g => `<option value="${g}">${g}</option>`).join('');
-            document.getElementById('filter-author').innerHTML = '<option value="all">Tous les auteurs</option>' + authors.map(a => `<option value="${a}">${a}</option>`).join('');
+
+            const genreSelect = document.getElementById('filter-genre');
+            const authorSelect = document.getElementById('filter-author');
+            const currentGenre = genreSelect.value;
+            const currentAuthor = authorSelect.value;
+
+            genreSelect.innerHTML = '<option value="all">Tous les genres</option>' + genres.map(g => `<option value="${g}">${g}</option>`).join('');
+            authorSelect.innerHTML = '<option value="all">Tous les auteurs</option>' + authors.map(a => `<option value="${a}">${a}</option>`).join('');
+
+            genreSelect.value = genres.includes(currentGenre) ? currentGenre : 'all';
+            authorSelect.value = authors.includes(currentAuthor) ? currentAuthor : 'all';
         };
 
         window.saveToFirebase = async () => {
@@ -1152,8 +1207,9 @@
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
-            document.getElementById('btn-' + id).classList.add('active');
-            document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats');
+            document.getElementById('btn-' + id)?.classList.add('active');
+            document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats' || id === 'compte');
+            if (id === 'compte') openProfile();
         };
 
         window.jumpToFiche = (id) => { 
@@ -1320,6 +1376,7 @@
             library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false });
             library.forEach((b, i) => b.id = i + 1);
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            updateFilterOptions();
             render();
         };
     </script>
