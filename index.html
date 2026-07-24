@@ -120,6 +120,7 @@
         }
 
         .fiche-summary { font-size: 15px; color: #444; font-style: italic; line-height: 1.6; }
+        .avis-label { color: var(--gold-accent) !important; }
 
         .info-grid {
             display: grid;
@@ -285,13 +286,14 @@
         html.dark .fiche-author { color: var(--gold-accent) !important; }
         html.dark #best-book-title { color: #F2F0EA !important; }
         html.dark #best-book-banner {
-            background: #1E1E1E !important;
-            border-color: rgba(197, 160, 89, 0.15) !important;
+            background: linear-gradient(to right, rgba(197, 160, 89, 0.28), rgba(197, 160, 89, 0.08)) !important;
+            border-color: rgba(197, 160, 89, 0.4) !important;
         }
         html.dark .fiche-summary { color: #cfcfcf; }
         html.dark .info-item { border-color: #2a2a2a !important; }
         html.dark .info-value { color: #F2F0EA !important; }
         html.dark .section-label, html.dark .text-slate-400, html.dark .text-gray-400 { color: #8a8a8a !important; }
+        html.dark .avis-label { color: var(--gold-accent) !important; }
         html.dark .filter-select, html.dark .dashboard-year-select { background-color: #1E1E1E !important; color: #ddd; border-color: #333 !important; }
         html.dark #edit-modal > div { background-color: #1E1E1E !important; }
         html.dark .bg-slate-50 { background-color: #242424 !important; }
@@ -1090,7 +1092,7 @@
                         <div class="info-item"><p class="section-label">Langue :</p><p class="info-value">${book.lang || '—'}</p></div>
                     </div>
                     <div class="mt-8">
-                        <p class="section-label">Mon avis personnel :</p>
+                        <p class="section-label avis-label">Mon avis personnel :</p>
                         <div class="avis-box"><p class="avis-text">${book.comment || 'Aucun commentaire.'}</p></div>
                     </div>
                     <div class="mt-8 flex justify-end gap-3 items-center">
