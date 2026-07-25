@@ -280,15 +280,25 @@
         }
         html.dark .sticky.top-0 { background-color: rgba(18,18,18,0.95) !important; border-color: #2a2a2a !important; }
         html.dark .grid-thumb, html.dark .avis-box, html.dark .podium-item { background-color: #242424 !important; border-color: #2f2f2f !important; }
+        html.dark .avis-box { border-left-color: var(--gold-accent) !important; }
+        html.dark .avis-text { color: #E5E5E0 !important; }
         html.dark .grid-thumb-title { color: #F2F0EA !important; }
         html.dark .modal-input { background-color: #242424 !important; border-color: #3a3a3a !important; color: #eee; }
         html.dark .fiche-title, html.dark h1, html.dark h2, html.dark h3 { color: #F2F0EA !important; }
         html.dark .fiche-author { color: var(--gold-accent) !important; }
         html.dark #best-book-title { color: #F2F0EA !important; }
         html.dark #best-book-banner {
-            background: linear-gradient(to right, rgba(197, 160, 89, 0.28), rgba(197, 160, 89, 0.08)) !important;
-            border-color: rgba(197, 160, 89, 0.4) !important;
+            background: linear-gradient(to right, color-mix(in srgb, var(--gold-accent) 28%, transparent), color-mix(in srgb, var(--gold-accent) 8%, transparent)) !important;
+            border-color: color-mix(in srgb, var(--gold-accent) 40%, transparent) !important;
         }
+        .best-book-banner {
+            background: linear-gradient(to right, color-mix(in srgb, var(--gold-accent) 12%, white), color-mix(in srgb, var(--gold-accent) 5%, white));
+            border: 1px solid color-mix(in srgb, var(--gold-accent) 30%, white);
+        }
+        .best-book-thumb-wrap { border: 1px solid color-mix(in srgb, var(--gold-accent) 35%, white); }
+        .best-book-fallback { color: var(--gold-accent); }
+        .best-book-label { color: var(--gold-accent); }
+        .best-book-author-label { color: var(--gold-accent); }
         html.dark .fiche-summary { color: #cfcfcf; }
         html.dark .info-item { border-color: #2a2a2a !important; }
         html.dark .info-value { color: #F2F0EA !important; }
@@ -319,6 +329,11 @@
             background: var(--gold-accent); color: white; font-weight: 800; font-size: 14px;
         }
         .profile-avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+        .theme-color-swatch { transition: transform 0.15s; cursor: pointer; border: 2px solid transparent; }
+        .theme-color-swatch:hover { transform: scale(1.15); }
+        .theme-color-swatch.selected { box-shadow: 0 0 0 2px white, 0 0 0 4px var(--deep-black); }
+        html.dark .theme-color-swatch.selected { box-shadow: 0 0 0 2px #1E1E1E, 0 0 0 4px #F2F0EA; }
 
         .profile-menu-wrapper { position: relative; }
         .profile-dropdown {
@@ -523,15 +538,15 @@
                     </div>
 
                     <div id="best-book-card" class="flex-1 w-full invisible">
-                        <div id="best-book-banner" class="bg-gradient-to-r from-amber-50 to-amber-100/50 rounded-2xl p-4 border border-amber-200/60 shadow-sm flex items-center gap-4 h-[58px] w-full">
-                            <div class="w-8 h-11 bg-white rounded shadow-sm overflow-hidden shrink-0 flex items-center justify-center border border-amber-200">
+                        <div id="best-book-banner" class="best-book-banner rounded-2xl p-4 shadow-sm flex items-center gap-4 h-[58px] w-full">
+                            <div class="best-book-thumb-wrap w-8 h-11 bg-white rounded shadow-sm overflow-hidden shrink-0 flex items-center justify-center">
                                 <img id="best-book-img" src="" class="w-full h-full object-cover hidden">
-                                <span id="best-book-fallback" class="text-amber-400 text-sm font-black">👑</span>
+                                <span id="best-book-fallback" class="best-book-fallback text-sm font-black">👑</span>
                             </div>
                             <div class="text-left truncate flex-1">
-                                <span class="block text-[8px] font-black tracking-[0.2em] uppercase text-amber-600">👑 LIVRE DE L'ANNÉE <span class="display-year">...</span></span>
+                                <span class="best-book-label block text-[8px] font-black tracking-[0.2em] uppercase">👑 LIVRE DE L'ANNÉE <span class="display-year">...</span></span>
                                 <h3 id="best-book-title" class="font-serif text-sm font-bold uppercase tracking-tight text-slate-800 truncate leading-tight mt-0.5"></h3>
-                                <p id="best-book-author" class="text-[9px] font-bold text-amber-700 uppercase tracking-wider truncate"></p>
+                                <p id="best-book-author" class="best-book-author-label text-[9px] font-bold uppercase tracking-wider truncate"></p>
                             </div>
                         </div>
                     </div>
@@ -589,29 +604,77 @@
             <section id="section-compte" class="view-section">
                 <button onclick="showSection('stats')" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent mb-6">← Retour au tableau de bord</button>
 
-                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 max-w-md mx-auto text-center">
-                    <div class="relative w-28 h-28 mx-auto mb-6">
-                        <div id="profile-photo-wrap" class="w-28 h-28 rounded-full flex items-center justify-center bg-[var(--gold-accent)] text-white text-4xl font-black overflow-hidden border-4 border-[var(--gold-accent)] shadow-md"></div>
-                        <button onclick="document.getElementById('profile-photo-input').click()" class="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-white border-2 border-[var(--gold-accent)] flex items-center justify-center text-sm shadow-md hover:bg-slate-50 transition-colors" title="Changer la photo">✏️</button>
-                        <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="handlePhotoChange(event)">
+                <div class="max-w-4xl mx-auto space-y-6">
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div class="flex flex-col sm:flex-row items-center gap-6">
+                            <div class="relative w-24 h-24 shrink-0">
+                                <div id="profile-photo-wrap" class="w-24 h-24 rounded-full flex items-center justify-center bg-[var(--gold-accent)] text-white text-3xl font-black overflow-hidden border-4 border-[var(--gold-accent)] shadow-md"></div>
+                                <button onclick="document.getElementById('profile-photo-input').click()" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border-2 border-[var(--gold-accent)] flex items-center justify-center text-xs shadow-md hover:bg-slate-50 transition-colors" title="Changer la photo">✏️</button>
+                                <button id="profile-photo-remove-btn" onclick="removePhoto()" class="hidden absolute bottom-0 left-0 w-8 h-8 rounded-full bg-white border-2 border-red-300 flex items-center justify-center text-xs shadow-md hover:bg-red-50 transition-colors" title="Retirer la photo">🗑️</button>
+                                <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="handlePhotoChange(event)">
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <h2 id="profile-name" class="text-2xl font-black uppercase tracking-tight font-serif mb-1">—</h2>
+                                <p id="profile-joined" class="text-[10px] text-gray-400 uppercase tracking-widest"></p>
+                            </div>
+                        </div>
+
+                        <div class="text-center sm:text-right">
+                            <p class="section-label mb-3">Palette du site</p>
+                            <div id="profile-theme-palette" class="flex items-center justify-center sm:justify-end gap-2.5 flex-wrap">
+                                <button onclick="setThemeColor('#C5A059')" data-theme-color="#C5A059" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#C5A059" title="Doré"></button>
+                                <button onclick="setThemeColor('#7B3F3F')" data-theme-color="#7B3F3F" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#7B3F3F" title="Bordeaux"></button>
+                                <button onclick="setThemeColor('#3E5C50')" data-theme-color="#3E5C50" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#3E5C50" title="Vert forêt"></button>
+                                <button onclick="setThemeColor('#35506B')" data-theme-color="#35506B" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#35506B" title="Bleu marine"></button>
+                                <button onclick="setThemeColor('#B5651D')" data-theme-color="#B5651D" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#B5651D" title="Terracotta"></button>
+                                <button onclick="setThemeColor('#5B4B8A')" data-theme-color="#5B4B8A" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#5B4B8A" title="Prune"></button>
+                                <button onclick="setThemeColor('#4A4A4A')" data-theme-color="#4A4A4A" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#4A4A4A" title="Anthracite"></button>
+                                <label class="relative w-8 h-8 rounded-full cursor-pointer flex items-center justify-center overflow-hidden border border-slate-200" style="background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);" title="Couleur personnalisée">
+                                    <input type="color" id="custom-theme-color" value="#C5A059" oninput="setThemeColor(this.value)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
-                    <h2 id="profile-name" class="text-2xl font-black uppercase tracking-tight font-serif mb-2">—</h2>
-                    <p id="profile-email" class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-3">—</p>
-                    <p id="profile-joined" class="text-[10px] text-gray-400 uppercase tracking-widest mb-14"></p>
-
-                    <div id="profile-password-section" class="text-left border-t border-slate-200 pt-10 hidden">
-                        <p class="section-label mb-5 text-center">Changer le mot de passe</p>
-                        <div class="max-w-xs mx-auto">
-                            <input type="password" id="profile-current-password" placeholder="Mot de passe actuel" class="modal-input w-full mb-3">
-                            <input type="password" id="profile-new-password" placeholder="Nouveau mot de passe" class="modal-input w-full mb-3">
-                            <p id="profile-password-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-3 text-center"></p>
-                            <p id="profile-password-success" class="text-green-500 text-[10px] font-bold uppercase hidden mb-3 text-center"></p>
-                            <button onclick="handlePasswordChange()" class="w-full py-3 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors">Valider</button>
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <p class="section-label mb-4">Email</p>
+                                <input type="text" id="profile-email" disabled class="modal-input w-full !mb-0 !bg-slate-100 !text-slate-400 cursor-not-allowed">
+                            </div>
+                            <div>
+                                <p class="section-label mb-4">Pseudo</p>
+                                <input type="text" id="profile-pseudo-input" placeholder="Choisis un pseudo unique" class="modal-input w-full !mb-0" maxlength="20">
+                                <p id="profile-pseudo-error" class="text-red-500 text-[10px] font-bold uppercase hidden mt-3"></p>
+                                <p id="profile-pseudo-success" class="text-green-500 text-[10px] font-bold uppercase hidden mt-3"></p>
+                                <button onclick="handlePseudoChange()" class="py-2.5 px-8 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors mt-4">Valider le pseudo</button>
+                            </div>
                         </div>
+                    </div>
+
+                    <div id="profile-password-section" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 hidden">
+                        <p class="section-label mb-4">Changer le mot de passe</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-3">
+                            <input type="password" id="profile-current-password" placeholder="Mot de passe actuel" class="modal-input w-full !mb-0">
+                            <input type="password" id="profile-new-password" placeholder="Nouveau mot de passe" class="modal-input w-full !mb-0">
+                        </div>
+                        <p id="profile-password-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-2"></p>
+                        <p id="profile-password-success" class="text-green-500 text-[10px] font-bold uppercase hidden mb-2"></p>
+                        <button onclick="handlePasswordChange()" class="py-2.5 px-8 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors">Valider</button>
                     </div>
                 </div>
             </section>
+        </div>
+    </div>
+
+    <div id="pseudo-onboard-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[120] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center">
+            <h2 class="text-lg font-black uppercase tracking-tight font-serif mb-2">Choisis ton pseudo</h2>
+            <p class="text-[11px] text-gray-400 mb-5">Il sera unique et te permettra d'être identifié(e) sur Ma Biblio.</p>
+            <input type="text" id="pseudo-onboard-input" placeholder="ex: jeni_lit" class="modal-input w-full mb-2" maxlength="20">
+            <p id="pseudo-onboard-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-3"></p>
+            <button onclick="handlePseudoOnboard()" class="w-full py-3 bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold-accent transition-colors mb-2">Valider</button>
+            <button onclick="skipPseudoOnboard()" class="w-full py-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent">Plus tard</button>
         </div>
     </div>
 
@@ -667,7 +730,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, runTransaction, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyALZ0tu1jU2OJbGrAmCcAFXVFB5os4-pfY",
@@ -703,6 +766,20 @@
         };
         applyTheme(localStorage.getItem('biblio-theme') || 'light');
 
+        // --- PALETTE DU SITE ---
+        function applyThemeColor(color) {
+            document.documentElement.style.setProperty('--gold-accent', color);
+            document.querySelectorAll('.theme-color-swatch').forEach(sw => {
+                sw.classList.toggle('selected', sw.dataset.themeColor.toLowerCase() === color.toLowerCase());
+            });
+            if (currentUser) {
+                const initial = (currentUser.displayName || currentUser.email || '?')[0].toUpperCase();
+                paintAvatars(photoRemoved ? null : (customPhotoUrl || currentUser.photoURL), initial);
+            }
+        }
+        applyThemeColor('#C5A059');
+
+
         // --- CONNEXION GOOGLE ---
         window.signInWithGoogle = async () => {
             try { await signInWithPopup(auth, googleProvider); }
@@ -736,20 +813,106 @@
 
         // --- PROFIL ---
         let customPhotoUrl = null;
+        let photoRemoved = false;
 
         function paintAvatars(url, initial) {
             const navAvatar = document.getElementById('profile-avatar-btn');
             const photoWrap = document.getElementById('profile-photo-wrap');
+            const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--gold-accent').trim() || '#C5A059';
             const html = url ? `<img src="${url}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : initial;
-            if (navAvatar) navAvatar.innerHTML = html;
-            if (photoWrap) photoWrap.innerHTML = html;
+            if (navAvatar) { navAvatar.innerHTML = html; navAvatar.style.background = themeColor; navAvatar.style.borderColor = themeColor; }
+            if (photoWrap) { photoWrap.innerHTML = html; photoWrap.style.background = themeColor; photoWrap.style.borderColor = themeColor; }
+            document.getElementById('profile-photo-remove-btn')?.classList.toggle('hidden', !url);
         }
+
+        window.setThemeColor = async (color) => {
+            applyThemeColor(color);
+            localStorage.setItem('biblio-theme-color', color);
+            if (typeof render === 'function' && currentUser) render();
+            if (!currentUser) return;
+            try {
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { themeColor: color }, { merge: true });
+            } catch (err) {
+                alert("Erreur lors de l'enregistrement de la palette : " + err.message);
+            }
+        };
+
+        // --- PSEUDO (unique) ---
+        let currentPseudo = null;
+
+        async function claimPseudo(pseudo, uid) {
+            const key = pseudo.trim().toLowerCase();
+            const usernameRef = doc(db, "usernames", key);
+            await runTransaction(db, async (transaction) => {
+                const snap = await transaction.get(usernameRef);
+                if (snap.exists() && snap.data().uid !== uid) {
+                    throw new Error("TAKEN");
+                }
+                transaction.set(usernameRef, { uid, pseudo: pseudo.trim() });
+            });
+        }
+
+        function validatePseudoFormat(pseudo) {
+            if (pseudo.length < 3) return "Le pseudo doit faire au moins 3 caractères.";
+            if (!/^[a-zA-Z0-9_.-]+$/.test(pseudo)) return "Lettres, chiffres, points, tirets et underscores uniquement.";
+            return null;
+        }
+
+        async function savePseudo(pseudo, errorEl, successEl) {
+            const formatError = validatePseudoFormat(pseudo);
+            if (formatError) { errorEl.innerText = formatError; errorEl.classList.remove('hidden'); return false; }
+            try {
+                await claimPseudo(pseudo, currentUser.uid);
+                if (currentPseudo && currentPseudo.toLowerCase() !== pseudo.trim().toLowerCase()) {
+                    try { await deleteDoc(doc(db, "usernames", currentPseudo.toLowerCase())); } catch (e) {}
+                }
+                currentPseudo = pseudo.trim();
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { pseudo: currentPseudo }, { merge: true });
+                if (!currentUser.displayName) document.getElementById('profile-name').innerText = currentPseudo;
+                if (successEl) { successEl.innerText = "Pseudo enregistré !"; successEl.classList.remove('hidden'); }
+                return true;
+            } catch (err) {
+                errorEl.innerText = err.message === "TAKEN" ? "Ce pseudo est déjà pris." : "Erreur, réessaie.";
+                errorEl.classList.remove('hidden');
+                return false;
+            }
+        }
+
+        window.handlePseudoChange = async () => {
+            const input = document.getElementById('profile-pseudo-input');
+            const errorEl = document.getElementById('profile-pseudo-error');
+            const successEl = document.getElementById('profile-pseudo-success');
+            errorEl.classList.add('hidden');
+            successEl.classList.add('hidden');
+            await savePseudo(input.value, errorEl, successEl);
+        };
+
+        window.handlePseudoOnboard = async () => {
+            const input = document.getElementById('pseudo-onboard-input');
+            const errorEl = document.getElementById('pseudo-onboard-error');
+            errorEl.classList.add('hidden');
+            const ok = await savePseudo(input.value, errorEl, null);
+            if (ok) document.getElementById('pseudo-onboard-modal').classList.add('hidden');
+        };
+
+        window.skipPseudoOnboard = () => {
+            document.getElementById('pseudo-onboard-modal').classList.add('hidden');
+        };
+
 
         window.openProfile = async () => {
             if (!currentUser) return;
-            document.getElementById('profile-name').innerText = currentUser.displayName || 'Membre';
-            document.getElementById('profile-email').innerText = currentUser.email || '';
+            document.getElementById('profile-name').innerText = currentUser.displayName || currentPseudo || 'Membre';
+            document.getElementById('profile-email').value = currentUser.email || '';
             const isGoogleAccount = currentUser.providerData[0]?.providerId === 'google.com';
+
+            const currentThemeColor = getComputedStyle(document.documentElement).getPropertyValue('--gold-accent').trim();
+            const customColorInput = document.getElementById('custom-theme-color');
+            if (customColorInput && /^#[0-9a-f]{6}$/i.test(currentThemeColor)) customColorInput.value = currentThemeColor;
+
+            document.getElementById('profile-pseudo-input').value = currentPseudo || '';
+            document.getElementById('profile-pseudo-error').classList.add('hidden');
+            document.getElementById('profile-pseudo-success').classList.add('hidden');
 
             if (currentUser.metadata?.creationTime) {
                 const joinDate = new Date(currentUser.metadata.creationTime);
@@ -763,7 +926,7 @@
             document.getElementById('profile-password-success').classList.add('hidden');
 
             const initial = (currentUser.displayName || currentUser.email || '?')[0].toUpperCase();
-            paintAvatars(customPhotoUrl || currentUser.photoURL, initial);
+            paintAvatars(photoRemoved ? null : (customPhotoUrl || currentUser.photoURL), initial);
         };
 
         window.handlePhotoChange = (event) => {
@@ -784,6 +947,7 @@
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
 
                     customPhotoUrl = dataUrl;
+                    photoRemoved = false;
                     const initial = (currentUser.displayName || currentUser.email || '?')[0].toUpperCase();
                     paintAvatars(customPhotoUrl, initial);
 
@@ -796,6 +960,21 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        };
+
+        window.removePhoto = async () => {
+            if (!currentUser) return;
+            customPhotoUrl = null;
+            photoRemoved = true;
+            const initial = (currentUser.displayName || currentUser.email || '?')[0].toUpperCase();
+            paintAvatars(null, initial);
+            document.getElementById('profile-photo-input').value = '';
+
+            try {
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { photo: "" }, { merge: true });
+            } catch (err) {
+                alert("Erreur lors de la suppression de la photo : " + err.message);
+            }
         };
 
         window.handlePasswordChange = async () => {
@@ -873,21 +1052,32 @@
             if (user) {
                 currentUser = user;
                 customPhotoUrl = null;
+                photoRemoved = false;
+                currentPseudo = null;
                 try {
                     const profileSnap = await getDoc(doc(db, "user_profiles", user.uid));
-                    if (profileSnap.exists() && profileSnap.data().photo) {
-                        customPhotoUrl = profileSnap.data().photo;
+                    if (profileSnap.exists()) {
+                        const p = profileSnap.data().photo;
+                        if (p) customPhotoUrl = p;
+                        else if (p === "") photoRemoved = true;
+                        if (profileSnap.data().pseudo) currentPseudo = profileSnap.data().pseudo;
+                        if (profileSnap.data().themeColor) {
+                            applyThemeColor(profileSnap.data().themeColor);
+                            localStorage.setItem('biblio-theme-color', profileSnap.data().themeColor);
+                        }
                     }
                 } catch (err) { /* pas grave si ça échoue, on retombe sur photoURL ou l'initiale */ }
                 const initial = (user.displayName || user.email || '?')[0].toUpperCase();
-                paintAvatars(customPhotoUrl || user.photoURL, initial);
+                paintAvatars(photoRemoved ? null : (customPhotoUrl || user.photoURL), initial);
                 document.getElementById('auth-form').reset();
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
                 setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
                 showSection('stats', true);
                 await loadUserLibrary();
+                if (!currentPseudo) document.getElementById('pseudo-onboard-modal').classList.remove('hidden');
             } else {
+                applyThemeColor('#C5A059');
                 document.getElementById('app-content').classList.add('hidden');
                 document.getElementById('auth-screen').classList.remove('hidden');
             }
@@ -974,9 +1164,9 @@
             }
 
             const formatIcons = {
-                'Livre': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>`,
-                'Ebook': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="1.6"/><line x1="8.5" y1="6.5" x2="15.5" y2="6.5"/><line x1="8.5" y1="9.5" x2="15.5" y2="9.5"/><line x1="8.5" y1="12.5" x2="13" y2="12.5"/></svg>`,
-                'Audiobook': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1v-4a9 9 0 0 1 18 0v4a1 1 0 0 1-1 1h-2a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>`
+                'Livre': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>`,
+                'Ebook': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="1.6"/><line x1="8.5" y1="6.5" x2="15.5" y2="6.5"/><line x1="8.5" y1="9.5" x2="15.5" y2="9.5"/><line x1="8.5" y1="12.5" x2="13" y2="12.5"/></svg>`,
+                'Audiobook': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1v-4a9 9 0 0 1 18 0v4a1 1 0 0 1-1 1h-2a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>`
             };
             const formatOrder = ['Livre', 'Ebook', 'Audiobook'];
             const formatCounts = {};
@@ -987,7 +1177,7 @@
                 const pct = formatTotal ? Math.round((count / formatTotal) * 100) : 0;
                 return `
                     <div class="flex flex-col items-center">
-                        <span class="flex items-center justify-center h-6 mb-1 text-2xl" title="${f}">${formatIcons[f]}</span>
+                        <span class="flex items-center justify-center h-6 mb-1 text-2xl" style="color: var(--gold-accent);" title="${f}">${formatIcons[f]}</span>
                         <span class="text-sm font-black">${pct}%</span>
                     </div>
                 `;
@@ -1035,7 +1225,7 @@
                         ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<div class="flex flex-col items-center justify-center text-center px-3 py-2 h-full w-full"><span class="grid-thumb-title font-serif font-black uppercase leading-tight text-[15px]">${b.title}</span><span class="mt-2 text-[10px] font-bold uppercase tracking-wide" style="color: var(--gold-accent);">${b.author || ''}</span></div>`}
                         
                         <!-- Badge Favori -->
-                        ${b.isFavorite ? `<span class="absolute top-2 right-2 bg-[#C5A059]/25 backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg border border-[#C5A059]/40">👑</span>` : ''}
+                        ${b.isFavorite ? `<span class="absolute top-2 right-2 backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg" style="background: color-mix(in srgb, var(--gold-accent) 25%, transparent); border: 1px solid color-mix(in srgb, var(--gold-accent) 40%, transparent);">👑</span>` : ''}
                         
                         <!-- Badge Book Club -->
     ${b.isBookClub ? `<span class="absolute bottom-2 left-2 bg-blue-500/80 backdrop-blur-md text-white text-[10px] w-6 h-6 flex items-center justify-center rounded-full shadow-lg border border-white/20">📖</span>` : ''}
@@ -1135,6 +1325,13 @@
             render();
         };
 
+        function hexToRgba(hex, alpha) {
+            const h = hex.replace('#', '');
+            const bigint = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+            const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
         function updateChart(books) {
             const counts = new Array(12).fill(0);
             books.forEach(b => {
@@ -1145,9 +1342,10 @@
             });
             const ctx = document.getElementById('readingChart').getContext('2d');
             if(readingChart) readingChart.destroy();
+            const chartColor = getComputedStyle(document.documentElement).getPropertyValue('--gold-accent').trim() || '#C5A059';
             readingChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels: ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"], datasets: [{ label: 'Livres', data: counts, borderColor: '#C5A059', backgroundColor: 'rgba(197, 160, 89, 0.1)', fill: true, tension: 0.4 }] },
+                data: { labels: ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"], datasets: [{ label: 'Livres', data: counts, borderColor: chartColor, backgroundColor: hexToRgba(chartColor, 0.1), fill: true, tension: 0.4 }] },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
