@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
     <style>
         :root {
             --paper-bg: #FAF9F6;
@@ -153,6 +153,68 @@
         }
 
         .grid-thumb-title { color: var(--deep-black); }
+
+        /* --- DOS DE LIVRE (placeholder sans couverture) --- */
+        .book-spine {
+            position: relative;
+            background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 3px);
+        }
+        .book-spine::before, .book-spine::after {
+            content: ''; position: absolute; left: 8%; right: 8%; height: 2px;
+            background: color-mix(in srgb, var(--gold-accent) 70%, white);
+            box-shadow: 0 3px 0 color-mix(in srgb, var(--gold-accent) 70%, white);
+        }
+        .book-spine::before { top: 10%; }
+        .book-spine::after { bottom: 10%; }
+        .book-spine-frame {
+            position: relative; z-index: 1;
+            width: 78%; height: 62%;
+            border: 1.5px solid color-mix(in srgb, var(--gold-accent) 75%, white);
+            box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px color-mix(in srgb, var(--gold-accent) 55%, white);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 10px 8px; text-align: center; border-radius: 2px;
+        }
+        .book-spine-title {
+            font-family: 'Playfair Display', serif; font-weight: 900; text-transform: uppercase;
+            font-size: 13px; line-height: 1.25; color: #FBF8F1;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.25);
+        }
+        .book-spine-divider { width: 28px; height: 1px; margin: 7px 0; background: color-mix(in srgb, var(--gold-accent) 75%, white); }
+        .book-spine-author {
+            font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+            color: color-mix(in srgb, var(--gold-accent) 60%, white);
+        }
+        .spine-0 { background-color: #7B3F3F; }
+        .spine-1 { background-color: #3E5C50; }
+        .spine-2 { background-color: #35506B; }
+        .spine-3 { background-color: #B5651D; }
+        .spine-4 { background-color: #5B4B8A; }
+        .spine-5 { background-color: #4A4A4A; }
+
+
+        .spine-swatch {
+            width: 26px; height: 26px; border-radius: 50%;
+            border: 2px solid transparent; cursor: pointer; padding: 0;
+        }
+        .spine-swatch.active { border-color: var(--gold-accent); }
+        .spine-pattern-btn {
+            font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+            padding: 6px 10px; border-radius: 999px; border: 1px solid #e2e2e2; background: #fafafa; cursor: pointer;
+        }
+        .spine-pattern-btn.active { border-color: var(--gold-accent); background: rgba(197, 160, 89, 0.15); color: var(--gold-accent); }
+        html.dark .spine-pattern-btn { background: #2a2a2a; border-color: #3a3a3a; color: #d8d8d8; }
+        html.dark .spine-pattern-btn.active { background: rgba(197, 160, 89, 0.2); }
+
+        .spine-size-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            gap: 4px; width: 42px; height: 46px; padding: 4px 0 6px;
+            border-radius: 6px; border: 1px solid #e2e2e2; background: #fafafa; cursor: pointer;
+        }
+        .spine-size-btn.active { border-color: var(--gold-accent); background: rgba(197, 160, 89, 0.15); }
+        .spine-size-btn .bar { width: 12px; border-radius: 2px; background: #9c9c9c; }
+        .spine-size-btn.active .bar { background: var(--gold-accent); }
+        html.dark .spine-size-btn { background: #2a2a2a; border-color: #3a3a3a; }
+        html.dark .spine-size-btn.active { background: rgba(197, 160, 89, 0.2); }
 
         .avis-box {
             background-color: #fcfbf8;
@@ -390,6 +452,140 @@
         html.dark .profile-dropdown-item:hover { background: #262626; }
         html.dark .profile-dropdown-item.danger { color: #f87171; }
         html.dark .profile-dropdown-item.danger:hover { background: rgba(248, 113, 113, 0.12); }
+
+        .bookcase {
+            background:
+                repeating-linear-gradient(180deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 68px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 2px, transparent 5px),
+                linear-gradient(180deg, #d9a86c, #c68e52 40%, #b57c42 100%);
+            border: 1px solid rgba(120, 72, 30, 0.35);
+            border-radius: 14px;
+            padding: 22px 16px 16px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.15);
+        }
+        html.dark .bookcase {
+            background:
+                repeating-linear-gradient(180deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 68px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 2px, transparent 5px),
+                linear-gradient(180deg, #4a3421, #3a2a1a 40%, #2e2115 100%);
+            border-color: rgba(197, 160, 89, 0.25);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.35);
+        }
+        .bookshelf-row-wrap { margin-bottom: 22px; }
+        .bookshelf-row-wrap.bookshelf-row-wrap-last { margin-bottom: 4px; }
+        .bookshelf-row {
+            position: relative;
+            height: 108px;
+            padding: 4px 2px 0;
+        }
+        .bookshelf-ledge {
+            height: 10px;
+            margin-top: 0;
+            background: linear-gradient(180deg, #c9a662, #8a6a35);
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.25);
+        }
+        .shelf-spine {
+            border-radius: 3px;
+            position: absolute;
+            bottom: 0;
+            cursor: grab;
+            overflow: hidden;
+            touch-action: none;
+            transition: box-shadow 0.18s ease;
+            border: 1px solid rgba(197, 160, 89, 0.45);
+            box-shadow:
+                inset -3px 0 6px rgba(0,0,0,0.22),
+                inset 2px 0 3px rgba(255,255,255,0.15),
+                0 2px 4px rgba(0,0,0,0.15);
+        }
+        .shelf-spine::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(0,0,0,0.18) 85%);
+            pointer-events: none;
+        }
+        .shelf-spine::after {
+            content: '';
+            position: absolute; inset: 0;
+            pointer-events: none;
+        }
+        .spine-pattern-dots::after { background-image: radial-gradient(rgba(255,255,255,0.55) 1.4px, transparent 1.6px); background-size: 9px 9px; background-position: 3px 4px; }
+        .spine-pattern-stripes::after { background: repeating-linear-gradient(180deg, rgba(255,255,255,0.32) 0px, rgba(255,255,255,0.32) 4px, transparent 4px, transparent 11px); }
+        .spine-pattern-chevron::after { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.26) 0px, rgba(255,255,255,0.26) 3px, transparent 3px, transparent 10px); }
+        .spine-pattern-hearts::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 4.2C6.1 2.6 3.6 2.9 3.6 5c0 2 3.4 4 3.4 4s3.4-2 3.4-4c0-2.1-2.5-2.4-3.4-.8z' fill='%23ffffff' fill-opacity='0.5'/%3E%3C/svg%3E");
+            background-repeat: repeat; background-size: 15px 15px; background-position: 2px 3px;
+        }
+        .spine-pattern-arch::after {
+            background-image: radial-gradient(circle at 50% 100%, transparent 5px, rgba(255,255,255,0.28) 5.5px, rgba(255,255,255,0.28) 6.5px, transparent 7px);
+            background-size: 13px 13px; background-position: 0 2px;
+        }
+        .shelf-spine:hover { box-shadow: 0 8px 14px rgba(0,0,0,0.3); transform: translateY(-6px); z-index: 3; }
+        .shelf-spine.dragging { cursor: grabbing; box-shadow: 0 12px 20px rgba(0,0,0,0.4); transition: none; z-index: 50; user-select: none; }
+        .spine-cap {
+            position: absolute; left: 0; right: 0; height: 4px;
+            background: linear-gradient(180deg, #fff2cf, var(--gold-accent));
+            z-index: 1;
+        }
+        .spine-cap.top { top: 0; }
+        .spine-cap.bottom { bottom: 0; }
+        .shelf-spine-title {
+            writing-mode: vertical-rl;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(180deg);
+            font-family: 'Bebas Neue', 'Playfair Display', serif;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #fdf6e3;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.55);
+            white-space: normal;
+            overflow: hidden;
+            text-align: center;
+            max-height: 82%;
+            max-width: 92%;
+            z-index: 2;
+        }
+        .bookshelf-empty { font-size: 11px; color: #94a3b8; font-style: italic; padding: 4px 4px 12px; }
+        html.dark .bookshelf-empty { color: #6b6b6b; }
+
+        .shelf-tooltip {
+            position: fixed;
+            z-index: 200;
+            background: #fdf6e3;
+            color: #2a2115;
+            border: 1px solid var(--gold-accent);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 11px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+            max-width: 190px;
+            text-align: center;
+            opacity: 0;
+            transform: translate(-50%, -100%);
+            transition: opacity 0.12s ease;
+        }
+        .shelf-tooltip.visible { opacity: 1; pointer-events: auto; }
+        .shelf-tooltip:not(.visible) { pointer-events: none; }
+        .shelf-tooltip-title {
+            display: block; font-family: 'Playfair Display', serif; font-weight: 800;
+            text-transform: uppercase; font-size: 11px; line-height: 1.25;
+            padding-right: 16px;
+        }
+        .shelf-tooltip-author {
+            display: block; font-size: 9.5px; color: var(--gold-accent);
+            text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px;
+        }
+        .shelf-tooltip-edit {
+            position: absolute; top: 3px; right: 4px;
+            font-size: 10px; line-height: 1; padding: 3px;
+            background: none; border: none; cursor: pointer; opacity: 0.65;
+        }
+        .shelf-tooltip-edit:hover { opacity: 1; }
+        html.dark .shelf-tooltip { background: #242424; color: #F2F0EA; border-color: rgba(197, 160, 89, 0.4); }
     </style>
 </head>
 <body>
@@ -591,6 +787,26 @@
                         <canvas id="readingChart"></canvas>
                     </div>
                 </div>
+
+                <div id="bibliotheque-section" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm mt-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="section-label mb-0">Ma Bibliothèque</p>
+                    </div>
+                    <div class="bookcase">
+                        <div class="bookshelf-row-wrap">
+                            <div id="bookshelf-row-0" class="bookshelf-row" data-row="0"></div>
+                            <div class="bookshelf-ledge"></div>
+                        </div>
+                        <div class="bookshelf-row-wrap">
+                            <div id="bookshelf-row-1" class="bookshelf-row" data-row="1"></div>
+                            <div class="bookshelf-ledge"></div>
+                        </div>
+                        <div class="bookshelf-row-wrap bookshelf-row-wrap-last">
+                            <div id="bookshelf-row-2" class="bookshelf-row" data-row="2"></div>
+                            <div class="bookshelf-ledge"></div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="section-grille" class="view-section">
@@ -727,6 +943,31 @@
         </div>
     </div>
 
+    <div id="spine-editor-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[120] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-base font-black uppercase tracking-tight font-serif">Personnaliser le dos</h2>
+                <button onclick="closeSpineEditor()" class="text-slate-300 hover:text-black text-2xl leading-none">&times;</button>
+            </div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Couleur</p>
+            <div id="spine-editor-colors" class="flex flex-wrap gap-2 mb-3"></div>
+            <label class="flex items-center gap-2 mb-5 cursor-pointer">
+                <input type="color" id="spine-editor-custom-color" class="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Couleur personnalisée</span>
+            </label>
+            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Motif</p>
+            <div id="spine-editor-patterns" class="flex flex-wrap gap-2 mb-5"></div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Hauteur</p>
+            <div id="spine-editor-heights" class="flex gap-2 mb-5"></div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Largeur</p>
+            <div id="spine-editor-widths" class="flex gap-2 mb-5"></div>
+            <div class="flex gap-3">
+                <button onclick="resetSpineCustom()" class="flex-1 py-3 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Réinitialiser</button>
+                <button onclick="closeSpineEditor()" class="flex-1 py-3 text-[10px] font-black uppercase btn-gold-main rounded-xl">Fermer</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -836,6 +1077,369 @@
                 alert("Erreur lors de l'enregistrement de la palette : " + err.message);
             }
         };
+
+        // --- ÉTAGÈRE (Tableau de bord) ---
+        const SHELF_ROW_COUNT = 3;
+        let shelfPositions = {}; // { [bookId]: { row, x } }
+        let activeShelfDrag = null; // { el, book, dragOffsetX, startX, startY, moved, lastLeft, pointerId }
+        let shelfColorCache = {};
+
+        function hashColor(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            const hue = Math.abs(hash) % 360;
+            return `hsl(${hue}, 38%, 40%)`;
+        }
+
+        const GENRE_PALETTE = ['#7B3F3F', '#3E5C50', '#35506B', '#B5651D', '#5B4B8A', '#4A4A4A', '#7A6A2E', '#2E6B6B', '#8A4A6B', '#4E6B2E'];
+        function genreColor(genre) {
+            if (!genre) return null;
+            let hash = 0;
+            for (let i = 0; i < genre.length; i++) hash = genre.charCodeAt(i) + ((hash << 5) - hash);
+            return GENRE_PALETTE[Math.abs(hash) % GENRE_PALETTE.length];
+        }
+
+        function getAverageColor(imgUrl) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.referrerPolicy = 'no-referrer';
+                img.onload = () => {
+                    try {
+                        const size = 10;
+                        const canvas = document.createElement('canvas');
+                        canvas.width = size; canvas.height = size;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, size, size);
+                        const data = ctx.getImageData(0, 0, size, size).data;
+                        let r = 0, g = 0, b = 0, count = 0;
+                        for (let i = 0; i < data.length; i += 4) {
+                            r += data[i]; g += data[i + 1]; b += data[i + 2]; count++;
+                        }
+                        resolve(`rgb(${Math.round(r / count)}, ${Math.round(g / count)}, ${Math.round(b / count)})`);
+                    } catch (e) {
+                        resolve(null);
+                    }
+                };
+                img.onerror = () => resolve(null);
+                img.src = imgUrl;
+            });
+        }
+
+        async function saveShelfPositions() {
+            if (!currentUser) return;
+            try {
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { shelfPositions }, { merge: true });
+            } catch (err) { /* pas grave */ }
+        }
+
+        const SPINE_WIDTHS = [28, 32, 36];
+        const SPINE_HEIGHTS = [74, 86, 98, 108];
+        function spineWidthFor(b) {
+            if (b.shelfWidth) return b.shelfWidth;
+            return SPINE_WIDTHS[Math.abs(b.id * 7) % SPINE_WIDTHS.length];
+        }
+        function spineHeightFor(b) {
+            return b.shelfHeight || 108;
+        }
+
+        function fitSpineTitle(el) {
+            if (!el) return;
+            const spineEl = el.parentElement;
+            const maxWidth = spineEl.clientWidth * 0.86;
+            let size = 10.5;
+            el.style.fontSize = size + 'px';
+            while (el.scrollWidth > maxWidth && size > 5.5) {
+                size -= 0.5;
+                el.style.fontSize = size + 'px';
+            }
+        }
+
+        const SPINE_PATTERNS = ['', 'spine-pattern-dots', 'spine-pattern-stripes', 'spine-pattern-chevron', 'spine-pattern-hearts', 'spine-pattern-arch'];
+        function spineHTML(b) {
+            const width = spineWidthFor(b);
+            const height = spineHeightFor(b);
+            const initialColor = b.shelfColor || genreColor(b.genre) || (b.cover ? (shelfColorCache[b.cover] || '#c9c2b4') : hashColor(b.title || String(b.id)));
+            const safeTitle = (b.title || '').replace(/"/g, '&quot;');
+            const pattern = (b.shelfPattern !== undefined && b.shelfPattern !== null) ? b.shelfPattern : SPINE_PATTERNS[Math.abs(b.id * 13) % SPINE_PATTERNS.length];
+            return `<div class="shelf-spine ${pattern}" data-id="${b.id}" style="width:${width}px; height:${height}px; background:${initialColor};">
+                <span class="spine-cap top"></span>
+                <span class="spine-cap bottom"></span>
+                <span class="shelf-spine-title">${safeTitle}</span>
+            </div>`;
+        }
+
+        let shelfTooltipEl = null;
+        let shelfTooltipHideTimer = null;
+        function getShelfTooltip() {
+            if (!shelfTooltipEl) {
+                shelfTooltipEl = document.createElement('div');
+                shelfTooltipEl.className = 'shelf-tooltip';
+                shelfTooltipEl.addEventListener('mouseenter', cancelHideShelfTooltip);
+                shelfTooltipEl.addEventListener('mouseleave', hideShelfTooltip);
+                document.body.appendChild(shelfTooltipEl);
+            }
+            return shelfTooltipEl;
+        }
+        function cancelHideShelfTooltip() {
+            if (shelfTooltipHideTimer) { clearTimeout(shelfTooltipHideTimer); shelfTooltipHideTimer = null; }
+        }
+        function showShelfTooltip(el, book) {
+            cancelHideShelfTooltip();
+            const tip = getShelfTooltip();
+            const safeTitle = (book.title || '').replace(/</g, '&lt;');
+            tip.innerHTML = `<button type="button" class="shelf-tooltip-edit" title="Personnaliser ce dos" onclick="openSpineEditor(${book.id})">✏️</button>`
+                + `<span class="shelf-tooltip-title">${safeTitle}</span>`
+                + (book.author ? `<span class="shelf-tooltip-author">${book.author.replace(/</g, '&lt;')}</span>` : '');
+            const rect = el.getBoundingClientRect();
+            tip.style.left = (rect.left + rect.width / 2) + 'px';
+            tip.style.top = (rect.top - 8) + 'px';
+            tip.classList.add('visible');
+        }
+        function hideShelfTooltip() {
+            cancelHideShelfTooltip();
+            shelfTooltipHideTimer = setTimeout(() => {
+                if (shelfTooltipEl) shelfTooltipEl.classList.remove('visible');
+            }, 180);
+        }
+
+        const SPINE_PATTERN_LABELS = { '': 'Uni', 'spine-pattern-dots': 'Pois', 'spine-pattern-stripes': 'Rayures', 'spine-pattern-chevron': 'Chevrons', 'spine-pattern-hearts': 'Cœurs', 'spine-pattern-arch': 'Arches' };
+        let spineEditorBookId = null;
+
+        function refreshSpineEditorUI() {
+            const book = library.find(b => b.id === spineEditorBookId);
+            if (!book) return;
+            const currentColor = book.shelfColor || genreColor(book.genre) || hashColor(book.title || String(book.id));
+            document.getElementById('spine-editor-colors').innerHTML = GENRE_PALETTE.map(c =>
+                `<button type="button" class="spine-swatch ${c === book.shelfColor ? 'active' : ''}" style="background:${c}" onclick="setSpineColor('${c}')"></button>`
+            ).join('');
+            document.getElementById('spine-editor-custom-color').value = /^#/.test(currentColor) ? currentColor : '#7B3F3F';
+            document.getElementById('spine-editor-patterns').innerHTML = SPINE_PATTERNS.map(p =>
+                `<button type="button" class="spine-pattern-btn ${p === book.shelfPattern ? 'active' : ''}" onclick="setSpinePattern('${p}')">${SPINE_PATTERN_LABELS[p]}</button>`
+            ).join('');
+            const currentHeight = spineHeightFor(book);
+            document.getElementById('spine-editor-heights').innerHTML = SPINE_HEIGHTS.map(h =>
+                `<button type="button" class="spine-size-btn ${h === currentHeight ? 'active' : ''}" onclick="setSpineHeight(${h})"><span class="bar" style="height:${Math.round(h / 3.2)}px;"></span></button>`
+            ).join('');
+            const currentWidth = spineWidthFor(book);
+            document.getElementById('spine-editor-widths').innerHTML = SPINE_WIDTHS.map(w =>
+                `<button type="button" class="spine-size-btn ${w === currentWidth ? 'active' : ''}" onclick="setSpineWidth(${w})"><span class="bar" style="width:${w}px; height:26px;"></span></button>`
+            ).join('');
+        }
+
+        window.openSpineEditor = (id) => {
+            spineEditorBookId = id;
+            cancelHideShelfTooltip();
+            if (shelfTooltipEl) shelfTooltipEl.classList.remove('visible');
+            refreshSpineEditorUI();
+            document.getElementById('spine-editor-modal').classList.remove('hidden');
+        };
+
+        window.closeSpineEditor = () => {
+            document.getElementById('spine-editor-modal').classList.add('hidden');
+            spineEditorBookId = null;
+        };
+
+        async function saveSpineCustomization() {
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            render();
+            refreshSpineEditorUI();
+        }
+
+        window.setSpineColor = async (color) => {
+            const book = library.find(b => b.id === spineEditorBookId);
+            if (!book) return;
+            book.shelfColor = color;
+            await saveSpineCustomization();
+        };
+
+        window.setSpinePattern = async (pattern) => {
+            const book = library.find(b => b.id === spineEditorBookId);
+            if (!book) return;
+            book.shelfPattern = pattern;
+            await saveSpineCustomization();
+        };
+
+        window.setSpineHeight = async (height) => {
+            const book = library.find(b => b.id === spineEditorBookId);
+            if (!book) return;
+            book.shelfHeight = height;
+            await saveSpineCustomization();
+        };
+
+        window.setSpineWidth = async (width) => {
+            const book = library.find(b => b.id === spineEditorBookId);
+            if (!book) return;
+            book.shelfWidth = width;
+            await saveSpineCustomization();
+        };
+
+        window.resetSpineCustom = async () => {
+            const book = library.find(b => b.id === spineEditorBookId);
+            if (!book) return;
+            delete book.shelfColor;
+            delete book.shelfPattern;
+            delete book.shelfHeight;
+            delete book.shelfWidth;
+            await saveSpineCustomization();
+        };
+
+        document.getElementById('spine-editor-custom-color').addEventListener('input', (e) => {
+            window.setSpineColor(e.target.value);
+        });
+
+        // Garde shelfPositions synchronisé avec la vraie liste de livres : retire les livres
+        // supprimés et place les nouveaux livres à la suite, sans jamais déplacer
+        // les emplacements déjà choisis par l'utilisateur.
+        function reconcileShelfPositions(books) {
+            const idSet = new Set(books.map(b => b.id));
+            Object.keys(shelfPositions).forEach(id => { if (!idSet.has(parseInt(id))) delete shelfPositions[id]; });
+
+            const rowExtent = Array(SHELF_ROW_COUNT).fill(0);
+            Object.entries(shelfPositions).forEach(([id, pos]) => {
+                const book = books.find(b => b.id === parseInt(id));
+                if (!book) return;
+                rowExtent[pos.row] = Math.max(rowExtent[pos.row], pos.x + spineWidthFor(book));
+            });
+
+            books.forEach(b => {
+                if (shelfPositions[b.id]) return;
+                let shortest = 0;
+                for (let i = 1; i < SHELF_ROW_COUNT; i++) {
+                    if (rowExtent[i] < rowExtent[shortest]) shortest = i;
+                }
+                shelfPositions[b.id] = { row: shortest, x: Math.round(rowExtent[shortest]) };
+                rowExtent[shortest] += spineWidthFor(b) + 6;
+            });
+        }
+
+        function initShelfDrag(el, book) {
+            el.addEventListener('mouseenter', () => { if (!activeShelfDrag) showShelfTooltip(el, book); });
+            el.addEventListener('mouseleave', () => hideShelfTooltip());
+
+            el.addEventListener('pointerdown', (e) => {
+                if (activeShelfDrag) return;
+                activeShelfDrag = {
+                    el, book,
+                    dragOffsetX: e.clientX - el.getBoundingClientRect().left,
+                    startX: e.clientX, startY: e.clientY,
+                    moved: false,
+                    lastLeft: parseFloat(el.style.left) || 0,
+                    pointerId: e.pointerId,
+                };
+                try { el.setPointerCapture(e.pointerId); } catch (err) {}
+                cancelHideShelfTooltip();
+                if (shelfTooltipEl) shelfTooltipEl.classList.remove('visible');
+            });
+        }
+
+        function onShelfPointerMove(e) {
+            const drag = activeShelfDrag;
+            if (!drag || e.pointerId !== drag.pointerId) return;
+            const el = drag.el;
+
+            if (!drag.moved) {
+                const dx = Math.abs(e.clientX - drag.startX);
+                const dy = Math.abs(e.clientY - drag.startY);
+                if (dx < 4 && dy < 4) return;
+                drag.moved = true;
+                el.classList.add('dragging');
+            }
+
+            // Rangée la plus proche du curseur (par distance au centre), plus fiable qu'une zone étendue
+            let targetRowEl = el.parentElement;
+            let bestDist = Infinity;
+            for (let i = 0; i < SHELF_ROW_COUNT; i++) {
+                const rEl = document.getElementById(`bookshelf-row-${i}`);
+                if (!rEl) continue;
+                const rect = rEl.getBoundingClientRect();
+                const dist = Math.abs(e.clientY - (rect.top + rect.height / 2));
+                if (dist < bestDist) { bestDist = dist; targetRowEl = rEl; }
+            }
+            if (targetRowEl !== el.parentElement) targetRowEl.appendChild(el);
+
+            const rowRect = targetRowEl.getBoundingClientRect();
+            const width = el.offsetWidth;
+            let newLeft = e.clientX - rowRect.left - drag.dragOffsetX;
+            newLeft = Math.max(0, Math.min(rowRect.width - width, newLeft));
+
+            // Empêche le chevauchement avec les autres livres de la rangée
+            const siblings = Array.from(targetRowEl.children).filter(c => c !== el && c.classList.contains('shelf-spine'));
+            siblings.forEach(sib => {
+                const sLeft = parseFloat(sib.style.left) || 0;
+                const sRight = sLeft + sib.offsetWidth;
+                const right = newLeft + width;
+                if (newLeft < sRight && right > sLeft) {
+                    newLeft = (drag.lastLeft <= sLeft) ? (sLeft - width) : sRight;
+                }
+            });
+            newLeft = Math.max(0, Math.min(rowRect.width - width, newLeft));
+            el.style.left = newLeft + 'px';
+            drag.lastLeft = newLeft;
+        }
+
+        async function onShelfPointerUp(e) {
+            const drag = activeShelfDrag;
+            if (!drag || e.pointerId !== drag.pointerId) return;
+            const el = drag.el, book = drag.book;
+            activeShelfDrag = null;
+            el.classList.remove('dragging');
+            try { el.releasePointerCapture(e.pointerId); } catch (err) {}
+
+            if (!drag.moved) {
+                jumpToFiche(book.id);
+                return;
+            }
+            const rowEl = el.closest('.bookshelf-row');
+            shelfPositions[book.id] = { row: parseInt(rowEl.dataset.row), x: Math.round(parseFloat(el.style.left) || 0) };
+            await saveShelfPositions();
+        }
+
+        function onShelfPointerCancel(e) {
+            const drag = activeShelfDrag;
+            if (!drag || e.pointerId !== drag.pointerId) return;
+            activeShelfDrag = null;
+            drag.el.classList.remove('dragging');
+        }
+
+        document.addEventListener('pointermove', onShelfPointerMove);
+        document.addEventListener('pointerup', onShelfPointerUp);
+        document.addEventListener('pointercancel', onShelfPointerCancel);
+
+        function renderShelf(books) {
+            const rowElements = Array.from({ length: SHELF_ROW_COUNT }, (_, i) => document.getElementById(`bookshelf-row-${i}`));
+            if (!rowElements[0]) return;
+
+            if (!books.length) {
+                rowElements[0].innerHTML = '<p class="bookshelf-empty">Ajoute des livres dans Ma Grille pour remplir ton étagère.</p>';
+                rowElements.slice(1).forEach(el => { if (el) el.innerHTML = ''; });
+                return;
+            }
+
+            reconcileShelfPositions(books);
+            rowElements.forEach(el => { if (el) el.innerHTML = ''; });
+
+            books.forEach(b => {
+                const pos = shelfPositions[b.id];
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = spineHTML(b);
+                const spineEl = wrapper.firstElementChild;
+                spineEl.style.left = pos.x + 'px';
+                rowElements[pos.row].appendChild(spineEl);
+                initShelfDrag(spineEl, b);
+                fitSpineTitle(spineEl.querySelector('.shelf-spine-title'));
+            });
+
+            books.forEach(b => {
+                if (b.shelfColor || genreColor(b.genre) || !b.cover || shelfColorCache[b.cover]) return;
+                getAverageColor(b.cover).then(color => {
+                    const finalColor = color || hashColor(b.title || String(b.id));
+                    shelfColorCache[b.cover] = finalColor;
+                    const el = document.querySelector(`.shelf-spine[data-id="${b.id}"]`);
+                    if (el) el.style.background = finalColor;
+                });
+            });
+        }
 
         // --- PSEUDO (unique) ---
         let currentPseudo = null;
@@ -1054,6 +1658,7 @@
                 customPhotoUrl = null;
                 photoRemoved = false;
                 currentPseudo = null;
+                shelfPositions = {};
                 try {
                     const profileSnap = await getDoc(doc(db, "user_profiles", user.uid));
                     if (profileSnap.exists()) {
@@ -1064,6 +1669,21 @@
                         if (profileSnap.data().themeColor) {
                             applyThemeColor(profileSnap.data().themeColor);
                             localStorage.setItem('biblio-theme-color', profileSnap.data().themeColor);
+                        }
+                        if (profileSnap.data().shelfPositions) {
+                            shelfPositions = profileSnap.data().shelfPositions;
+                        } else if (Array.isArray(profileSnap.data().shelfRows)) {
+                            // Migration depuis l'ancien format (rangées ordonnées sans position libre)
+                            const saved = profileSnap.data().shelfRows;
+                            const widths = [28, 32, 36];
+                            saved.forEach((row, rowIndex) => {
+                                let x = 0;
+                                (row || []).forEach(id => {
+                                    const w = widths[Math.abs(id * 7) % widths.length];
+                                    shelfPositions[id] = { row: rowIndex, x };
+                                    x += w + 6;
+                                });
+                            });
                         }
                     }
                 } catch (err) { /* pas grave si ça échoue, on retombe sur photoURL ou l'initiale */ }
@@ -1216,13 +1836,14 @@
             `).join('') || '<p class="text-[10px] text-slate-400 text-center italic py-4">Aucun bilan pour '+yStatsF+'</p>';
 
             updateChart(statLib);
+            renderShelf(library.filter(b => b.title));
 
             // HTML GRILLE
             const nextEmptyBook = library.find(b => !b.title);
             document.getElementById('grid-content').innerHTML = filteredGrid.map(b => `
                 <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
                     <div class="grid-thumb relative">
-                        ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<div class="flex flex-col items-center justify-center text-center px-3 py-2 h-full w-full"><span class="grid-thumb-title font-serif font-black uppercase leading-tight text-[15px]">${b.title}</span><span class="mt-2 text-[10px] font-bold uppercase tracking-wide" style="color: var(--gold-accent);">${b.author || ''}</span></div>`}
+                        ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<div class="book-spine spine-${b.id % 6} flex flex-col items-center justify-center h-full w-full"><div class="book-spine-frame"><span class="book-spine-title">${b.title}</span><span class="book-spine-divider"></span><span class="book-spine-author">${b.author || ''}</span></div></div>`}
                         
                         <!-- Badge Favori -->
                         ${b.isFavorite ? `<span class="absolute top-2 right-2 backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg" style="background: color-mix(in srgb, var(--gold-accent) 25%, transparent); border: 1px solid color-mix(in srgb, var(--gold-accent) 40%, transparent);">👑</span>` : ''}
@@ -1255,9 +1876,14 @@
                         </button>
                         <div class="fiche-number">#${book.id}</div>
                     </div>
-                    <button onclick="showSection('grille', true)" class="mb-6 flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
-                         <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Grille</span>
-                    </button>
+                    <div class="flex items-center gap-2 mb-6">
+                        <button onclick="showSection('grille', true)" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
+                             <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Grille</span>
+                        </button>
+                        <button onclick="goToBibliotheque()" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
+                             <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Bibliothèque</span>
+                        </button>
+                    </div>
                     <div class="flex flex-col md:flex-row gap-10">
                         <div class="cover-box shrink-0">
                             ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
@@ -1410,6 +2036,19 @@
             document.getElementById('btn-' + id)?.classList.add('active');
             document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats' || id === 'compte');
             if (id === 'compte') openProfile();
+        };
+
+        window.goToBibliotheque = () => {
+            showSection('stats');
+            setTimeout(() => {
+                const el = document.getElementById('bibliotheque-section');
+                if (el) {
+                    const header = document.querySelector('.sticky.top-0');
+                    const headerHeight = header ? header.offsetHeight : 0;
+                    const top = el.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
+                    window.scrollTo({ top, behavior: 'instant' });
+                }
+            }, 0);
         };
 
         window.jumpToFiche = (id) => { 
