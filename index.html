@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800;900&family=Bebas+Neue&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --paper-bg: #FAF9F6;
@@ -204,6 +204,16 @@
         .spine-pattern-btn.active { border-color: var(--gold-accent); background: rgba(197, 160, 89, 0.15); color: var(--gold-accent); }
         html.dark .spine-pattern-btn { background: #2a2a2a; border-color: #3a3a3a; color: #d8d8d8; }
         html.dark .spine-pattern-btn.active { background: rgba(197, 160, 89, 0.2); }
+        .decoration-picker-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 14px 6px; border-radius: 12px; border: 1px solid #e2e2e2; background: #fafafa;
+            cursor: pointer; transition: border-color 0.15s, background 0.15s;
+            font-size: 26px;
+        }
+        .decoration-picker-btn:hover { border-color: var(--gold-accent); background: rgba(197, 160, 89, 0.1); }
+        .decoration-picker-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; color: #94a3b8; }
+        html.dark .decoration-picker-btn { background: #2a2a2a; border-color: #3a3a3a; }
+        html.dark .decoration-picker-btn:hover { background: rgba(197, 160, 89, 0.15); }
 
         .spine-size-btn {
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -266,6 +276,17 @@
             overflow: hidden;
         }
         .stat-value { font-family: 'Playfair Display', serif; font-size: 2.1rem; font-weight: 900; color: var(--gold-accent); }
+
+        .landing-screenshot-slot {
+            aspect-ratio: 4 / 3;
+            border-radius: 16px;
+            border: 1.5px dashed rgba(197, 160, 89, 0.35);
+            background: rgba(197, 160, 89, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        html.dark .landing-screenshot-slot { background: rgba(197, 160, 89, 0.06); border-color: rgba(197, 160, 89, 0.25); }
         
         .podium-item {
             display: flex; align-items: center; justify-content: space-between;
@@ -455,13 +476,13 @@
 
         .bookcase {
             background:
-                repeating-linear-gradient(180deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 68px),
+                repeating-linear-gradient(180deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 68px),
                 repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 2px, transparent 5px),
-                linear-gradient(180deg, #d9a86c, #c68e52 40%, #b57c42 100%);
-            border: 1px solid rgba(120, 72, 30, 0.35);
+                linear-gradient(180deg, #c99664, #b17f4a 40%, #96683a 100%);
+            border: 1px solid rgba(110, 66, 28, 0.4);
             border-radius: 14px;
             padding: 22px 16px 16px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.15);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
         }
         html.dark .bookcase {
             background:
@@ -477,78 +498,139 @@
             position: relative;
             height: 108px;
             padding: 4px 2px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
         }
         .bookshelf-ledge {
             height: 10px;
             margin-top: 0;
-            background: linear-gradient(180deg, #c9a662, #8a6a35);
+            background: linear-gradient(180deg, #9c7040, #664020);
             border-radius: 0 0 5px 5px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.25);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
         }
         .shelf-spine {
-            border-radius: 3px;
+            border-radius: 4px 6px 2px 2px;
             position: absolute;
             bottom: 0;
             cursor: grab;
             overflow: hidden;
             touch-action: none;
-            transition: box-shadow 0.18s ease;
-            border: 1px solid rgba(197, 160, 89, 0.45);
-            box-shadow:
-                inset -3px 0 6px rgba(0,0,0,0.22),
-                inset 2px 0 3px rgba(255,255,255,0.15),
-                0 2px 4px rgba(0,0,0,0.15);
+            transition: transform 0.15s ease;
+            border: 1px solid rgba(0,0,0,0.15);
+            background-color: var(--spine-color, #c9c2b4);
+            box-shadow: 1px 2px 3px rgba(0,0,0,0.18);
         }
+        html.dark .shelf-spine { border-color: rgba(255,255,255,0.15); box-shadow: 1px 1px 2px rgba(0,0,0,0.35); }
         .shelf-spine::before {
             content: '';
             position: absolute; inset: 0;
-            background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(0,0,0,0.18) 85%);
+            background: linear-gradient(100deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.04) 18%, transparent 40%, rgba(0,0,0,0.12) 100%);
             pointer-events: none;
         }
         .shelf-spine::after {
             content: '';
-            position: absolute; inset: 0;
+            position: absolute; top: 0; bottom: 0; left: 3px; width: 2px;
+            background: rgba(255,255,255,0.35);
             pointer-events: none;
         }
-        .spine-pattern-dots::after { background-image: radial-gradient(rgba(255,255,255,0.55) 1.4px, transparent 1.6px); background-size: 9px 9px; background-position: 3px 4px; }
-        .spine-pattern-stripes::after { background: repeating-linear-gradient(180deg, rgba(255,255,255,0.32) 0px, rgba(255,255,255,0.32) 4px, transparent 4px, transparent 11px); }
-        .spine-pattern-chevron::after { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.26) 0px, rgba(255,255,255,0.26) 3px, transparent 3px, transparent 10px); }
-        .spine-pattern-hearts::after {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 4.2C6.1 2.6 3.6 2.9 3.6 5c0 2 3.4 4 3.4 4s3.4-2 3.4-4c0-2.1-2.5-2.4-3.4-.8z' fill='%23ffffff' fill-opacity='0.5'/%3E%3C/svg%3E");
-            background-repeat: repeat; background-size: 15px 15px; background-position: 2px 3px;
+        html.dark .shelf-spine::after { background: rgba(255,255,255,0.15); }
+        .spine-pattern-dots.shelf-spine { background-image: radial-gradient(rgba(0,0,0,0.12) 1.4px, transparent 1.6px); background-size: 9px 9px; }
+        .spine-pattern-stripes.shelf-spine { background-image: repeating-linear-gradient(180deg, rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 4px, transparent 4px, transparent 9px); }
+        .spine-pattern-chevron.shelf-spine {
+            background-image: repeating-linear-gradient(135deg, rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 2px, transparent 2px, transparent 7px),
+                        repeating-linear-gradient(45deg, rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 2px, transparent 2px, transparent 7px);
+            background-size: 11px 11px;
         }
-        .spine-pattern-arch::after {
-            background-image: radial-gradient(circle at 50% 100%, transparent 5px, rgba(255,255,255,0.28) 5.5px, rgba(255,255,255,0.28) 6.5px, transparent 7px);
-            background-size: 13px 13px; background-position: 0 2px;
+        .spine-pattern-hearts.shelf-spine {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 4.4C6.2 2.9 3.9 3.6 3.9 5.8c0 2.2 3.7 4.4 3.7 4.4s3.7-2.2 3.7-4.4C11.3 3.6 9 2.9 8.2 4.4z' fill='none' stroke='%23000' stroke-opacity='0.16' stroke-width='1.1'/%3E%3C/svg%3E");
+            background-repeat: repeat; background-size: 15px 15px;
         }
-        .shelf-spine:hover { box-shadow: 0 8px 14px rgba(0,0,0,0.3); transform: translateY(-6px); z-index: 3; }
-        .shelf-spine.dragging { cursor: grabbing; box-shadow: 0 12px 20px rgba(0,0,0,0.4); transition: none; z-index: 50; user-select: none; }
-        .spine-cap {
-            position: absolute; left: 0; right: 0; height: 4px;
-            background: linear-gradient(180deg, #fff2cf, var(--gold-accent));
+        .spine-pattern-arch.shelf-spine {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Ccircle cx='7' cy='7' r='2.6' fill='none' stroke='%23000' stroke-opacity='0.14' stroke-width='1.1'/%3E%3C/svg%3E");
+            background-repeat: repeat; background-size: 14px 14px;
+        }
+        .shelf-spine:hover { transform: translateY(-8px); z-index: 3; }
+        .shelf-decoration {
+            position: absolute;
+            bottom: 0;
+            line-height: 1;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            transition: transform 0.15s ease;
+            filter: drop-shadow(1px 3px 2px rgba(0,0,0,0.25));
+        }
+        .shelf-decoration:hover { transform: translateY(-6px); z-index: 3; }
+        .shelf-decoration.dragging { cursor: grabbing; transition: none; z-index: 50; user-select: none; }
+        .decoration-remove {
+            position: absolute; top: -8px; right: -8px;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid rgba(248, 113, 113, 0.5);
+            color: #f87171;
+            font-size: 11px;
+            line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        .shelf-decoration:hover .decoration-remove { opacity: 1; }
+        .decoration-edit-photo {
+            position: absolute; top: -8px; left: -8px;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid rgba(197, 160, 89, 0.5);
+            font-size: 9px;
+            line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            cursor: pointer;
+        }
+        .shelf-decoration:hover .decoration-edit-photo { opacity: 1; }
+        .decoration-svg { display: block; line-height: 0; }
+        .decoration-emoji.decoration-svg svg { display: block; width: 104px; height: 104px; position: relative; z-index: 1; }
+        .deco-statue .decoration-emoji.decoration-svg svg { width: 52px; height: 71px; }
+        .shelf-spine.dragging { cursor: grabbing; transition: none; z-index: 50; user-select: none; }
+        .spine-cap { display: none; }
+        .spine-label {
+            position: absolute;
+            top: 8%;
+            left: 12%;
+            right: 12%;
+            bottom: 8%;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 1;
         }
-        .spine-cap.top { top: 0; }
-        .spine-cap.bottom { bottom: 0; }
         .shelf-spine-title {
             writing-mode: vertical-rl;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(180deg);
-            font-family: 'Bebas Neue', 'Playfair Display', serif;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #fdf6e3;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.55);
-            white-space: normal;
+            transform: rotate(180deg);
+            font-family: 'Quicksand', 'Bebas Neue', 'Playfair Display', serif;
+            font-weight: 700;
+            text-transform: none;
+            letter-spacing: 0.01em;
+            color: #2a2115;
+            white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
             text-align: center;
-            max-height: 82%;
-            max-width: 92%;
+            max-height: 96%;
+            max-width: 96%;
             z-index: 2;
         }
+        .spine-text-dark .shelf-spine-title { color: #2a2115; text-shadow: 0 1px 1px rgba(255,255,255,0.3); }
+        .spine-text-light .shelf-spine-title { color: #fdf6e3; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .bookshelf-empty { font-size: 11px; color: #94a3b8; font-style: italic; padding: 4px 4px 12px; }
         html.dark .bookshelf-empty { color: #6b6b6b; }
 
@@ -590,42 +672,117 @@
 </head>
 <body>
 
-    <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
+    <div id="landing-page" class="min-h-screen">
+        <div class="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+            <h1 class="text-xl font-black italic uppercase tracking-tighter font-serif">
+                Ma Biblio <span style="color: var(--gold-accent)">100</span>
+            </h1>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleLang()" id="landing-lang-toggle-btn" class="text-[10px] font-black uppercase tracking-widest border border-slate-200 rounded-full px-2.5 py-1 hover:border-gold-accent hover:text-gold-accent transition-colors" title="Change language">FR</button>
+                <button onclick="toggleTheme()" id="landing-theme-toggle-btn" class="theme-toggle-btn" title="Changer de thème"></button>
+                <button onclick="showAuthScreen()" class="py-2.5 px-6 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg" data-i18n="landing.login">Connexion</button>
+            </div>
+        </div>
+
+        <div class="max-w-5xl mx-auto px-6 pt-10 pb-6 text-left">
+            <h2 class="text-4xl md:text-5xl font-black italic font-serif tracking-tight mb-6 leading-tight" data-i18n-html="landing.heroTitle">
+                Ta bibliothèque personnelle,<br>enfin <span style="color: var(--gold-accent)">bien rangée</span>.
+            </h2>
+            <p class="text-sm md:text-base text-slate-500 leading-relaxed text-justify" data-i18n="landing.heroSubtitle">
+                Ma Biblio 100 t'aide à garder une trace de tout ce que tu lis : notes, avis, genres, dates de lecture.
+                Visualise tes statistiques année par année, organise tes livres sur une étagère virtuelle personnalisable,
+                et retrouve en un instant le prochain livre que tu voulais lire.
+            </p>
+        </div>
+
+        <div class="max-w-5xl mx-auto px-6 pb-24">
+            <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-center py-16 border-t border-slate-200">
+                <div class="text-left">
+                    <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color: var(--gold-accent)">01</p>
+                    <h3 class="font-serif font-black uppercase text-3xl md:text-4xl mb-4 leading-tight" data-i18n="landing.feat1Title">Tableau de bord</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed" data-i18n="landing.feat1Body">Suis ton rythme de lecture, ta note moyenne et ton livre de l'année, en un coup d'œil, avec un graphique mois par mois.</p>
+                </div>
+                <div class="landing-screenshot-slot" data-feature="tableau-de-bord">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300" data-i18n="landing.screenshotSoon">Capture d'écran à venir</span>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-center py-16 border-t border-slate-200">
+                <div class="landing-screenshot-slot md:order-1" data-feature="ma-grille">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300" data-i18n="landing.screenshotSoon">Capture d'écran à venir</span>
+                </div>
+                <div class="text-left md:order-2">
+                    <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color: var(--gold-accent)">02</p>
+                    <h3 class="font-serif font-black uppercase text-3xl md:text-4xl mb-4 leading-tight" data-i18n="landing.feat2Title">Ma Grille</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed" data-i18n="landing.feat2Body">Visualise toute ta collection en un coup d'œil grâce aux couvertures de tes livres, triable et filtrable par année de lecture.</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-center py-16 border-t border-slate-200">
+                <div class="text-left">
+                    <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color: var(--gold-accent)">03</p>
+                    <h3 class="font-serif font-black uppercase text-3xl md:text-4xl mb-4 leading-tight" data-i18n="landing.feat3Title">Mes Fiches</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed" data-i18n="landing.feat3Body">Ouvre chaque livre en détail : résumé, note, avis personnel et informations complètes réunis sur une seule fiche.</p>
+                </div>
+                <div class="landing-screenshot-slot" data-feature="mes-fiches">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300" data-i18n="landing.screenshotSoon">Capture d'écran à venir</span>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-center py-16 border-t border-b border-slate-200">
+                <div class="landing-screenshot-slot md:order-1" data-feature="etagere">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-300" data-i18n="landing.screenshotSoon">Capture d'écran à venir</span>
+                </div>
+                <div class="text-left md:order-2">
+                    <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color: var(--gold-accent)">04</p>
+                    <h3 class="font-serif font-black uppercase text-3xl md:text-4xl mb-4 leading-tight" data-i18n="landing.feat4Title">Une étagère personnalisée</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed" data-i18n="landing.feat4Body">Range tes livres sur une étagère virtuelle : couleurs, motifs et décorations sont entièrement personnalisables.</p>
+                </div>
+            </div>
+
+            <div class="text-center pt-16">
+                <button onclick="showAuthScreen()" class="py-4 px-10 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg" data-i18n="landing.login2">Se connecter</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6 hidden">
         <div class="auth-card w-full max-w-md rounded-3xl p-10 text-center">
+            <button onclick="showLandingPage()" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent mb-4" data-i18n="auth.backToHome">← Retour à l'accueil</button>
             <div class="mb-8">
                 <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif mb-2">
                     Ma Biblio <span style="color: var(--gold-accent)">100</span>
                 </h1>
-                <p id="auth-mode-title" class="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">Connexion Membre</p>
+                <p id="auth-mode-title" class="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold" data-i18n="auth.memberLogin">Connexion Membre</p>
             </div>
             <form id="auth-form" class="space-y-5 text-left">
                 <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Adresse Email</label>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block" data-i18n="auth.emailAddress">Adresse Email</label>
                     <input type="email" id="email" required autocomplete="username" data-lpignore="false" class="modal-input !mb-0" placeholder="exemple@mail.com">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Mot de passe</label>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block" data-i18n="auth.password">Mot de passe</label>
                     <input type="password" id="password" required class="modal-input !mb-0" placeholder="••••••••">
-                    <button type="button" onclick="handleForgotPassword()" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent mt-2">Mot de passe oublié ?</button>
+                    <button type="button" onclick="handleForgotPassword()" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent mt-2" data-i18n="auth.forgotPassword">Mot de passe oublié ?</button>
                 </div>
-                <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg mt-4">Ouvrir ma collection</button>
+                <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg mt-4" data-i18n="auth.openCollection">Ouvrir ma collection</button>
             </form>
             <p id="auth-error" class="text-red-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
             <p id="auth-success" class="text-green-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
 
             <div class="flex items-center gap-3 my-6">
                 <div class="flex-1 h-px bg-slate-100"></div>
-                <span class="text-[10px] text-gray-300 font-bold uppercase tracking-widest">ou</span>
+                <span class="text-[10px] text-gray-300 font-bold uppercase tracking-widest" data-i18n="auth.or">ou</span>
                 <div class="flex-1 h-px bg-slate-100"></div>
             </div>
 
             <button onclick="signInWithGoogle()" class="w-full py-3.5 border border-slate-200 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-slate-50 transition-colors">
                 <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.9 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.2 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.2 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.9-5.4l-6.4-5.4C29.4 34.9 26.8 36 24 36c-5.4 0-9.9-3.1-11.3-7.4l-6.5 5C9.6 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1 3-3.1 5.5-5.9 7.1l6.4 5.4C39.9 37.5 44 31.3 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
-                Continuer avec Google
+                <span data-i18n="auth.continueGoogle">Continuer avec Google</span>
             </button>
 
             <div class="mt-6">
-                <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent">Pas encore de compte ? S'inscrire</button>
+                <button onclick="toggleAuthMode()" id="toggle-auth-btn" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent" data-i18n="auth.noAccount">Pas encore de compte ? S'inscrire</button>
             </div>
         </div>
     </div>
@@ -638,22 +795,23 @@
                     <h1 class="text-2xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
                     
                     <div class="flex gap-8 items-center">
-                        <button onclick="showSection('stats')" id="btn-stats" class="tab-btn active">Tableau de Bord</button>
-                        <button onclick="showSection('grille')" id="btn-grille" class="tab-btn">Ma Grille</button>
-                        <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn">Mes Fiches</button>
+                        <button onclick="showSection('stats')" id="btn-stats" class="tab-btn active" data-i18n="nav.dashboard">Tableau de Bord</button>
+                        <button onclick="showSection('grille')" id="btn-grille" class="tab-btn" data-i18n="nav.grid">Ma Grille</button>
+                        <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn" data-i18n="nav.fiches">Mes Fiches</button>
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <button onclick="toggleTheme()" id="theme-toggle-btn" class="theme-toggle-btn" title="Changer de thème"></button>
+                        <button onclick="toggleLang()" id="lang-toggle-btn" class="text-[10px] font-black uppercase tracking-widest border border-slate-200 rounded-full px-2.5 py-1 hover:border-gold-accent hover:text-gold-accent transition-colors" title="Change language">FR</button>
+                        <button onclick="toggleTheme()" id="theme-toggle-btn" class="theme-toggle-btn" data-i18n-title="nav.themeToggle" title="Changer de thème"></button>
                         <div class="profile-menu-wrapper" id="profile-menu-wrapper">
                             <button id="profile-avatar-btn" class="profile-avatar-btn" title="Mon profil"></button>
                             <div class="profile-dropdown">
                                 <div class="profile-dropdown-inner">
                                     <button onclick="showSection('compte')" class="profile-dropdown-item">
-                                        <span class="icon">👤</span> Compte
+                                        <span class="icon">👤</span> <span data-i18n="nav.account">Compte</span>
                                     </button>
                                     <button onclick="logout()" class="profile-dropdown-item danger">
-                                        <span class="icon">↪</span> Déconnexion
+                                        <span class="icon">↪</span> <span data-i18n="nav.logout">Déconnexion</span>
                                     </button>
                                 </div>
                             </div>
@@ -666,18 +824,18 @@
                         <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </span>
-                        <input type="text" id="search-input" autocomplete="off" data-lpignore="true" data-form-type="other" name="book-search-query" readonly onfocus="this.removeAttribute('readonly')" oninput="render()" placeholder="Recherche rapide (titre, auteur, genre...)" class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent transition-all shadow-sm">
+                        <input type="text" id="search-input" autocomplete="off" data-lpignore="true" data-form-type="other" name="book-search-query" readonly onfocus="this.removeAttribute('readonly')" oninput="render()" data-i18n-placeholder="filters.searchPlaceholder" placeholder="Recherche rapide (titre, auteur, genre...)" class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-gold-accent transition-all shadow-sm">
                     </div>
                     
                     <div class="flex flex-wrap gap-2 items-center text-xs">
-                        <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider">Filtrer par :</span>
+                        <span class="text-[10px] font-black uppercase text-slate-400 mr-1 tracking-wider" data-i18n="filters.filterBy">Filtrer par :</span>
                         
                         <select id="filter-year-grid" onchange="render()" class="filter-select !bg-black !text-white font-bold">
-                            <option value="all">Toutes les années</option>
+                            <option value="all" data-i18n="filters.allYears">Toutes les années</option>
                         </select>
 
                         <select id="filter-rating" onchange="render()" class="filter-select">
-                            <option value="all">Toutes les notes</option>
+                            <option value="all" data-i18n="filters.allRatings">Toutes les notes</option>
                             <option value="0">0 ★</option>
                             <option value="1">1 ★</option>
                             <option value="2">2 ★</option>
@@ -690,36 +848,36 @@
                         </select>
 
                         <select id="filter-genre" onchange="render()" class="filter-select">
-                            <option value="all">Tous les genres</option>
+                            <option value="all" data-i18n="filters.allGenres">Tous les genres</option>
                         </select>
 
                         <select id="filter-author" onchange="render()" class="filter-select">
-                            <option value="all">Tous les auteurs</option>
+                            <option value="all" data-i18n="filters.allAuthors">Tous les auteurs</option>
                         </select>
 
                         <select id="filter-month" onchange="render()" class="filter-select">
-                            <option value="all">Tous les mois</option>
-                            <option value="01">Janvier</option>
-                            <option value="02">Février</option>
-                            <option value="03">Mars</option>
-                            <option value="04">Avril</option>
-                            <option value="05">Mai</option>
-                            <option value="06">Juin</option>
-                            <option value="07">Juillet</option>
-                            <option value="08">Août</option>
-                            <option value="09">Septembre</option>
-                            <option value="10">Octobre</option>
-                            <option value="11">Novembre</option>
-                            <option value="12">Décembre</option>
+                            <option value="all" data-i18n="filters.allMonths">Tous les mois</option>
+                            <option value="01" data-i18n="months.01">Janvier</option>
+                            <option value="02" data-i18n="months.02">Février</option>
+                            <option value="03" data-i18n="months.03">Mars</option>
+                            <option value="04" data-i18n="months.04">Avril</option>
+                            <option value="05" data-i18n="months.05">Mai</option>
+                            <option value="06" data-i18n="months.06">Juin</option>
+                            <option value="07" data-i18n="months.07">Juillet</option>
+                            <option value="08" data-i18n="months.08">Août</option>
+                            <option value="09" data-i18n="months.09">Septembre</option>
+                            <option value="10" data-i18n="months.10">Octobre</option>
+                            <option value="11" data-i18n="months.11">Novembre</option>
+                            <option value="12" data-i18n="months.12">Décembre</option>
                         </select>
 
                         <select id="filter-special" onchange="render()" class="filter-select">
-                            <option value="all">Tous les livres</option>
-                            <option value="favorite">👑 Livre de l'année</option>
-                            <option value="bookclub">📖 Book Club</option>
+                            <option value="all" data-i18n="filters.allBooks">Tous les livres</option>
+                            <option value="favorite" data-i18n="filters.bookOfYear">👑 Livre de l'année</option>
+                            <option value="bookclub" data-i18n="filters.bookClub">📖 Book Club</option>
                         </select>
 
-                        <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto">Réinitialiser</button>
+                        <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto" data-i18n="filters.reset">Réinitialiser</button>
                     </div>
                 </div>
             </div>
@@ -740,7 +898,7 @@
                                 <span id="best-book-fallback" class="best-book-fallback text-sm font-black">👑</span>
                             </div>
                             <div class="text-left truncate flex-1">
-                                <span class="best-book-label block text-[8px] font-black tracking-[0.2em] uppercase">👑 LIVRE DE L'ANNÉE <span class="display-year">...</span></span>
+                                <span class="best-book-label block text-[8px] font-black tracking-[0.2em] uppercase">👑 <span data-i18n="dash.bookOfYear">LIVRE DE L'ANNÉE</span> <span class="display-year">...</span></span>
                                 <h3 id="best-book-title" class="font-serif text-sm font-bold uppercase tracking-tight text-slate-800 truncate leading-tight mt-0.5"></h3>
                                 <p id="best-book-author" class="best-book-author-label text-[9px] font-bold uppercase tracking-wider truncate"></p>
                             </div>
@@ -751,38 +909,38 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <div class="stat-card flex flex-col justify-center items-center">
                         <span class="text-xl mb-1" style="opacity:0.5">📚</span>
-                        <p class="section-label">Livres Lus en <span class="display-year">...</span></p>
+                        <p class="section-label"><span data-i18n="dash.booksRead">Livres Lus en</span> <span class="display-year">...</span></p>
                         <div id="stat-count" class="stat-value">0</div>
                         <p id="stat-count-compare" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">&nbsp;</p>
                     </div>
                     <div class="stat-card flex flex-col justify-center items-center">
                         <span class="text-xl mb-1" style="opacity:0.5">⭐</span>
-                        <p class="section-label">Note Moyenne</p>
+                        <p class="section-label" data-i18n="dash.avgRating">Note Moyenne</p>
                         <div class="flex items-center justify-center gap-10 w-full">
                             <div class="flex flex-col items-center" style="transform: translateY(10px);">
                                 <span id="stat-avg-min" class="stat-minmax">&nbsp;</span>
-                                <span class="stat-minmax-label">min</span>
+                                <span class="stat-minmax-label" data-i18n="dash.min">min</span>
                             </div>
                             <div id="stat-avg" class="stat-value">0.0</div>
                             <div class="flex flex-col items-center" style="transform: translateY(10px);">
                                 <span id="stat-avg-max" class="stat-minmax">&nbsp;</span>
-                                <span class="stat-minmax-label">max</span>
+                                <span class="stat-minmax-label" data-i18n="dash.max">max</span>
                             </div>
                         </div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Étoiles sur 5</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="dash.starsOutOf5">Étoiles sur 5</p>
                     </div>
                     <div class="stat-card flex flex-col justify-center items-center px-4">
-                        <p class="section-label mb-3">Formats Lus</p>
+                        <p class="section-label mb-3" data-i18n="dash.formatsRead">Formats Lus</p>
                         <div id="stat-format" class="flex justify-around w-full items-end gap-3"></div>
                     </div>
                     <div class="stat-card text-left px-8">
-                        <p class="section-label text-center mb-2">Podium des Genres</p>
+                        <p class="section-label text-center mb-2" data-i18n="dash.genrePodium">Podium des Genres</p>
                         <div id="genre-podium" class="space-y-1 overflow-y-auto" style="max-height: 140px;"></div>
                     </div>
                 </div>
                 
                 <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                    <p class="section-label mb-3">Rythme de lecture (Livres par mois en <span class="display-year">...</span>)</p>
+                    <p class="section-label mb-3"><span data-i18n="dash.readingPace">Rythme de lecture (Livres par mois en</span> <span class="display-year">...</span>)</p>
                     <div class="h-64 w-full">
                         <canvas id="readingChart"></canvas>
                     </div>
@@ -790,22 +948,14 @@
 
                 <div id="bibliotheque-section" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm mt-4">
                     <div class="flex items-center justify-between mb-4">
-                        <p class="section-label mb-0">Ma Bibliothèque</p>
-                    </div>
-                    <div class="bookcase">
-                        <div class="bookshelf-row-wrap">
-                            <div id="bookshelf-row-0" class="bookshelf-row" data-row="0"></div>
-                            <div class="bookshelf-ledge"></div>
-                        </div>
-                        <div class="bookshelf-row-wrap">
-                            <div id="bookshelf-row-1" class="bookshelf-row" data-row="1"></div>
-                            <div class="bookshelf-ledge"></div>
-                        </div>
-                        <div class="bookshelf-row-wrap bookshelf-row-wrap-last">
-                            <div id="bookshelf-row-2" class="bookshelf-row" data-row="2"></div>
-                            <div class="bookshelf-ledge"></div>
+                        <p class="section-label mb-0" data-i18n="dash.myLibrary">Ma Bibliothèque</p>
+                        <div class="flex items-center gap-3">
+                            <button onclick="openDecorationPicker()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.addDecoration" title="Ajouter une décoration">✨</button>
+                            <button onclick="openShelfSettings()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.shelfSettings" title="Réglages de la bibliothèque">⚙️</button>
                         </div>
                     </div>
+                    <div id="bookcase-container" class="bookcase"></div>
+                    <button onclick="addShelfRow()" class="mt-3 mx-auto flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-gold-accent hover:text-gold-accent transition-colors" data-i18n-title="dash.addRow" title="Ajouter une rangée">+</button>
                 </div>
             </section>
 
@@ -818,16 +968,17 @@
             </section>
 
             <section id="section-compte" class="view-section">
-                <button onclick="showSection('stats')" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent mb-6">← Retour au tableau de bord</button>
+                <button onclick="showSection('stats')" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent mb-6" data-i18n="account.backToDashboard">← Retour au tableau de bord</button>
 
                 <div class="max-w-4xl mx-auto space-y-6">
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
                         <div class="flex flex-col sm:flex-row items-center gap-6">
                             <div class="relative w-24 h-24 shrink-0">
                                 <div id="profile-photo-wrap" class="w-24 h-24 rounded-full flex items-center justify-center bg-[var(--gold-accent)] text-white text-3xl font-black overflow-hidden border-4 border-[var(--gold-accent)] shadow-md"></div>
-                                <button onclick="document.getElementById('profile-photo-input').click()" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border-2 border-[var(--gold-accent)] flex items-center justify-center text-xs shadow-md hover:bg-slate-50 transition-colors" title="Changer la photo">✏️</button>
-                                <button id="profile-photo-remove-btn" onclick="removePhoto()" class="hidden absolute bottom-0 left-0 w-8 h-8 rounded-full bg-white border-2 border-red-300 flex items-center justify-center text-xs shadow-md hover:bg-red-50 transition-colors" title="Retirer la photo">🗑️</button>
+                                <button onclick="document.getElementById('profile-photo-input').click()" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border-2 border-[var(--gold-accent)] flex items-center justify-center text-xs shadow-md hover:bg-slate-50 transition-colors" data-i18n-title="account.changePhoto" title="Changer la photo">✏️</button>
+                                <button id="profile-photo-remove-btn" onclick="removePhoto()" class="hidden absolute bottom-0 left-0 w-8 h-8 rounded-full bg-white border-2 border-red-300 flex items-center justify-center text-xs shadow-md hover:bg-red-50 transition-colors" data-i18n-title="account.removePhoto" title="Retirer la photo">🗑️</button>
                                 <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="handlePhotoChange(event)">
+                                <input type="file" id="frame-photo-input" accept="image/*" class="hidden" onchange="handleFramePhotoChange(event)">
                             </div>
                             <div class="text-center sm:text-left">
                                 <h2 id="profile-name" class="text-2xl font-black uppercase tracking-tight font-serif mb-1">—</h2>
@@ -836,16 +987,16 @@
                         </div>
 
                         <div class="text-center sm:text-right">
-                            <p class="section-label mb-3">Palette du site</p>
+                            <p class="section-label mb-3" data-i18n="account.sitePalette">Palette du site</p>
                             <div id="profile-theme-palette" class="flex items-center justify-center sm:justify-end gap-2.5 flex-wrap">
-                                <button onclick="setThemeColor('#C5A059')" data-theme-color="#C5A059" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#C5A059" title="Doré"></button>
-                                <button onclick="setThemeColor('#7B3F3F')" data-theme-color="#7B3F3F" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#7B3F3F" title="Bordeaux"></button>
-                                <button onclick="setThemeColor('#3E5C50')" data-theme-color="#3E5C50" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#3E5C50" title="Vert forêt"></button>
-                                <button onclick="setThemeColor('#35506B')" data-theme-color="#35506B" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#35506B" title="Bleu marine"></button>
-                                <button onclick="setThemeColor('#B5651D')" data-theme-color="#B5651D" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#B5651D" title="Terracotta"></button>
-                                <button onclick="setThemeColor('#5B4B8A')" data-theme-color="#5B4B8A" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#5B4B8A" title="Prune"></button>
-                                <button onclick="setThemeColor('#4A4A4A')" data-theme-color="#4A4A4A" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#4A4A4A" title="Anthracite"></button>
-                                <label class="relative w-8 h-8 rounded-full cursor-pointer flex items-center justify-center overflow-hidden border border-slate-200" style="background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);" title="Couleur personnalisée">
+                                <button onclick="setThemeColor('#C5A059')" data-theme-color="#C5A059" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#C5A059" data-i18n-title="colors.gold" title="Doré"></button>
+                                <button onclick="setThemeColor('#7B3F3F')" data-theme-color="#7B3F3F" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#7B3F3F" data-i18n-title="colors.burgundy" title="Bordeaux"></button>
+                                <button onclick="setThemeColor('#3E5C50')" data-theme-color="#3E5C50" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#3E5C50" data-i18n-title="colors.forestGreen" title="Vert forêt"></button>
+                                <button onclick="setThemeColor('#35506B')" data-theme-color="#35506B" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#35506B" data-i18n-title="colors.navyBlue" title="Bleu marine"></button>
+                                <button onclick="setThemeColor('#B5651D')" data-theme-color="#B5651D" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#B5651D" data-i18n-title="colors.terracotta" title="Terracotta"></button>
+                                <button onclick="setThemeColor('#5B4B8A')" data-theme-color="#5B4B8A" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#5B4B8A" data-i18n-title="colors.plum" title="Prune"></button>
+                                <button onclick="setThemeColor('#4A4A4A')" data-theme-color="#4A4A4A" class="theme-color-swatch w-8 h-8 rounded-full" style="background:#4A4A4A" data-i18n-title="colors.anthracite" title="Anthracite"></button>
+                                <label class="relative w-8 h-8 rounded-full cursor-pointer flex items-center justify-center overflow-hidden border border-slate-200" style="background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);" data-i18n-title="colors.custom" title="Couleur personnalisée">
                                     <input type="color" id="custom-theme-color" value="#C5A059" oninput="setThemeColor(this.value)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                 </label>
                             </div>
@@ -855,28 +1006,28 @@
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
-                                <p class="section-label mb-4">Email</p>
+                                <p class="section-label mb-4" data-i18n="account.email">Email</p>
                                 <input type="text" id="profile-email" disabled class="modal-input w-full !mb-0 !bg-slate-100 !text-slate-400 cursor-not-allowed">
                             </div>
                             <div>
-                                <p class="section-label mb-4">Pseudo</p>
-                                <input type="text" id="profile-pseudo-input" placeholder="Choisis un pseudo unique" class="modal-input w-full !mb-0" maxlength="20">
+                                <p class="section-label mb-4" data-i18n="account.pseudo">Pseudo</p>
+                                <input type="text" id="profile-pseudo-input" data-i18n-placeholder="account.pseudoPlaceholder" placeholder="Choisis un pseudo unique" class="modal-input w-full !mb-0" maxlength="20">
                                 <p id="profile-pseudo-error" class="text-red-500 text-[10px] font-bold uppercase hidden mt-3"></p>
                                 <p id="profile-pseudo-success" class="text-green-500 text-[10px] font-bold uppercase hidden mt-3"></p>
-                                <button onclick="handlePseudoChange()" class="py-2.5 px-8 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors mt-4">Valider le pseudo</button>
+                                <button onclick="handlePseudoChange()" class="py-2.5 px-8 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors mt-4" data-i18n="account.validatePseudo">Valider le pseudo</button>
                             </div>
                         </div>
                     </div>
 
                     <div id="profile-password-section" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 hidden">
-                        <p class="section-label mb-4">Changer le mot de passe</p>
+                        <p class="section-label mb-4" data-i18n="account.changePassword">Changer le mot de passe</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-3">
-                            <input type="password" id="profile-current-password" placeholder="Mot de passe actuel" class="modal-input w-full !mb-0">
-                            <input type="password" id="profile-new-password" placeholder="Nouveau mot de passe" class="modal-input w-full !mb-0">
+                            <input type="password" id="profile-current-password" data-i18n-placeholder="account.currentPassword" placeholder="Mot de passe actuel" class="modal-input w-full !mb-0">
+                            <input type="password" id="profile-new-password" data-i18n-placeholder="account.newPassword" placeholder="Nouveau mot de passe" class="modal-input w-full !mb-0">
                         </div>
                         <p id="profile-password-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-2"></p>
                         <p id="profile-password-success" class="text-green-500 text-[10px] font-bold uppercase hidden mb-2"></p>
-                        <button onclick="handlePasswordChange()" class="py-2.5 px-8 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors">Valider</button>
+                        <button onclick="handlePasswordChange()" class="py-2.5 px-8 border border-[var(--gold-accent)] text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-[var(--gold-accent)] hover:text-white transition-colors" data-i18n="account.validate">Valider</button>
                     </div>
                 </div>
             </section>
@@ -885,40 +1036,40 @@
 
     <div id="pseudo-onboard-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[120] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center">
-            <h2 class="text-lg font-black uppercase tracking-tight font-serif mb-2">Choisis ton pseudo</h2>
-            <p class="text-[11px] text-gray-400 mb-5">Il sera unique et te permettra d'être identifié(e) sur Ma Biblio.</p>
-            <input type="text" id="pseudo-onboard-input" placeholder="ex: jeni_lit" class="modal-input w-full mb-2" maxlength="20">
+            <h2 class="text-lg font-black uppercase tracking-tight font-serif mb-2" data-i18n="onboard.title">Choisis ton pseudo</h2>
+            <p class="text-[11px] text-gray-400 mb-5" data-i18n="onboard.body">Il sera unique et te permettra d'être identifié(e) sur Ma Biblio.</p>
+            <input type="text" id="pseudo-onboard-input" data-i18n-placeholder="onboard.placeholder" placeholder="ex: jeni_lit" class="modal-input w-full mb-2" maxlength="20">
             <p id="pseudo-onboard-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-3"></p>
-            <button onclick="handlePseudoOnboard()" class="w-full py-3 bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold-accent transition-colors mb-2">Valider</button>
-            <button onclick="skipPseudoOnboard()" class="w-full py-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent">Plus tard</button>
+            <button onclick="handlePseudoOnboard()" class="w-full py-3 bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold-accent transition-colors mb-2" data-i18n="account.validate">Valider</button>
+            <button onclick="skipPseudoOnboard()" class="w-full py-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent" data-i18n="onboard.later">Plus tard</button>
         </div>
     </div>
 
     <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
            <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black uppercase tracking-tight font-serif">Modifier la Fiche #<span id="modal-id"></span></h2>
+                <h2 class="text-2xl font-black uppercase tracking-tight font-serif"><span data-i18n="editModal.title">Modifier la Fiche #</span><span id="modal-id"></span></h2>
                 <button onclick="closeModal()" class="text-slate-300 hover:text-black text-2xl">&times;</button>
             </div>
             
             <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-                <label class="text-[10px] font-bold text-gold-accent uppercase mb-2 block tracking-widest">Remplissage Automatique</label>
+                <label class="text-[10px] font-bold text-gold-accent uppercase mb-2 block tracking-widest" data-i18n="editModal.autofill">Remplissage Automatique</label>
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
                     <div class="md:col-span-6 relative">
-                        <input id="in-title" autocomplete="off" oninput="handleTitleInput()" placeholder="Commence à taper un titre..." class="modal-input !mb-0">
+                        <input id="in-title" autocomplete="off" oninput="handleTitleInput()" data-i18n-placeholder="editModal.titlePlaceholder" placeholder="Commence à taper un titre..." class="modal-input !mb-0">
                         <div id="title-suggestions" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto"></div>
                     </div>
                     <div class="md:col-span-6">
-                        <input id="in-author" class="modal-input !mb-0" placeholder="Auteur...">
+                        <input id="in-author" class="modal-input !mb-0" data-i18n-placeholder="editModal.authorPlaceholder" placeholder="Auteur...">
                     </div>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-2">Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.</p>
+                <p class="text-[10px] text-slate-400 mt-2" data-i18n="editModal.autofillHint">Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Genre</label><input id="in-genre" class="modal-input"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Année de sortie</label><input id="in-year" class="modal-input" placeholder="ex: 2019"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Note</label>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.genre">Genre</label><input id="in-genre" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.releaseYear">Année de sortie</label><input id="in-year" class="modal-input" placeholder="ex: 2019"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.rating">Note</label>
                     <select id="in-rating" class="modal-input">
                         <option value="0">0</option>
                         <option value="1">1</option>
@@ -931,40 +1082,75 @@
                         <option value="5">5</option>
                     </select>
                 </div>
-                <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">URL Couverture</label><input id="in-cover" class="modal-input"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Langue</label><input id="in-lang" class="modal-input"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Début (ex: 01/05/2025)</label><input id="in-start" class="modal-input" placeholder="JJ/MM/AAAA"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fin (ex: 15/05/2025)</label><input id="in-end" class="modal-input" placeholder="JJ/MM/AAAA"></div>
+                <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.coverUrl">URL Couverture</label><input id="in-cover" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.format">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre" data-i18n="editModal.formatBook">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.language">Langue</label><input id="in-lang" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.start">Début (ex: 01/05/2025)</label><input id="in-start" class="modal-input" placeholder="JJ/MM/AAAA"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.end">Fin (ex: 15/05/2025)</label><input id="in-end" class="modal-input" placeholder="JJ/MM/AAAA"></div>
             </div>
-            <textarea id="in-summary" class="modal-input h-24" placeholder="Résumé..."></textarea>
-            <textarea id="in-comment" class="modal-input h-24" placeholder="Mon avis..."></textarea>
-            <div class="flex gap-3 mt-4"><button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Annuler</button><button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl">Enregistrer</button></div>
+            <textarea id="in-summary" class="modal-input h-24" data-i18n-placeholder="editModal.summaryPlaceholder" placeholder="Résumé..."></textarea>
+            <textarea id="in-comment" class="modal-input h-24" data-i18n-placeholder="editModal.commentPlaceholder" placeholder="Mon avis..."></textarea>
+            <div class="flex gap-3 mt-4"><button onclick="closeModal()" class="flex-1 py-4 text-[10px] font-black uppercase bg-slate-50 rounded-xl" data-i18n="editModal.cancel">Annuler</button><button onclick="saveToFirebase()" class="flex-1 py-4 text-[10px] font-black uppercase btn-gold-main rounded-xl" data-i18n="editModal.save">Enregistrer</button></div>
+        </div>
+    </div>
+
+    <div id="shelf-settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[120] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-base font-black uppercase tracking-tight font-serif" data-i18n="dash.shelfSettings">Réglages de la bibliothèque</h2>
+                <button onclick="closeShelfSettings()" class="text-slate-300 hover:text-black text-2xl leading-none">&times;</button>
+            </div>
+            <p class="section-label mb-2" data-i18n="shelf.genreColor">Couleur par genre</p>
+            <div id="shelf-settings-genres" class="max-h-72 overflow-y-auto mb-2"></div>
         </div>
     </div>
 
     <div id="spine-editor-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[120] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-base font-black uppercase tracking-tight font-serif">Personnaliser le dos</h2>
+                <h2 class="text-base font-black uppercase tracking-tight font-serif" data-i18n="shelf.customizeSpine">Personnaliser le dos</h2>
                 <button onclick="closeSpineEditor()" class="text-slate-300 hover:text-black text-2xl leading-none">&times;</button>
             </div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Couleur</p>
+            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest" data-i18n="shelf.color">Couleur</p>
             <div id="spine-editor-colors" class="flex flex-wrap gap-2 mb-3"></div>
             <label class="flex items-center gap-2 mb-5 cursor-pointer">
                 <input type="color" id="spine-editor-custom-color" class="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0">
-                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Couleur personnalisée</span>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest" data-i18n="shelf.customColor">Couleur personnalisée</span>
             </label>
-            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Motif</p>
+            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest" data-i18n="shelf.pattern">Motif</p>
             <div id="spine-editor-patterns" class="flex flex-wrap gap-2 mb-5"></div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Hauteur</p>
+            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest" data-i18n="shelf.height">Hauteur</p>
             <div id="spine-editor-heights" class="flex gap-2 mb-5"></div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Largeur</p>
-            <div id="spine-editor-widths" class="flex gap-2 mb-5"></div>
-            <div class="flex gap-3">
-                <button onclick="resetSpineCustom()" class="flex-1 py-3 text-[10px] font-black uppercase bg-slate-50 rounded-xl">Réinitialiser</button>
-                <button onclick="closeSpineEditor()" class="flex-1 py-3 text-[10px] font-black uppercase btn-gold-main rounded-xl">Fermer</button>
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest" data-i18n="shelf.thickness">Épaisseur</p>
+                <span id="spine-editor-width-value" class="text-[10px] font-bold text-gray-400">—</span>
             </div>
+            <div class="flex items-center gap-3 mb-5">
+                <input type="range" id="spine-editor-width-slider" min="18" max="60" step="1" class="flex-1">
+                <span id="spine-editor-width-bar" class="shrink-0 rounded-sm bg-slate-300" style="width:34px; height:26px;"></span>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="resetSpineCustom()" class="flex-1 py-3 text-[10px] font-black uppercase bg-slate-50 rounded-xl" data-i18n="filters.reset">Réinitialiser</button>
+                <button onclick="closeSpineEditor()" class="flex-1 py-3 text-[10px] font-black uppercase btn-gold-main rounded-xl" data-i18n="shelf.close">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="decoration-picker-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[120] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-base font-black uppercase tracking-tight font-serif" data-i18n="dash.addDecoration">Ajouter une décoration</h2>
+                <button onclick="closeDecorationPicker()" class="text-slate-300 hover:text-black text-2xl leading-none">&times;</button>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="addShelfDecoration('🪴', 'plant')" class="decoration-picker-btn"><span class="decoration-svg" style="width:26px; height:26px;"><svg viewBox="0 0 64 64" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><path d="M20 64 L44 64 L41 46 L23 46 Z" fill="#b8863a"/><rect x="19" y="43" width="26" height="4" rx="1" fill="#8a5f26"/><line x1="32" y1="44" x2="32" y2="28" stroke="#3E5C50" stroke-width="2.6" stroke-linecap="round"/><path d="M32 30 C21 27 15 15 19 5 C29 11 35 21 32 30 Z" fill="#4a7c59"/><path d="M32 30 C43 27 49 15 45 5 C35 11 29 21 32 30 Z" fill="#3E5C50"/><path d="M32 30 C28 19 30 8 32 2 C34 8 36 19 32 30 Z" fill="#6ba07d"/></svg></span><span class="decoration-picker-label" data-i18n="deco.plant">Plante</span></button>
+                <button onclick="addShelfDecoration('🏮', 'lamp')" class="decoration-picker-btn"><span class="decoration-svg" style="width:26px; height:26px;"><svg viewBox="0 0 64 64" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><line x1="32" y1="1" x2="32" y2="9" stroke="#1a1a1a" stroke-width="2"/><circle cx="32" cy="12" r="3.2" fill="none" stroke="#1a1a1a" stroke-width="2"/><path d="M19 22 L32 10 L45 22 Z" fill="#161616"/><rect x="29" y="15" width="6" height="5" fill="#161616"/><rect x="20" y="22" width="24" height="4" rx="1" fill="#161616"/><rect x="21" y="26" width="22" height="28" fill="#161616"/><rect x="25" y="29" width="14" height="22" fill="#f6d98a" opacity="0.9"/><rect x="21" y="26" width="3.5" height="28" fill="#161616"/><rect x="39.5" y="26" width="3.5" height="28" fill="#161616"/><rect x="18" y="54" width="28" height="4" rx="1" fill="#161616"/><rect x="23" y="58" width="18" height="3" rx="1" fill="#161616"/></svg></span><span class="decoration-picker-label" data-i18n="deco.lamp">Lampe</span></button>
+                <button onclick="addShelfDecoration('🕯️', 'candle')" class="decoration-picker-btn"><span class="decoration-svg" style="width:26px; height:26px;"><svg viewBox="0 0 64 64" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><rect x="22" y="18" width="18" height="46" rx="2" fill="#e2d3ae"/><rect x="40" y="40" width="14" height="24" rx="2" fill="#e2d3ae"/><path d="M31 12 C28 8 29 4 31 1 C33 4 34 8 31 12 Z" fill="#ffb84d"/><path d="M47 35 C44 31 45 27 47 24 C49 27 50 31 47 35 Z" fill="#ffb84d"/></svg></span><span class="decoration-picker-label" data-i18n="deco.candle">Bougie</span></button>
+                <button onclick="addShelfDecoration('🌍', 'globe')" class="decoration-picker-btn"><span class="decoration-svg" style="width:26px; height:26px;"><svg viewBox="0 0 64 64" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><path d="M23 62 L41 62 L37 55 L27 55 Z" fill="#4a3018"/><rect x="29" y="43" width="6" height="12" fill="#b8863a"/><circle cx="32" cy="27" r="15" fill="#ecdfbb"/><path d="M20 16 L25 14 L29 16 L28 20 L31 23 L30 28 L29 37 L24 34 L23 20 Z" fill="#8faa6e"/><path d="M34 14 L40 13 L45 16 L47 20 L42 29 L38 27 L39 22 L36 20 Z" fill="#d99a8a"/><path d="M22 32 L27 30 L30 34 L28 39 L20 38 Z" fill="#c9a86f"/><path d="M33 11 Q54 27 33 43" fill="none" stroke="#b8863a" stroke-width="2.6" stroke-linecap="round"/></svg></span><span class="decoration-picker-label" data-i18n="deco.globe">Globe</span></button>
+                <button onclick="addShelfDecoration('🖼️', 'frame')" class="decoration-picker-btn"><span class="decoration-svg" style="width:26px; height:26px;"><svg viewBox="0 0 64 64" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="48" height="48" rx="2" fill="#161616"/><rect x="14" y="14" width="36" height="36" fill="#ecdfbb"/><g transform="translate(15,15) scale(0.5625)"><path d="M17,6 C19,3 22,3 23,6 L26,14 C29,12 33,12 36,14 L38,6 C39,3 42,3 44,6 C46,10 44,15 41,17 C45,22 47,29 46,36 C45,44 40,50 33,53 C36,55 37,58 35,60 L14,60 C10,60 6,58 5,54 C4,50 6,46 10,45 C7,40 6,33 8,27 C10,20 14,16 19,14 C16,12 15,9 17,6 Z" fill="#161616"/><line x1="1" y1="21" x2="14" y2="24" stroke="#161616" stroke-width="1.4"/><line x1="1" y1="27" x2="14" y2="27" stroke="#161616" stroke-width="1.4"/><path d="M33,53 C40,50 46,44 48,36 C49,32 48,28 46,26" stroke="#161616" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="45" cy="30" r="7" fill="#161616"/><circle cx="57" cy="30" r="7" fill="#161616"/><polygon points="37,33 65,33 51,48" fill="#161616"/></g><rect x="26" y="56" width="12" height="3" rx="1" fill="#161616"/></svg></span><span class="decoration-picker-label" data-i18n="deco.frame">Cadre photo</span></button>
+                <button onclick="addShelfDecoration('🗿', 'statue')" class="decoration-picker-btn"><span class="decoration-svg" style="width:16px; height:22px;"><svg viewBox="0 0 44 60" width="16" height="22" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="marbleGradPrev" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f7f2e6"/><stop offset="55%" stop-color="#e7dcc2"/><stop offset="100%" stop-color="#cdbd98"/></linearGradient></defs><rect x="10" y="52" width="24" height="6" rx="1" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><path d="M22,13 C13,13 8,22 8,33 C8,44 13,52 22,52 C31,52 36,44 36,33 C36,22 31,13 22,13 Z" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><path d="M14,16 L18,7 L22,16 Z" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><path d="M30,16 L26,7 L22,16 Z" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><circle cx="16" cy="28" r="5.4" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><circle cx="28" cy="28" r="5.4" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><circle cx="16" cy="28" r="1.9" fill="#a68f66"/><circle cx="28" cy="28" r="1.9" fill="#a68f66"/><path d="M20,34 L24,34 L22,38 Z" fill="#cdbd98" stroke="#b8a67d" stroke-width="0.6"/></svg></span><span class="decoration-picker-label" data-i18n="deco.statue">Statuette</span></button>
+            </div>
+            <button onclick="clearAllShelfDecorations()" class="mt-4 w-full text-center text-[10px] font-bold uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors" data-i18n="deco.clearAll">Tout retirer de l'étagère</button>
         </div>
     </div>
 
@@ -992,13 +1178,124 @@
         let readingChart = null;
         let isSignUp = false;
 
+        // --- TRADUCTION (FR / EN) ---
+        const TRANSLATIONS = {
+            fr: {
+                nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
+                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", reset: "Réinitialiser" },
+                months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
+                dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", readingPace: "Rythme de lecture (Livres par mois en", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée" },
+                account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
+                colors: { gold: "Doré", burgundy: "Bordeaux", forestGreen: "Vert forêt", navyBlue: "Bleu marine", terracotta: "Terracotta", plum: "Prune", anthracite: "Anthracite", custom: "Couleur personnalisée" },
+                auth: { backToHome: "← Retour à l'accueil", memberLogin: "Connexion Membre", memberSignup: "Création de Compte", emailAddress: "Adresse Email", password: "Mot de passe", forgotPassword: "Mot de passe oublié ?", openCollection: "Ouvrir ma collection", or: "ou", continueGoogle: "Continuer avec Google", noAccount: "Pas encore de compte ? S'inscrire", haveAccount: "Déjà un compte ? Se connecter" },
+                landing: {
+                    login: "Connexion", login2: "Se connecter",
+                    heroTitle: "Ta bibliothèque personnelle,<br>enfin <span style=\"color: var(--gold-accent)\">bien rangée</span>.",
+                    heroSubtitle: "Ma Biblio 100 t'aide à garder une trace de tout ce que tu lis : notes, avis, genres, dates de lecture. Visualise tes statistiques année par année, organise tes livres sur une étagère virtuelle personnalisable, et retrouve en un instant le prochain livre que tu voulais lire.",
+                    feat1Title: "Tableau de bord", feat1Body: "Suis ton rythme de lecture, ta note moyenne et ton livre de l'année, en un coup d'œil, avec un graphique mois par mois.",
+                    feat2Title: "Ma Grille", feat2Body: "Visualise toute ta collection en un coup d'œil grâce aux couvertures de tes livres, triable et filtrable par année de lecture.",
+                    feat3Title: "Mes Fiches", feat3Body: "Ouvre chaque livre en détail : résumé, note, avis personnel et informations complètes réunis sur une seule fiche.",
+                    feat4Title: "Une étagère personnalisée", feat4Body: "Range tes livres sur une étagère virtuelle : couleurs, motifs et décorations sont entièrement personnalisables.",
+                    screenshotSoon: "Capture d'écran à venir"
+                },
+                onboard: { title: "Choisis ton pseudo", body: "Il sera unique et te permettra d'être identifié(e) sur Ma Biblio.", placeholder: "ex: jeni_lit", later: "Plus tard" },
+                editModal: { title: "Modifier la Fiche #", autofill: "Remplissage Automatique", titlePlaceholder: "Commence à taper un titre...", authorPlaceholder: "Auteur...", autofillHint: "Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.", genre: "Genre", releaseYear: "Année de sortie", rating: "Note", coverUrl: "URL Couverture", format: "Format", formatBook: "Livre", language: "Langue", start: "Début (ex: 01/05/2025)", end: "Fin (ex: 15/05/2025)", summaryPlaceholder: "Résumé...", commentPlaceholder: "Mon avis...", cancel: "Annuler", save: "Enregistrer" },
+                shelf: { genreColor: "Couleur par genre", customizeSpine: "Personnaliser le dos", color: "Couleur", customColor: "Couleur personnalisée", pattern: "Motif", height: "Hauteur", thickness: "Épaisseur", close: "Fermer" },
+                deco: { plant: "Plante", lamp: "Lampe", candle: "Bougie", globe: "Globe", frame: "Cadre photo", statue: "Statuette", clearAll: "Tout retirer de l'étagère" },
+                fiche: { backToGrid: "← Retour Grille", backToLibrary: "← Retour Bibliothèque" },
+                msg: {
+                    maxRows: "Nombre maximum de rangées atteint.", minRows: "Il doit rester au moins une rangée.",
+                    clearDecorConfirm: "Retirer toutes les décorations de l'étagère ?",
+                    deleteConfirm: "Supprimer ?",
+                    emailFirst: "Renseigne ton email ci-dessus d'abord.", resetEmailSent: "Email envoyé ! Vérifie ta boîte de réception (et les spams).",
+                    pseudoSaved: "Pseudo enregistré !",
+                    fillBothFields: "Remplis les deux champs.", passwordTooShort: "Le nouveau mot de passe doit faire au moins 6 caractères.", passwordUpdated: "Mot de passe mis à jour !",
+                    endDateFirst: "Veuillez d'abord renseigner une date de fin pour ce livre."
+                }
+            },
+            en: {
+                nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
+                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", reset: "Reset" },
+                months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
+                dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", readingPace: "Reading pace (Books per month in", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row" },
+                account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
+                colors: { gold: "Gold", burgundy: "Burgundy", forestGreen: "Forest green", navyBlue: "Navy blue", terracotta: "Terracotta", plum: "Plum", anthracite: "Anthracite", custom: "Custom color" },
+                auth: { backToHome: "← Back to home", memberLogin: "Member Login", memberSignup: "Create Account", emailAddress: "Email Address", password: "Password", forgotPassword: "Forgot password?", openCollection: "Open my collection", or: "or", continueGoogle: "Continue with Google", noAccount: "No account yet? Sign up", haveAccount: "Already have an account? Log in" },
+                landing: {
+                    login: "Log In", login2: "Log In",
+                    heroTitle: "Your personal library,<br>finally <span style=\"color: var(--gold-accent)\">well organized</span>.",
+                    heroSubtitle: "Ma Biblio 100 helps you keep track of everything you read: ratings, reviews, genres, reading dates. See your stats year by year, arrange your books on a customizable virtual shelf, and instantly find the next book you wanted to read.",
+                    feat1Title: "Dashboard", feat1Body: "Track your reading pace, average rating and book of the year at a glance, with a month-by-month chart.",
+                    feat2Title: "My Grid", feat2Body: "See your whole collection at a glance through your book covers, sortable and filterable by reading year.",
+                    feat3Title: "My Reviews", feat3Body: "Open each book in detail: summary, rating, personal review and full info gathered on a single page.",
+                    feat4Title: "A personalized shelf", feat4Body: "Arrange your books on a virtual shelf: colors, patterns and decorations are fully customizable.",
+                    screenshotSoon: "Screenshot coming soon"
+                },
+                onboard: { title: "Choose your username", body: "It will be unique and let you be identified on Ma Biblio.", placeholder: "e.g. jeni_reads", later: "Later" },
+                editModal: { title: "Edit Entry #", autofill: "Auto-fill", titlePlaceholder: "Start typing a title...", authorPlaceholder: "Author...", autofillHint: "Pick a suggestion to auto-fill the author, genre, year and cover.", genre: "Genre", releaseYear: "Release year", rating: "Rating", coverUrl: "Cover URL", format: "Format", formatBook: "Book", language: "Language", start: "Start (e.g. 05/01/2025)", end: "End (e.g. 05/15/2025)", summaryPlaceholder: "Summary...", commentPlaceholder: "My review...", cancel: "Cancel", save: "Save" },
+                shelf: { genreColor: "Color by genre", customizeSpine: "Customize spine", color: "Color", customColor: "Custom color", pattern: "Pattern", height: "Height", thickness: "Thickness", close: "Close" },
+                deco: { plant: "Plant", lamp: "Lamp", candle: "Candle", globe: "Globe", frame: "Photo frame", statue: "Statuette", clearAll: "Remove everything from the shelf" },
+                fiche: { backToGrid: "← Back to Grid", backToLibrary: "← Back to Library" },
+                msg: {
+                    maxRows: "Maximum number of rows reached.", minRows: "At least one row must remain.",
+                    clearDecorConfirm: "Remove all decorations from the shelf?",
+                    deleteConfirm: "Delete?",
+                    emailFirst: "Enter your email above first.", resetEmailSent: "Email sent! Check your inbox (and spam folder).",
+                    pseudoSaved: "Username saved!",
+                    fillBothFields: "Fill in both fields.", passwordTooShort: "The new password must be at least 6 characters.", passwordUpdated: "Password updated!",
+                    endDateFirst: "Please enter an end date for this book first."
+                }
+            }
+        };
+
+        let currentLang = localStorage.getItem('biblio-lang') || 'fr';
+
+        function t(key) {
+            const parts = key.split('.');
+            let node = TRANSLATIONS[currentLang];
+            for (const p of parts) { node = node?.[p]; if (node === undefined) break; }
+            if (node === undefined) {
+                node = TRANSLATIONS.fr;
+                for (const p of parts) node = node?.[p];
+            }
+            return node ?? key;
+        }
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            localStorage.setItem('biblio-lang', lang);
+            document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+            document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+            document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+            document.querySelectorAll('#lang-toggle-btn, #landing-lang-toggle-btn').forEach(btn => { btn.textContent = lang.toUpperCase(); });
+            const authTitle = document.getElementById('auth-mode-title');
+            if (authTitle) authTitle.innerText = isSignUp ? t('auth.memberSignup') : t('auth.memberLogin');
+            const toggleAuthBtn = document.getElementById('toggle-auth-btn');
+            if (toggleAuthBtn) toggleAuthBtn.innerText = isSignUp ? t('auth.haveAccount') : t('auth.noAccount');
+            if (typeof updateFilterOptions === 'function' && currentUser) updateFilterOptions();
+            if (typeof render === 'function' && currentUser) render();
+        }
+
+        window.toggleLang = async () => {
+            const next = currentLang === 'fr' ? 'en' : 'fr';
+            applyLanguage(next);
+            if (currentUser) {
+                try { await setDoc(doc(db, "user_profiles", currentUser.uid), { lang: next }, { merge: true }); } catch (err) { /* pas grave */ }
+            }
+        };
+
         // --- MODE SOMBRE ---
         const MOON_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
         const SUN_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>';
         function applyTheme(theme) {
             document.documentElement.classList.toggle('dark', theme === 'dark');
+            const icon = theme === 'dark' ? SUN_ICON : MOON_ICON;
             const btn = document.getElementById('theme-toggle-btn');
-            if (btn) btn.innerHTML = theme === 'dark' ? SUN_ICON : MOON_ICON;
+            if (btn) btn.innerHTML = icon;
+            const landingBtn = document.getElementById('landing-theme-toggle-btn');
+            if (landingBtn) landingBtn.innerHTML = icon;
         }
         window.toggleTheme = () => {
             const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
@@ -1006,6 +1303,7 @@
             applyTheme(next);
         };
         applyTheme(localStorage.getItem('biblio-theme') || 'light');
+        applyLanguage(currentLang);
 
         // --- PALETTE DU SITE ---
         function applyThemeColor(color) {
@@ -1036,13 +1334,13 @@
             successEl.classList.add('hidden');
 
             if (!email) {
-                errorEl.innerText = "Renseigne ton email ci-dessus d'abord.";
+                errorEl.innerText = t("msg.emailFirst");
                 errorEl.classList.remove('hidden');
                 return;
             }
             try {
                 await sendPasswordResetEmail(auth, email);
-                successEl.innerText = "Email envoyé ! Vérifie ta boîte de réception (et les spams).";
+                successEl.innerText = t("msg.resetEmailSent");
                 successEl.classList.remove('hidden');
             } catch (err) {
                 errorEl.innerText = err.code === 'auth/invalid-email'
@@ -1079,10 +1377,318 @@
         };
 
         // --- ÉTAGÈRE (Tableau de bord) ---
-        const SHELF_ROW_COUNT = 3;
+        let SHELF_ROW_COUNT = 3;
+
+        async function saveShelfSettings() {
+            if (!currentUser) return;
+            try {
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { genreColorOverrides, shelfRowCount: SHELF_ROW_COUNT }, { merge: true });
+            } catch (err) { /* pas grave */ }
+        }
+
+        function renderBookcaseRows() {
+            const bookcase = document.getElementById('bookcase-container');
+            if (!bookcase) return;
+            bookcase.innerHTML = Array.from({ length: SHELF_ROW_COUNT }, (_, i) => `
+                <div class="bookshelf-row-wrap group relative ${i === SHELF_ROW_COUNT - 1 ? 'bookshelf-row-wrap-last' : ''}">
+                    <button onclick="removeShelfRow(${i})" class="absolute -top-1 -right-1 z-10 w-6 h-6 rounded-full bg-white border border-red-200 text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 flex items-center justify-center shadow-sm" title="Supprimer cette rangée">×</button>
+                    <div id="bookshelf-row-${i}" class="bookshelf-row" data-row="${i}"></div>
+                    <div class="bookshelf-ledge"></div>
+                </div>
+            `).join('');
+        }
+
+        window.addShelfRow = () => {
+            if (SHELF_ROW_COUNT >= 8) { alert(t("msg.maxRows")); return; }
+            SHELF_ROW_COUNT++;
+            renderBookcaseRows();
+            renderShelf(library.filter(b => b.title));
+            saveShelfSettings();
+        };
+
+        window.removeShelfRow = (rowIndex) => {
+            if (SHELF_ROW_COUNT <= 1) { alert(t("msg.minRows")); return; }
+            const booksOnRow = Object.entries(shelfPositions).filter(([id, pos]) => pos.row === rowIndex).length;
+            const msg = booksOnRow > 0
+                ? `Cette rangée contient ${booksOnRow} livre${booksOnRow > 1 ? 's' : ''}. Ils seront replacés sur une autre rangée. Continuer ?`
+                : "Supprimer cette rangée ?";
+            if (!confirm(msg)) return;
+
+            Object.keys(shelfPositions).forEach(id => {
+                const pos = shelfPositions[id];
+                if (pos.row === rowIndex) {
+                    delete shelfPositions[id];
+                } else if (pos.row > rowIndex) {
+                    pos.row -= 1;
+                }
+            });
+            Object.keys(shelfDecorations).forEach(id => {
+                const deco = shelfDecorations[id];
+                if (deco.row === rowIndex) {
+                    delete shelfDecorations[id];
+                } else if (deco.row > rowIndex) {
+                    deco.row -= 1;
+                }
+            });
+            SHELF_ROW_COUNT--;
+            renderBookcaseRows();
+            renderShelf(library.filter(b => b.title));
+            saveShelfSettings();
+            saveShelfPositions();
+            saveShelfDecorations();
+        };
+
+        window.openShelfSettings = () => {
+            const genres = [...new Set(library.map(b => b.genre).filter(g => g))].sort();
+            const container = document.getElementById('shelf-settings-genres');
+            if (genres.length === 0) {
+                container.innerHTML = '<p class="text-[11px] text-slate-400 italic">Ajoute un genre à tes livres pour pouvoir lui choisir une couleur.</p>';
+            } else {
+                container.innerHTML = genres.map(g => `
+                    <div class="flex items-center justify-between gap-3 py-2 border-b border-slate-100 last:border-0">
+                        <span class="text-xs font-bold uppercase truncate">${g}</span>
+                        <input type="color" value="${genreColorOverrides[g] || genreColor(g)}" onchange="setGenreColor('${g.replace(/'/g, "\\'")}', this.value)" class="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0 shrink-0">
+                    </div>
+                `).join('');
+            }
+            document.getElementById('shelf-settings-modal').classList.remove('hidden');
+        };
+        window.closeShelfSettings = () => document.getElementById('shelf-settings-modal').classList.add('hidden');
+
+        window.setGenreColor = (genre, color) => {
+            genreColorOverrides[genre] = color;
+            saveShelfSettings();
+            renderShelf(library.filter(b => b.title));
+        };
+
         let shelfPositions = {}; // { [bookId]: { row, x } }
-        let activeShelfDrag = null; // { el, book, dragOffsetX, startX, startY, moved, lastLeft, pointerId }
+        let shelfDecorations = {}; // { [decoId]: { row, x, emoji } }
+        let activeShelfDrag = null; // { el, item, kind, dragOffsetX, startX, startY, moved, lastLeft, pointerId }
         let shelfColorCache = {};
+
+        async function saveShelfDecorations() {
+            if (!currentUser) return;
+            try {
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { shelfDecorations }, { merge: true });
+            } catch (err) { /* pas grave */ }
+        }
+
+        window.openDecorationPicker = () => document.getElementById('decoration-picker-modal').classList.remove('hidden');
+        window.closeDecorationPicker = () => document.getElementById('decoration-picker-modal').classList.add('hidden');
+
+        window.addShelfDecoration = (emoji, key) => {
+            const id = 'deco_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            shelfDecorations[id] = { row: 0, x: 4, emoji, key };
+            saveShelfDecorations();
+            renderShelfDecorations();
+            closeDecorationPicker();
+        };
+
+        window.removeShelfDecoration = (id) => {
+            delete shelfDecorations[id];
+            saveShelfDecorations();
+            renderShelfDecorations();
+        };
+
+        let frameEditTargetId = null;
+        window.triggerFramePhotoUpload = (id) => {
+            frameEditTargetId = id;
+            document.getElementById('frame-photo-input').click();
+        };
+
+        window.handleFramePhotoChange = (event) => {
+            const file = event.target.files[0];
+            const targetId = frameEditTargetId;
+            if (!file || !targetId || !shelfDecorations[targetId]) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas');
+                    const size = 200;
+                    canvas.width = size; canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    const minSide = Math.min(img.width, img.height);
+                    const sx = (img.width - minSide) / 2;
+                    const sy = (img.height - minSide) / 2;
+                    ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                    shelfDecorations[targetId].photo = dataUrl;
+                    renderShelfDecorations();
+                    await saveShelfDecorations();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        };
+
+        window.clearAllShelfDecorations = () => {
+            if (!confirm(t("msg.clearDecorConfirm"))) return;
+            shelfDecorations = {};
+            saveShelfDecorations();
+            renderShelfDecorations();
+            closeDecorationPicker();
+        };
+
+        const DECORATION_SVGS = {
+            lamp: `<svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="lampGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#fff3c4" stop-opacity="1"/>
+                        <stop offset="55%" stop-color="#ffd66e" stop-opacity="0.65"/>
+                        <stop offset="100%" stop-color="#ffd66e" stop-opacity="0"/>
+                    </radialGradient>
+                    <clipPath id="lampGlassClip"><rect x="25" y="29" width="14" height="22"/></clipPath>
+                </defs>
+                <line x1="32" y1="1" x2="32" y2="9" stroke="#1a1a1a" stroke-width="2"/>
+                <circle cx="32" cy="12" r="3.2" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+                <path d="M19 22 L32 10 L45 22 Z" fill="#161616"/>
+                <rect x="29" y="15" width="6" height="5" fill="#161616"/>
+                <rect x="20" y="22" width="24" height="4" rx="1" fill="#161616"/>
+                <rect x="21" y="26" width="22" height="28" fill="#161616"/>
+                <rect x="25" y="29" width="14" height="22" fill="#ffe9a8"/>
+                <g clip-path="url(#lampGlassClip)">
+                    <circle cx="32" cy="40" r="20" fill="url(#lampGlow)"/>
+                </g>
+                <rect x="21" y="26" width="3.5" height="28" fill="#161616"/>
+                <rect x="39.5" y="26" width="3.5" height="28" fill="#161616"/>
+                <rect x="18" y="54" width="28" height="4" rx="1" fill="#161616"/>
+                <rect x="23" y="58" width="18" height="3" rx="1" fill="#161616"/>
+            </svg>`,
+            candle: `<svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="waxGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#f2e8d2"/>
+                        <stop offset="100%" stop-color="#d9c8a3"/>
+                    </linearGradient>
+                    <radialGradient id="flameGrad" cx="50%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#fff3c4"/>
+                        <stop offset="55%" stop-color="#ffb84d"/>
+                        <stop offset="100%" stop-color="#e8672a"/>
+                    </radialGradient>
+                </defs>
+                <rect x="22" y="18" width="18" height="46" rx="2" fill="url(#waxGrad)"/>
+                <rect x="40" y="40" width="14" height="24" rx="2" fill="url(#waxGrad)"/>
+                <line x1="31" y1="18" x2="31" y2="12" stroke="#4a3a28" stroke-width="1.3"/>
+                <path d="M31 12 C28 8 29 4 31 1 C33 4 34 8 31 12 Z" fill="url(#flameGrad)"/>
+                <line x1="47" y1="40" x2="47" y2="35" stroke="#4a3a28" stroke-width="1.3"/>
+                <path d="M47 35 C44 31 45 27 47 24 C49 27 50 31 47 35 Z" fill="url(#flameGrad)"/>
+            </svg>`,
+            plant: `<svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 64 L44 64 L41 46 L23 46 Z" fill="#b8863a"/>
+                <rect x="19" y="43" width="26" height="4" rx="1" fill="#8a5f26"/>
+                <line x1="32" y1="44" x2="32" y2="28" stroke="#3E5C50" stroke-width="2.6" stroke-linecap="round"/>
+                <path d="M32 30 C21 27 15 15 19 5 C29 11 35 21 32 30 Z" fill="#4a7c59"/>
+                <path d="M32 30 C43 27 49 15 45 5 C35 11 29 21 32 30 Z" fill="#3E5C50"/>
+                <path d="M32 30 C28 19 30 8 32 2 C34 8 36 19 32 30 Z" fill="#6ba07d"/>
+            </svg>`,
+            frame: `<svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                <rect x="8" y="8" width="48" height="48" rx="2" fill="#161616"/>
+                <rect x="14" y="14" width="36" height="36" fill="#ecdfbb"/>
+                <g transform="translate(15,15) scale(0.5625)">
+                    <path d="M17,6 C19,3 22,3 23,6 L26,14 C29,12 33,12 36,14 L38,6 C39,3 42,3 44,6 C46,10 44,15 41,17 C45,22 47,29 46,36 C45,44 40,50 33,53 C36,55 37,58 35,60 L14,60 C10,60 6,58 5,54 C4,50 6,46 10,45 C7,40 6,33 8,27 C10,20 14,16 19,14 C16,12 15,9 17,6 Z" fill="#161616"/>
+                    <line x1="1" y1="21" x2="14" y2="24" stroke="#161616" stroke-width="1.4"/>
+                    <line x1="1" y1="27" x2="14" y2="27" stroke="#161616" stroke-width="1.4"/>
+                    <path d="M33,53 C40,50 46,44 48,36 C49,32 48,28 46,26" stroke="#161616" stroke-width="5" fill="none" stroke-linecap="round"/>
+                    <circle cx="45" cy="30" r="7" fill="#161616"/>
+                    <circle cx="57" cy="30" r="7" fill="#161616"/>
+                    <polygon points="37,33 65,33 51,48" fill="#161616"/>
+                </g>
+                <rect x="26" y="56" width="12" height="3" rx="1" fill="#161616"/>
+            </svg>`,
+            globe: `<svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="globeGrad" cx="35%" cy="28%" r="75%">
+                        <stop offset="0%" stop-color="#f3e9d0"/>
+                        <stop offset="100%" stop-color="#e0d2ac"/>
+                    </radialGradient>
+                    <clipPath id="globeClip"><circle cx="32" cy="27" r="15"/></clipPath>
+                </defs>
+                <path d="M23 62 L41 62 L37 55 L27 55 Z" fill="#4a3018"/>
+                <rect x="29" y="43" width="6" height="12" fill="#b8863a"/>
+                <ellipse cx="32" cy="55" rx="4" ry="1.6" fill="#c9a24f"/>
+                <g transform="translate(32 42) scale(1.2667) translate(-32 -42)">
+                    <circle cx="32" cy="27" r="15" fill="url(#globeGrad)"/>
+                    <g clip-path="url(#globeClip)">
+                        <path d="M20 16 L25 14 L29 16 L28 20 L31 23 L30 28 L32 32 L29 37 L26 40 L24 34 L26 29 L22 25 L23 20 Z" fill="#8faa6e"/>
+                        <path d="M34 14 L40 13 L45 16 L47 20 L44 22 L46 26 L42 29 L38 27 L39 22 L36 20 L35 17 Z" fill="#d99a8a"/>
+                        <path d="M22 32 L27 30 L30 34 L28 39 L24 41 L20 38 L20 34 Z" fill="#c9a86f"/>
+                        <path d="M38 30 L43 29 L46 33 L44 37 L39 38 L37 34 Z" fill="#e0935a"/>
+                        <path d="M29 11 L33 11 L34 14 L30 15 Z" fill="#7fb3ad"/>
+                    </g>
+                    <circle cx="33" cy="11" r="1.8" fill="#c9a24f"/>
+                    <circle cx="33" cy="43" r="1.8" fill="#c9a24f"/>
+                    <path d="M33 11 Q54 27 33 43" fill="none" stroke="#b8863a" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M33 11 Q54 27 33 43" fill="none" stroke="#f0d28f" stroke-width="0.8" opacity="0.7" stroke-linecap="round"/>
+                </g>
+            </svg>`,
+            statue: `<svg viewBox="0 0 44 60" width="52" height="71" xmlns="http://www.w3.org/2000/svg">
+                <defs><linearGradient id="marbleGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f7f2e6"/><stop offset="55%" stop-color="#e7dcc2"/><stop offset="100%" stop-color="#cdbd98"/></linearGradient></defs>
+                <rect x="10" y="52" width="24" height="6" rx="1" fill="url(#marbleGrad)" stroke="#b8a67d" stroke-width="1"/>
+                <path d="M22,13 C13,13 8,22 8,33 C8,44 13,52 22,52 C31,52 36,44 36,33 C36,22 31,13 22,13 Z" fill="url(#marbleGrad)" stroke="#b8a67d" stroke-width="1"/>
+                <path d="M14,16 L18,7 L22,16 Z" fill="url(#marbleGrad)" stroke="#b8a67d" stroke-width="1"/>
+                <path d="M30,16 L26,7 L22,16 Z" fill="url(#marbleGrad)" stroke="#b8a67d" stroke-width="1"/>
+                <path d="M10,30 C6,35 6,43 9,49 C12,47 13,39 13,32 Z" fill="#cdbd98" stroke="#b8a67d" stroke-width="0.7" opacity="0.75"/>
+                <path d="M34,30 C38,35 38,43 35,49 C32,47 31,39 31,32 Z" fill="#cdbd98" stroke="#b8a67d" stroke-width="0.7" opacity="0.75"/>
+                <circle cx="16" cy="28" r="5.4" fill="url(#marbleGrad)" stroke="#b8a67d" stroke-width="1"/>
+                <circle cx="28" cy="28" r="5.4" fill="url(#marbleGrad)" stroke="#b8a67d" stroke-width="1"/>
+                <circle cx="16" cy="28" r="1.9" fill="#a68f66"/>
+                <circle cx="28" cy="28" r="1.9" fill="#a68f66"/>
+                <path d="M20,34 L24,34 L22,38 Z" fill="#cdbd98" stroke="#b8a67d" stroke-width="0.6"/>
+                <path d="M16,42 C19,44 25,44 28,42" stroke="#b8a67d" stroke-width="0.7" fill="none" opacity="0.4"/>
+                <path d="M15,47 C19,49 25,49 29,47" stroke="#b8a67d" stroke-width="0.7" fill="none" opacity="0.35"/>
+            </svg>`
+        };
+
+        function decorationHTML(id, deco) {
+            let visual;
+            if (deco.key === 'frame' && deco.photo) {
+                visual = `<span class="decoration-emoji decoration-svg"><svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="8" y="8" width="48" height="48" rx="2" fill="#161616"/>
+                    <defs><clipPath id="frameClip-${id}"><rect x="14" y="14" width="36" height="36"/></clipPath></defs>
+                    <image href="${deco.photo}" x="14" y="14" width="36" height="36" preserveAspectRatio="xMidYMid slice" clip-path="url(#frameClip-${id})"/>
+                    <rect x="26" y="56" width="12" height="3" rx="1" fill="#161616"/>
+                </svg></span>`;
+            } else {
+                visual = DECORATION_SVGS[deco.key]
+                    ? `<span class="decoration-emoji decoration-svg">${DECORATION_SVGS[deco.key]}</span>`
+                    : `<span class="decoration-emoji">${deco.emoji}</span>`;
+            }
+            const frameEditBtn = deco.key === 'frame'
+                ? `<button type="button" class="decoration-edit-photo" onpointerdown="event.stopPropagation()" onclick="triggerFramePhotoUpload('${id}')" title="Choisir une photo">✏️</button>`
+                : '';
+            return `<div class="shelf-decoration ${deco.key ? 'deco-' + deco.key : ''}" data-deco-id="${id}" style="left:${deco.x}px; font-size:64px;">
+                ${visual}
+                ${frameEditBtn}
+                <button type="button" class="decoration-remove" onpointerdown="event.stopPropagation()" onclick="removeShelfDecoration('${id}')">×</button>
+            </div>`;
+        }
+
+        function reconcileShelfDecorations() {
+            let changed = false;
+            Object.keys(shelfDecorations).forEach(id => {
+                const deco = shelfDecorations[id];
+                if (!deco || typeof deco.row !== 'number' || deco.row < 0 || deco.row >= SHELF_ROW_COUNT) {
+                    delete shelfDecorations[id];
+                    changed = true;
+                }
+            });
+            if (changed) saveShelfDecorations();
+        }
+
+        function renderShelfDecorations() {
+            reconcileShelfDecorations();
+            const rowElements = Array.from({ length: SHELF_ROW_COUNT }, (_, i) => document.getElementById(`bookshelf-row-${i}`));
+            document.querySelectorAll('.shelf-decoration').forEach(el => el.remove());
+            Object.entries(shelfDecorations).forEach(([id, deco]) => {
+                const rowEl = rowElements[deco.row];
+                if (!rowEl) return;
+                rowEl.insertAdjacentHTML('beforeend', decorationHTML(id, deco));
+                const el = rowEl.querySelector(`.shelf-decoration[data-deco-id="${id}"]`);
+                if (el) initShelfDrag(el, { id, kind: 'decoration' }, 'decoration');
+            });
+        }
 
         function hashColor(str) {
             let hash = 0;
@@ -1092,8 +1698,10 @@
         }
 
         const GENRE_PALETTE = ['#7B3F3F', '#3E5C50', '#35506B', '#B5651D', '#5B4B8A', '#4A4A4A', '#7A6A2E', '#2E6B6B', '#8A4A6B', '#4E6B2E'];
+        let genreColorOverrides = {};
         function genreColor(genre) {
             if (!genre) return null;
+            if (genreColorOverrides[genre]) return genreColorOverrides[genre];
             let hash = 0;
             for (let i = 0; i < genre.length; i++) hash = genre.charCodeAt(i) + ((hash << 5) - hash);
             return GENRE_PALETTE[Math.abs(hash) % GENRE_PALETTE.length];
@@ -1133,11 +1741,12 @@
             } catch (err) { /* pas grave */ }
         }
 
-        const SPINE_WIDTHS = [28, 32, 36];
-        const SPINE_HEIGHTS = [74, 86, 98, 108];
+        const SPINE_WIDTH_RANGE = [18, 60];
+        const SPINE_HEIGHTS = [64, 74, 84, 92];
         function spineWidthFor(b) {
             if (b.shelfWidth) return b.shelfWidth;
-            return SPINE_WIDTHS[Math.abs(b.id * 7) % SPINE_WIDTHS.length];
+            const [min, max] = SPINE_WIDTH_RANGE;
+            return min + (Math.abs(b.id * 7) % (max - min));
         }
         function spineHeightFor(b) {
             return b.shelfHeight || 108;
@@ -1145,14 +1754,41 @@
 
         function fitSpineTitle(el) {
             if (!el) return;
-            const spineEl = el.parentElement;
-            const maxWidth = spineEl.clientWidth * 0.86;
-            let size = 10.5;
+            const labelEl = el.parentElement;
+            const maxWidth = labelEl.clientWidth * 0.88;
+            let size = 12;
             el.style.fontSize = size + 'px';
-            while (el.scrollWidth > maxWidth && size > 5.5) {
+            while (el.scrollWidth > maxWidth && size > 8) {
                 size -= 0.5;
                 el.style.fontSize = size + 'px';
             }
+        }
+
+        function textColorFor(colorStr) {
+            let r = 128, g = 128, b = 128;
+            const s = (colorStr || '').trim();
+            let m;
+            if ((m = s.match(/^#([0-9a-f]{6})$/i))) {
+                r = parseInt(m[1].slice(0,2), 16); g = parseInt(m[1].slice(2,4), 16); b = parseInt(m[1].slice(4,6), 16);
+            } else if ((m = s.match(/^rgb\(?\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/i))) {
+                r = +m[1]; g = +m[2]; b = +m[3];
+            } else if ((m = s.match(/^hsl\(\s*(\d+)[,\s]+(\d+)%[,\s]+(\d+)%/i))) {
+                const h = +m[1] / 360, sat = +m[2] / 100, l = +m[3] / 100;
+                const k = n => (n + h * 12) % 12;
+                const a = sat * Math.min(l, 1 - l);
+                const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+                r = Math.round(f(0) * 255); g = Math.round(f(8) * 255); b = Math.round(f(4) * 255);
+            }
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            return luminance > 0.6 ? 'dark' : 'light';
+        }
+
+        function applySpineTextColor(spineEl, color) {
+            if (!spineEl) return;
+            const titleEl = spineEl.querySelector('.shelf-spine-title');
+            const isDark = textColorFor(color) === 'dark';
+            spineEl.classList.toggle('spine-text-dark', isDark);
+            spineEl.classList.toggle('spine-text-light', !isDark);
         }
 
         const SPINE_PATTERNS = ['', 'spine-pattern-dots', 'spine-pattern-stripes', 'spine-pattern-chevron', 'spine-pattern-hearts', 'spine-pattern-arch'];
@@ -1162,10 +1798,9 @@
             const initialColor = b.shelfColor || genreColor(b.genre) || (b.cover ? (shelfColorCache[b.cover] || '#c9c2b4') : hashColor(b.title || String(b.id)));
             const safeTitle = (b.title || '').replace(/"/g, '&quot;');
             const pattern = (b.shelfPattern !== undefined && b.shelfPattern !== null) ? b.shelfPattern : SPINE_PATTERNS[Math.abs(b.id * 13) % SPINE_PATTERNS.length];
-            return `<div class="shelf-spine ${pattern}" data-id="${b.id}" style="width:${width}px; height:${height}px; background:${initialColor};">
-                <span class="spine-cap top"></span>
-                <span class="spine-cap bottom"></span>
-                <span class="shelf-spine-title">${safeTitle}</span>
+            const textClass = textColorFor(initialColor) === 'dark' ? 'spine-text-dark' : 'spine-text-light';
+            return `<div class="shelf-spine ${pattern} ${textClass}" data-id="${b.id}" style="width:${width}px; height:${height}px; --spine-color:${initialColor};">
+                <div class="spine-label"><span class="shelf-spine-title">${safeTitle}</span></div>
             </div>`;
         }
 
@@ -1222,9 +1857,9 @@
                 `<button type="button" class="spine-size-btn ${h === currentHeight ? 'active' : ''}" onclick="setSpineHeight(${h})"><span class="bar" style="height:${Math.round(h / 3.2)}px;"></span></button>`
             ).join('');
             const currentWidth = spineWidthFor(book);
-            document.getElementById('spine-editor-widths').innerHTML = SPINE_WIDTHS.map(w =>
-                `<button type="button" class="spine-size-btn ${w === currentWidth ? 'active' : ''}" onclick="setSpineWidth(${w})"><span class="bar" style="width:${w}px; height:26px;"></span></button>`
-            ).join('');
+            document.getElementById('spine-editor-width-slider').value = currentWidth;
+            document.getElementById('spine-editor-width-value').textContent = currentWidth + ' px';
+            document.getElementById('spine-editor-width-bar').style.width = currentWidth + 'px';
         }
 
         window.openSpineEditor = (id) => {
@@ -1288,6 +1923,15 @@
             window.setSpineColor(e.target.value);
         });
 
+        document.getElementById('spine-editor-width-slider').addEventListener('input', (e) => {
+            const width = parseInt(e.target.value);
+            document.getElementById('spine-editor-width-value').textContent = width + ' px';
+            document.getElementById('spine-editor-width-bar').style.width = width + 'px';
+        });
+        document.getElementById('spine-editor-width-slider').addEventListener('change', (e) => {
+            window.setSpineWidth(parseInt(e.target.value));
+        });
+
         // Garde shelfPositions synchronisé avec la vraie liste de livres : retire les livres
         // supprimés et place les nouveaux livres à la suite, sans jamais déplacer
         // les emplacements déjà choisis par l'utilisateur.
@@ -1313,14 +1957,16 @@
             });
         }
 
-        function initShelfDrag(el, book) {
-            el.addEventListener('mouseenter', () => { if (!activeShelfDrag) showShelfTooltip(el, book); });
-            el.addEventListener('mouseleave', () => hideShelfTooltip());
+        function initShelfDrag(el, item, kind = 'book') {
+            if (kind === 'book') {
+                el.addEventListener('mouseenter', () => { if (!activeShelfDrag) showShelfTooltip(el, item); });
+                el.addEventListener('mouseleave', () => hideShelfTooltip());
+            }
 
             el.addEventListener('pointerdown', (e) => {
                 if (activeShelfDrag) return;
                 activeShelfDrag = {
-                    el, book,
+                    el, item, kind,
                     dragOffsetX: e.clientX - el.getBoundingClientRect().left,
                     startX: e.clientX, startY: e.clientY,
                     moved: false,
@@ -1381,18 +2027,25 @@
         async function onShelfPointerUp(e) {
             const drag = activeShelfDrag;
             if (!drag || e.pointerId !== drag.pointerId) return;
-            const el = drag.el, book = drag.book;
+            const el = drag.el, item = drag.item;
             activeShelfDrag = null;
             el.classList.remove('dragging');
             try { el.releasePointerCapture(e.pointerId); } catch (err) {}
 
             if (!drag.moved) {
-                jumpToFiche(book.id);
+                if (drag.kind === 'book') jumpToFiche(item.id);
                 return;
             }
             const rowEl = el.closest('.bookshelf-row');
-            shelfPositions[book.id] = { row: parseInt(rowEl.dataset.row), x: Math.round(parseFloat(el.style.left) || 0) };
-            await saveShelfPositions();
+            if (drag.kind === 'decoration') {
+                if (!shelfDecorations[item.id]) return;
+                shelfDecorations[item.id].row = parseInt(rowEl.dataset.row);
+                shelfDecorations[item.id].x = Math.round(parseFloat(el.style.left) || 0);
+                await saveShelfDecorations();
+            } else {
+                shelfPositions[item.id] = { row: parseInt(rowEl.dataset.row), x: Math.round(parseFloat(el.style.left) || 0) };
+                await saveShelfPositions();
+            }
         }
 
         function onShelfPointerCancel(e) {
@@ -1413,6 +2066,7 @@
             if (!books.length) {
                 rowElements[0].innerHTML = '<p class="bookshelf-empty">Ajoute des livres dans Ma Grille pour remplir ton étagère.</p>';
                 rowElements.slice(1).forEach(el => { if (el) el.innerHTML = ''; });
+                renderShelfDecorations();
                 return;
             }
 
@@ -1436,9 +2090,11 @@
                     const finalColor = color || hashColor(b.title || String(b.id));
                     shelfColorCache[b.cover] = finalColor;
                     const el = document.querySelector(`.shelf-spine[data-id="${b.id}"]`);
-                    if (el) el.style.background = finalColor;
+                    if (el) { el.style.setProperty('--spine-color', finalColor); applySpineTextColor(el, finalColor); }
                 });
             });
+
+            renderShelfDecorations();
         }
 
         // --- PSEUDO (unique) ---
@@ -1473,7 +2129,7 @@
                 currentPseudo = pseudo.trim();
                 await setDoc(doc(db, "user_profiles", currentUser.uid), { pseudo: currentPseudo }, { merge: true });
                 if (!currentUser.displayName) document.getElementById('profile-name').innerText = currentPseudo;
-                if (successEl) { successEl.innerText = "Pseudo enregistré !"; successEl.classList.remove('hidden'); }
+                if (successEl) { successEl.innerText = t("msg.pseudoSaved"); successEl.classList.remove('hidden'); }
                 return true;
             } catch (err) {
                 errorEl.innerText = err.message === "TAKEN" ? "Ce pseudo est déjà pris." : "Erreur, réessaie.";
@@ -1590,12 +2246,12 @@
             successEl.classList.add('hidden');
 
             if (!currentPw || !newPw) {
-                errorEl.innerText = "Remplis les deux champs.";
+                errorEl.innerText = t("msg.fillBothFields");
                 errorEl.classList.remove('hidden');
                 return;
             }
             if (newPw.length < 6) {
-                errorEl.innerText = "Le nouveau mot de passe doit faire au moins 6 caractères.";
+                errorEl.innerText = t("msg.passwordTooShort");
                 errorEl.classList.remove('hidden');
                 return;
             }
@@ -1603,7 +2259,7 @@
                 const credential = EmailAuthProvider.credential(currentUser.email, currentPw);
                 await reauthenticateWithCredential(currentUser, credential);
                 await updatePassword(currentUser, newPw);
-                successEl.innerText = "Mot de passe mis à jour !";
+                successEl.innerText = t("msg.passwordUpdated");
                 successEl.classList.remove('hidden');
                 document.getElementById('profile-current-password').value = '';
                 document.getElementById('profile-new-password').value = '';
@@ -1659,6 +2315,9 @@
                 photoRemoved = false;
                 currentPseudo = null;
                 shelfPositions = {};
+                shelfDecorations = {};
+                genreColorOverrides = {};
+                SHELF_ROW_COUNT = 3;
                 try {
                     const profileSnap = await getDoc(doc(db, "user_profiles", user.uid));
                     if (profileSnap.exists()) {
@@ -1670,6 +2329,11 @@
                             applyThemeColor(profileSnap.data().themeColor);
                             localStorage.setItem('biblio-theme-color', profileSnap.data().themeColor);
                         }
+                        if (profileSnap.data().lang && profileSnap.data().lang !== currentLang) {
+                            applyLanguage(profileSnap.data().lang);
+                        }
+                        if (profileSnap.data().genreColorOverrides) genreColorOverrides = profileSnap.data().genreColorOverrides;
+                        if (profileSnap.data().shelfRowCount) SHELF_ROW_COUNT = profileSnap.data().shelfRowCount;
                         if (profileSnap.data().shelfPositions) {
                             shelfPositions = profileSnap.data().shelfPositions;
                         } else if (Array.isArray(profileSnap.data().shelfRows)) {
@@ -1685,11 +2349,22 @@
                                 });
                             });
                         }
+                        if (profileSnap.data().shelfDecorations) {
+                            shelfDecorations = profileSnap.data().shelfDecorations;
+                        }
+                        if (!profileSnap.data().shelfDecorCleanupV1 && Object.keys(shelfDecorations).length > 0) {
+                            shelfDecorations = {};
+                            await setDoc(doc(db, "user_profiles", user.uid), { shelfDecorations: {}, shelfDecorCleanupV1: true }, { merge: true });
+                        } else if (!profileSnap.data().shelfDecorCleanupV1) {
+                            await setDoc(doc(db, "user_profiles", user.uid), { shelfDecorCleanupV1: true }, { merge: true });
+                        }
                     }
                 } catch (err) { /* pas grave si ça échoue, on retombe sur photoURL ou l'initiale */ }
+                renderBookcaseRows();
                 const initial = (user.displayName || user.email || '?')[0].toUpperCase();
                 paintAvatars(photoRemoved ? null : (customPhotoUrl || user.photoURL), initial);
                 document.getElementById('auth-form').reset();
+                document.getElementById('landing-page').classList.add('hidden');
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
                 setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
@@ -1699,9 +2374,19 @@
             } else {
                 applyThemeColor('#C5A059');
                 document.getElementById('app-content').classList.add('hidden');
-                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('landing-page').classList.remove('hidden');
             }
         });
+
+        window.showAuthScreen = () => {
+            document.getElementById('landing-page').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+        };
+        window.showLandingPage = () => {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('landing-page').classList.remove('hidden');
+        };
 
         async function loadUserLibrary() {
             const docRef = doc(db, "users_libs", currentUser.uid);
@@ -1843,7 +2528,7 @@
             document.getElementById('grid-content').innerHTML = filteredGrid.map(b => `
                 <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
                     <div class="grid-thumb relative">
-                        ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<div class="book-spine spine-${b.id % 6} flex flex-col items-center justify-center h-full w-full"><div class="book-spine-frame"><span class="book-spine-title">${b.title}</span><span class="book-spine-divider"></span><span class="book-spine-author">${b.author || ''}</span></div></div>`}
+                        ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<div class="flex flex-col items-center justify-center text-center px-3 py-2 h-full w-full"><span class="grid-thumb-title font-serif font-black uppercase leading-tight text-[15px]">${b.title}</span><span class="mt-2 text-[10px] font-bold uppercase tracking-wide" style="color: var(--gold-accent);">${b.author || ''}</span></div>`}
                         
                         <!-- Badge Favori -->
                         ${b.isFavorite ? `<span class="absolute top-2 right-2 backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg" style="background: color-mix(in srgb, var(--gold-accent) 25%, transparent); border: 1px solid color-mix(in srgb, var(--gold-accent) 40%, transparent);">👑</span>` : ''}
@@ -1878,10 +2563,10 @@
                     </div>
                     <div class="flex items-center gap-2 mb-6">
                         <button onclick="showSection('grille', true)" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
-                             <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Grille</span>
+                             <span class="text-[9px] font-bold uppercase tracking-widest">${t('fiche.backToGrid')}</span>
                         </button>
                         <button onclick="goToBibliotheque()" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
-                             <span class="text-[9px] font-bold uppercase tracking-widest">← Retour Bibliothèque</span>
+                             <span class="text-[9px] font-bold uppercase tracking-widest">${t('fiche.backToLibrary')}</span>
                         </button>
                     </div>
                     <div class="flex flex-col md:flex-row gap-10">
@@ -1922,7 +2607,7 @@
         window.toggleFavorite = async (id) => {
             const targetBook = library.find(b => b.id === id);
             if (!targetBook || !targetBook.end) {
-                alert("Veuillez d'abord renseigner une date de fin pour ce livre.");
+                alert(t("msg.endDateFirst"));
                 return;
             }
             
@@ -2010,8 +2695,8 @@
             const currentGenre = genreSelect.value;
             const currentAuthor = authorSelect.value;
 
-            genreSelect.innerHTML = '<option value="all">Tous les genres</option>' + genres.map(g => `<option value="${g}">${g}</option>`).join('');
-            authorSelect.innerHTML = '<option value="all">Tous les auteurs</option>' + authors.map(a => `<option value="${a}">${a}</option>`).join('');
+            genreSelect.innerHTML = `<option value="all">${t('filters.allGenres')}</option>` + genres.map(g => `<option value="${g}">${g}</option>`).join('');
+            authorSelect.innerHTML = `<option value="all">${t('filters.allAuthors')}</option>` + authors.map(a => `<option value="${a}">${a}</option>`).join('');
 
             genreSelect.value = genres.includes(currentGenre) ? currentGenre : 'all';
             authorSelect.value = authors.includes(currentAuthor) ? currentAuthor : 'all';
@@ -2085,7 +2770,7 @@
         document.addEventListener('click', () => {
             document.getElementById('profile-menu-wrapper').classList.remove('open');
         });
-        window.toggleAuthMode = () => { isSignUp = !isSignUp; document.getElementById('auth-mode-title').innerText = isSignUp ? "Création" : "Connexion"; };
+        window.toggleAuthMode = () => { isSignUp = !isSignUp; applyLanguage(currentLang); };
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value, pass = document.getElementById('password').value;
@@ -2209,7 +2894,7 @@
             }
         });
         window.deleteBook = async (id) => {
-            if (!confirm("Supprimer ?")) return;
+            if (!confirm(t("msg.deleteConfirm"))) return;
             const idx = library.findIndex(b => b.id === id);
             library.splice(idx, 1);
             library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false });
