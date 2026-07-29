@@ -1202,7 +1202,7 @@
                 editModal: { title: "Modifier la Fiche #", autofill: "Remplissage Automatique", titlePlaceholder: "Commence à taper un titre...", authorPlaceholder: "Auteur...", autofillHint: "Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.", genre: "Genre", releaseYear: "Année de sortie", rating: "Note", coverUrl: "URL Couverture", format: "Format", formatBook: "Livre", language: "Langue", start: "Début (ex: 01/05/2025)", end: "Fin (ex: 15/05/2025)", summaryPlaceholder: "Résumé...", commentPlaceholder: "Mon avis...", cancel: "Annuler", save: "Enregistrer" },
                 shelf: { genreColor: "Couleur par genre", customizeSpine: "Personnaliser le dos", color: "Couleur", customColor: "Couleur personnalisée", pattern: "Motif", height: "Hauteur", thickness: "Épaisseur", close: "Fermer" },
                 deco: { plant: "Plante", lamp: "Lampe", candle: "Bougie", globe: "Globe", frame: "Cadre photo", statue: "Statuette", clearAll: "Tout retirer de l'étagère" },
-                fiche: { backToGrid: "← Retour Grille", backToLibrary: "← Retour Bibliothèque" },
+                fiche: { backToGrid: "Retour Grille", backToLibrary: "Retour Bibliothèque" },
                 msg: {
                     maxRows: "Nombre maximum de rangées atteint.", minRows: "Il doit rester au moins une rangée.",
                     clearDecorConfirm: "Retirer toutes les décorations de l'étagère ?",
@@ -1235,7 +1235,7 @@
                 editModal: { title: "Edit Entry #", autofill: "Auto-fill", titlePlaceholder: "Start typing a title...", authorPlaceholder: "Author...", autofillHint: "Pick a suggestion to auto-fill the author, genre, year and cover.", genre: "Genre", releaseYear: "Release year", rating: "Rating", coverUrl: "Cover URL", format: "Format", formatBook: "Book", language: "Language", start: "Start (e.g. 05/01/2025)", end: "End (e.g. 05/15/2025)", summaryPlaceholder: "Summary...", commentPlaceholder: "My review...", cancel: "Cancel", save: "Save" },
                 shelf: { genreColor: "Color by genre", customizeSpine: "Customize spine", color: "Color", customColor: "Custom color", pattern: "Pattern", height: "Height", thickness: "Thickness", close: "Close" },
                 deco: { plant: "Plant", lamp: "Lamp", candle: "Candle", globe: "Globe", frame: "Photo frame", statue: "Statuette", clearAll: "Remove everything from the shelf" },
-                fiche: { backToGrid: "← Back to Grid", backToLibrary: "← Back to Library" },
+                fiche: { backToGrid: "Back to Grid", backToLibrary: "Back to Library" },
                 msg: {
                     maxRows: "Maximum number of rows reached.", minRows: "At least one row must remain.",
                     clearDecorConfirm: "Remove all decorations from the shelf?",
@@ -2095,6 +2095,21 @@
             });
 
             renderShelfDecorations();
+            updateBookcaseWidth();
+        }
+
+        function updateBookcaseWidth() {
+            const bookcase = document.getElementById('bookcase-container');
+            if (!bookcase) return;
+            let maxRight = 900;
+            bookcase.querySelectorAll('.shelf-spine, .shelf-decoration').forEach(el => {
+                const left = parseFloat(el.style.left) || 0;
+                const width = el.offsetWidth || 104;
+                maxRight = Math.max(maxRight, left + width + 40);
+            });
+            document.querySelectorAll('.bookshelf-row, .bookshelf-ledge, .bookshelf-row-wrap').forEach(el => {
+                el.style.minWidth = maxRight + 'px';
+            });
         }
 
         // --- PSEUDO (unique) ---
@@ -2551,12 +2566,13 @@
             // HTML FICHES
             document.getElementById('fiches-content').innerHTML = filteredFiches.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
-                    <div class="flex items-center gap-2 mb-4 flex-wrap">
-                        <button onclick="showSection('grille', true)" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
-                             <span class="text-[9px] font-bold uppercase tracking-widest">${t('fiche.backToGrid')}</span>
+                    <div class="flex items-center gap-4 mb-5 flex-wrap">
+                        <button onclick="showSection('grille', true)" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent transition-colors">
+                             ← ${t('fiche.backToGrid')}
                         </button>
-                        <button onclick="goToBibliotheque()" class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-gold-50 text-slate-400 rounded-full transition-all">
-                             <span class="text-[9px] font-bold uppercase tracking-widest">${t('fiche.backToLibrary')}</span>
+                        <span class="text-slate-200">|</span>
+                        <button onclick="goToBibliotheque()" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent transition-colors">
+                             ← ${t('fiche.backToLibrary')}
                         </button>
                     </div>
                     <div class="fiche-header-actions">
