@@ -77,12 +77,10 @@
         }
 
         .fiche-header-actions {
-            position: absolute;
-            top: 25px;
-            right: 30px;
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
 
         .fiche-number {
@@ -2566,24 +2564,26 @@
             // HTML FICHES
             document.getElementById('fiches-content').innerHTML = filteredFiches.map(book => `
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
-                    <div class="flex items-center gap-4 mb-5 flex-wrap">
-                        <button onclick="showSection('grille', true)" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent transition-colors">
-                             ← ${t('fiche.backToGrid')}
-                        </button>
-                        <span class="text-slate-200">|</span>
-                        <button onclick="goToBibliotheque()" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent transition-colors">
-                             ← ${t('fiche.backToLibrary')}
-                        </button>
-                    </div>
-                    <div class="fiche-header-actions">
-                        <button onclick="toggleBookClub(${book.id})" class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${book.isBookClub ? 'bg-blue-500 text-white shadow-md' : 'bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-500'}">
-        <span class="${book.isBookClub ? '' : 'grayscale opacity-40'}">📖</span> Book Club
-                           </button>
+                    <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <button onclick="showSection('grille', true)" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent transition-colors">
+                                 ← ${t('fiche.backToGrid')}
+                            </button>
+                            <span class="text-slate-200">|</span>
+                            <button onclick="goToBibliotheque()" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent transition-colors">
+                                 ← ${t('fiche.backToLibrary')}
+                            </button>
+                        </div>
+                        <div class="fiche-header-actions">
+                            <button onclick="toggleBookClub(${book.id})" class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${book.isBookClub ? 'bg-blue-500 text-white shadow-md' : 'bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-500'}">
+            <span class="${book.isBookClub ? '' : 'grayscale opacity-40'}">📖</span> Book Club
+                               </button>
 
-                           <button onclick="toggleFavorite(${book.id})" class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${book.isFavorite ? 'bg-amber-400 text-white shadow-md' : 'bg-slate-50 text-slate-400 hover:bg-amber-50 hover:text-amber-500'}" title="${book.isFavorite ? "Livre de l'année" : "Élire Livre de l'année"}">
-                            <span class="${book.isFavorite ? '' : 'grayscale opacity-40'}">👑</span> ${book.isFavorite ? "Livre de l'année" : "Élire"}
-                        </button>
-                        <div class="fiche-number">#${book.id}</div>
+                               <button onclick="toggleFavorite(${book.id})" class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${book.isFavorite ? 'bg-amber-400 text-white shadow-md' : 'bg-slate-50 text-slate-400 hover:bg-amber-50 hover:text-amber-500'}" title="${book.isFavorite ? "Livre de l'année" : "Élire Livre de l'année"}">
+                                <span class="${book.isFavorite ? '' : 'grayscale opacity-40'}">👑</span> ${book.isFavorite ? "Livre de l'année" : "Élire"}
+                            </button>
+                            <div class="fiche-number">#${book.id}</div>
+                        </div>
                     </div>
                     <div class="flex flex-col md:flex-row gap-10">
                         <div class="cover-box shrink-0">
