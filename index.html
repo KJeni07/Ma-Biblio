@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ma Biblio 100 - Édition Prestige</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ma Biblio">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#C5A059">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" href="icon-192.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -18,6 +25,7 @@
 
         html {
             overflow-y: scroll;
+            overflow-x: hidden;
             scrollbar-gutter: stable;
         }
 
@@ -26,7 +34,6 @@
             background-color: var(--paper-bg);
             color: var(--deep-black);
             margin: 0;
-            overflow-x: hidden;
         }
 
         h1, h2, .font-serif { font-family: 'Playfair Display', serif; }
@@ -793,9 +800,9 @@
                     <h1 class="text-2xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
                     
                     <div class="flex gap-8 items-center">
-                        <button onclick="showSection('stats')" id="btn-stats" class="tab-btn active" data-i18n="nav.dashboard">Tableau de Bord</button>
-                        <button onclick="showSection('grille')" id="btn-grille" class="tab-btn" data-i18n="nav.grid">Ma Grille</button>
-                        <button onclick="showSection('fiches')" id="btn-fiches" class="tab-btn" data-i18n="nav.fiches">Mes Fiches</button>
+                        <button onclick="showSection('stats', true)" id="btn-stats" class="tab-btn active" data-i18n="nav.dashboard">Tableau de Bord</button>
+                        <button onclick="showSection('grille', true)" id="btn-grille" class="tab-btn" data-i18n="nav.grid">Ma Grille</button>
+                        <button onclick="showSection('fiches', true)" id="btn-fiches" class="tab-btn" data-i18n="nav.fiches">Mes Fiches</button>
                     </div>
 
                     <div class="flex items-center gap-3">
@@ -874,7 +881,10 @@
                             <option value="favorite" data-i18n="filters.bookOfYear">👑 Livre de l'année</option>
                             <option value="bookclub" data-i18n="filters.bookClub">📖 Book Club</option>
                         </select>
+                    </div>
 
+                    <div class="flex items-center gap-2">
+                        <button onclick="openBulkImport()" class="flex items-center gap-1.5 text-[9px] font-black text-white uppercase tracking-widest bg-[var(--gold-accent)] px-3 py-1.5 rounded-full hover:opacity-90 transition-opacity" data-i18n="bulkImport.openBtn">✨ Import rapide</button>
                         <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto" data-i18n="filters.reset">Réinitialiser</button>
                     </div>
                 </div>
@@ -948,6 +958,9 @@
                     <div class="flex items-center justify-between mb-4">
                         <p class="section-label mb-0" data-i18n="dash.myLibrary">Ma Bibliothèque</p>
                         <div class="flex items-center gap-3">
+                            <select id="filter-year-shelf" onchange="render()" class="dashboard-year-select !text-xs !py-1.5">
+                                <option value="all" data-i18n="filters.allYears">Toutes les années</option>
+                            </select>
                             <button onclick="openDecorationPicker()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.addDecoration" title="Ajouter une décoration">✨</button>
                             <button onclick="openShelfSettings()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.shelfSettings" title="Réglages de la bibliothèque">⚙️</button>
                         </div>
@@ -1040,6 +1053,31 @@
             <p id="pseudo-onboard-error" class="text-red-500 text-[10px] font-bold uppercase hidden mb-3"></p>
             <button onclick="handlePseudoOnboard()" class="w-full py-3 bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gold-accent transition-colors mb-2" data-i18n="account.validate">Valider</button>
             <button onclick="skipPseudoOnboard()" class="w-full py-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent" data-i18n="onboard.later">Plus tard</button>
+        </div>
+    </div>
+
+    <div id="bulk-import-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-black uppercase tracking-tight font-serif" data-i18n="bulkImport.title">Import rapide</h2>
+                <button onclick="closeBulkImport()" class="text-slate-300 hover:text-black text-2xl">&times;</button>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4" data-i18n="bulkImport.intro">Colle ou écris la liste des livres que tu as déjà lus, un titre par ligne. On va chercher automatiquement la couverture, l'auteur et le genre de chacun. Il ne te restera plus qu'à mettre une note et ton avis dans Mes Fiches.</p>
+            <textarea id="bulk-import-textarea" rows="8" data-i18n-placeholder="bulkImport.placeholder" placeholder="Harry Potter à l'école des sorciers&#10;1984&#10;Le Petit Prince&#10;..." class="modal-input w-full !mb-0 font-mono text-xs"></textarea>
+            <p class="text-[10px] text-slate-400 mt-2" data-i18n="bulkImport.hint">Un titre par ligne. Les correspondances sont choisies automatiquement parmi les bases OpenLibrary / Google Books — vérifie et complète ensuite chaque fiche si besoin.</p>
+
+            <div id="bulk-import-progress" class="hidden mt-5">
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="bulk-import-bar" class="h-full bg-[var(--gold-accent)] transition-all" style="width:0%"></div>
+                </div>
+                <p id="bulk-import-status" class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-2 text-center"></p>
+            </div>
+            <div id="bulk-import-results" class="hidden mt-4 max-h-40 overflow-y-auto space-y-1 text-xs"></div>
+
+            <div class="flex gap-3 mt-6">
+                <button id="bulk-import-cancel-btn" onclick="closeBulkImport()" class="flex-1 py-3 text-[10px] font-black uppercase bg-slate-50 rounded-xl" data-i18n="editModal.cancel">Annuler</button>
+                <button id="bulk-import-submit-btn" onclick="runBulkImport()" class="flex-1 py-3 text-[10px] font-black uppercase btn-gold-main rounded-xl" data-i18n="bulkImport.launch">Lancer l'import</button>
+            </div>
         </div>
     </div>
 
@@ -1201,6 +1239,15 @@
                 shelf: { genreColor: "Couleur par genre", customizeSpine: "Personnaliser le dos", color: "Couleur", customColor: "Couleur personnalisée", pattern: "Motif", height: "Hauteur", thickness: "Épaisseur", close: "Fermer" },
                 deco: { plant: "Plante", lamp: "Lampe", candle: "Bougie", globe: "Globe", frame: "Cadre photo", statue: "Statuette", clearAll: "Tout retirer de l'étagère" },
                 fiche: { backToGrid: "Retour Grille", backToLibrary: "Retour Bibliothèque" },
+                bulkImport: {
+                    openBtn: "✨ Import rapide", title: "Import rapide",
+                    intro: "Colle ou écris la liste des livres que tu as déjà lus, un titre par ligne. On va chercher automatiquement la couverture, l'auteur et le genre de chacun. Il ne te restera plus qu'à mettre une note et ton avis dans Mes Fiches.",
+                    placeholder: "Harry Potter à l'école des sorciers\n1984\nLe Petit Prince\n...",
+                    hint: "Un titre par ligne. Les correspondances sont choisies automatiquement parmi les bases OpenLibrary / Google Books — vérifie et complète ensuite chaque fiche si besoin.",
+                    launch: "Lancer l'import",
+                    done: "{n} livre(s) importé(s). Ajoute tes notes et avis dans Mes Fiches !",
+                    doneFull: "{n} livre(s) importé(s), étagère pleine (100/100) : le reste n'a pas pu être ajouté."
+                },
                 msg: {
                     maxRows: "Nombre maximum de rangées atteint.", minRows: "Il doit rester au moins une rangée.",
                     clearDecorConfirm: "Retirer toutes les décorations de l'étagère ?",
@@ -1234,6 +1281,15 @@
                 shelf: { genreColor: "Color by genre", customizeSpine: "Customize spine", color: "Color", customColor: "Custom color", pattern: "Pattern", height: "Height", thickness: "Thickness", close: "Close" },
                 deco: { plant: "Plant", lamp: "Lamp", candle: "Candle", globe: "Globe", frame: "Photo frame", statue: "Statuette", clearAll: "Remove everything from the shelf" },
                 fiche: { backToGrid: "Back to Grid", backToLibrary: "Back to Library" },
+                bulkImport: {
+                    openBtn: "✨ Quick import", title: "Quick import",
+                    intro: "Paste or type the list of books you've already read, one title per line. We'll automatically fetch the cover, author and genre for each. All that's left is to add a rating and your review in My Sheets.",
+                    placeholder: "Harry Potter and the Sorcerer's Stone\n1984\nThe Little Prince\n...",
+                    hint: "One title per line. Matches are picked automatically from the OpenLibrary / Google Books databases — check and complete each entry afterwards if needed.",
+                    launch: "Start import",
+                    done: "{n} book(s) imported. Add your ratings and reviews in My Sheets!",
+                    doneFull: "{n} book(s) imported, shelf full (100/100): the rest could not be added."
+                },
                 msg: {
                     maxRows: "Maximum number of rows reached.", minRows: "At least one row must remain.",
                     clearDecorConfirm: "Remove all decorations from the shelf?",
@@ -1400,7 +1456,7 @@
             if (SHELF_ROW_COUNT >= 8) { alert(t("msg.maxRows")); return; }
             SHELF_ROW_COUNT++;
             renderBookcaseRows();
-            renderShelf(library.filter(b => b.title));
+            renderShelf(getShelfBooks());
             saveShelfSettings();
         };
 
@@ -1430,7 +1486,7 @@
             });
             SHELF_ROW_COUNT--;
             renderBookcaseRows();
-            renderShelf(library.filter(b => b.title));
+            renderShelf(getShelfBooks());
             saveShelfSettings();
             saveShelfPositions();
             saveShelfDecorations();
@@ -1456,7 +1512,7 @@
         window.setGenreColor = (genre, color) => {
             genreColorOverrides[genre] = color;
             saveShelfSettings();
-            renderShelf(library.filter(b => b.title));
+            renderShelf(getShelfBooks());
         };
 
         let shelfPositions = {}; // { [bookId]: { row, x } }
@@ -1933,18 +1989,19 @@
         // Garde shelfPositions synchronisé avec la vraie liste de livres : retire les livres
         // supprimés et place les nouveaux livres à la suite, sans jamais déplacer
         // les emplacements déjà choisis par l'utilisateur.
-        function reconcileShelfPositions(books) {
-            const idSet = new Set(books.map(b => b.id));
+        function reconcileShelfPositions(allBooks, visibleBooks) {
+            visibleBooks = visibleBooks || allBooks;
+            const idSet = new Set(allBooks.map(b => b.id));
             Object.keys(shelfPositions).forEach(id => { if (!idSet.has(parseInt(id))) delete shelfPositions[id]; });
 
             const rowExtent = Array(SHELF_ROW_COUNT).fill(0);
             Object.entries(shelfPositions).forEach(([id, pos]) => {
-                const book = books.find(b => b.id === parseInt(id));
+                const book = allBooks.find(b => b.id === parseInt(id));
                 if (!book) return;
                 rowExtent[pos.row] = Math.max(rowExtent[pos.row], pos.x + spineWidthFor(book));
             });
 
-            books.forEach(b => {
+            visibleBooks.forEach(b => {
                 if (shelfPositions[b.id]) return;
                 let shortest = 0;
                 for (let i = 1; i < SHELF_ROW_COUNT; i++) {
@@ -2057,6 +2114,14 @@
         document.addEventListener('pointerup', onShelfPointerUp);
         document.addEventListener('pointercancel', onShelfPointerCancel);
 
+        function getShelfBooks() {
+            const yearSelect = document.getElementById('filter-year-shelf');
+            const y = yearSelect ? yearSelect.value : 'all';
+            const base = library.filter(b => b.title);
+            if (y === 'all') return base;
+            return base.filter(b => b.end && b.end.includes(y));
+        }
+
         function renderShelf(books) {
             const rowElements = Array.from({ length: SHELF_ROW_COUNT }, (_, i) => document.getElementById(`bookshelf-row-${i}`));
             if (!rowElements[0]) return;
@@ -2068,7 +2133,7 @@
                 return;
             }
 
-            reconcileShelfPositions(books);
+            reconcileShelfPositions(library.filter(b => b.title), books);
             rowElements.forEach(el => { if (el) el.innerHTML = ''; });
 
             books.forEach(b => {
@@ -2288,6 +2353,7 @@
             const currentYear = new Date().getFullYear();
             const yearGrid = document.getElementById('filter-year-grid');
             const yearStats = document.getElementById('filter-year-stats');
+            const yearShelf = document.getElementById('filter-year-shelf');
             for(let y = 2027; y >= 2000; y--) {
                 const optGrid = document.createElement('option');
                 optGrid.value = y; optGrid.innerText = y;
@@ -2297,6 +2363,10 @@
                 optStats.value = y; optStats.innerText = y;
                 if(y === currentYear) optStats.selected = true;
                 yearStats.appendChild(optStats);
+
+                const optShelf = document.createElement('option');
+                optShelf.value = y; optShelf.innerText = y;
+                yearShelf.appendChild(optShelf);
             }
         }
         initYearFilters();
@@ -2534,7 +2604,7 @@
             `).join('') || '<p class="text-[10px] text-slate-400 text-center italic py-4">Aucun bilan pour '+yStatsF+'</p>';
 
             updateChart(statLib);
-            renderShelf(library.filter(b => b.title));
+            renderShelf(getShelfBooks());
 
             // HTML GRILLE
             const nextEmptyBook = library.find(b => !b.title);
@@ -2566,10 +2636,6 @@
                 <div id="fiche-scroll-${book.id}" class="fiche-container">
                     <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
                         <div class="flex items-center gap-4 flex-wrap">
-                            <button onclick="showSection('grille', true)" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent transition-colors">
-                                 ← ${t('fiche.backToGrid')}
-                            </button>
-                            <span class="text-slate-200">|</span>
                             <button onclick="goToBibliotheque()" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent transition-colors">
                                  ← ${t('fiche.backToLibrary')}
                             </button>
@@ -2865,6 +2931,85 @@
             } catch (e) { return []; }
         }
 
+        // Nettoie un titre collé en vrac (tomes, sous-titres entre parenthèses, ponctuation en trop...)
+        // pour donner une meilleure chance de le retrouver dans les bases de données.
+        function cleanTitleForSearch(raw) {
+            return raw
+                .replace(/\(.*?\)/g, ' ')
+                .replace(/\s*[-–—:]\s*(tome|t\.?)\s*\d+.*$/i, '')
+                .replace(/\s*,?\s*(tome|t\.?)\s*\d+.*$/i, '')
+                .replace(/["""'']/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        // Normalise un titre pour comparaison (minuscules, sans accents, sans ponctuation)
+        function normalizeTitle(s) {
+            return (s || '')
+                .toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        // Score de 0 à 1 : à quel point le titre trouvé ressemble au titre cherché
+        function titleSimilarity(a, b) {
+            const na = normalizeTitle(a), nb = normalizeTitle(b);
+            if (!na || !nb) return 0;
+            if (na === nb) return 1;
+            if (na.startsWith(nb) || nb.startsWith(na)) return 0.85;
+            const wa = new Set(na.split(' ').filter(w => w.length > 1));
+            const wb = new Set(nb.split(' ').filter(w => w.length > 1));
+            if (!wa.size || !wb.size) return 0;
+            const common = [...wa].filter(w => wb.has(w)).length;
+            const union = new Set([...wa, ...wb]).size;
+            return union ? common / union : 0;
+        }
+
+        // Cherche un livre sur plusieurs requêtes (titre brut, puis titre nettoyé si besoin)
+        // et sur les deux bases (OpenLibrary + Google Books). Choisit le résultat dont le
+        // titre ressemble le plus à ce qui a été cherché — pas juste le premier qui a une image.
+        async function findBestBookMatch(rawTitle) {
+            const cleaned = cleanTitleForSearch(rawTitle);
+            const queries = [...new Set([rawTitle.trim(), cleaned].filter(q => q))];
+            let candidates = [];
+
+            for (const q of queries) {
+                try {
+                    const olRes = await searchOpenLibrary(q);
+                    candidates.push(...olRes);
+                } catch (e) { /* pas grave, on tente la suite */ }
+                if (candidates.some(c => titleSimilarity(rawTitle, c.title) >= 0.85)) break;
+
+                await new Promise(r => setTimeout(r, 120));
+
+                try {
+                    const gbRes = await searchGoogleBooks(q);
+                    candidates.push(...gbRes);
+                } catch (e) { /* pas grave, on tente la suite */ }
+                if (candidates.some(c => titleSimilarity(rawTitle, c.title) >= 0.85)) break;
+
+                await new Promise(r => setTimeout(r, 120));
+            }
+
+            if (!candidates.length) return null;
+
+            const scored = candidates.map(c => {
+                const sim = titleSimilarity(rawTitle, c.title);
+                let score = sim * 10;
+                if (c.cover) score += 1;
+                if (c.hasFrenchEdition) score += 0.3;
+                return { c, sim, score };
+            }).sort((a, b) => b.score - a.score);
+
+            const best = scored[0];
+            // Si même le meilleur résultat ne ressemble pas assez au titre cherché,
+            // mieux vaut ne pas se tromper de livre que d'ajouter une mauvaise couverture.
+            if (best.sim < 0.35) return null;
+            return best.c;
+        }
+
         function renderSuggestions(items, query, dropdown) {
             titleSuggestions = items;
             if (titleSuggestions.length === 0) {
@@ -2909,6 +3054,93 @@
                 if (dropdown) dropdown.classList.add('hidden');
             }
         });
+        // --- IMPORT RAPIDE (liste de titres → fiches auto-remplies) ---
+        window.openBulkImport = () => {
+            document.getElementById('bulk-import-textarea').value = '';
+            document.getElementById('bulk-import-progress').classList.add('hidden');
+            document.getElementById('bulk-import-results').classList.add('hidden');
+            document.getElementById('bulk-import-results').innerHTML = '';
+            document.getElementById('bulk-import-bar').style.width = '0%';
+            document.getElementById('bulk-import-cancel-btn').classList.remove('hidden');
+            const submitBtn = document.getElementById('bulk-import-submit-btn');
+            submitBtn.setAttribute('data-i18n', 'bulkImport.launch');
+            submitBtn.textContent = t('bulkImport.launch');
+            submitBtn.onclick = runBulkImport;
+            document.getElementById('bulk-import-modal').classList.remove('hidden');
+        };
+        window.closeBulkImport = () => document.getElementById('bulk-import-modal').classList.add('hidden');
+
+        window.runBulkImport = async () => {
+            const raw = document.getElementById('bulk-import-textarea').value;
+            const titles = [...new Set(raw.split('\n').map(l => l.trim()).filter(l => l.length > 0))];
+            if (!titles.length) return;
+
+            const submitBtn = document.getElementById('bulk-import-submit-btn');
+            const cancelBtn = document.getElementById('bulk-import-cancel-btn');
+            const progress = document.getElementById('bulk-import-progress');
+            const bar = document.getElementById('bulk-import-bar');
+            const status = document.getElementById('bulk-import-status');
+            const results = document.getElementById('bulk-import-results');
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'pointer-events-none');
+            cancelBtn.classList.add('hidden');
+            progress.classList.remove('hidden');
+            results.classList.remove('hidden');
+            results.innerHTML = '';
+
+            let done = 0, added = 0, slotsFull = false;
+            for (const rawTitle of titles) {
+                status.textContent = `${done + 1} / ${titles.length}`;
+                const slot = library.find(b => !b.title);
+                if (!slot) { slotsFull = true; break; }
+
+                let match = null;
+                try {
+                    match = await findBestBookMatch(rawTitle);
+                } catch (err) { match = null; }
+
+                slot.title = match?.title || rawTitle;
+                slot.author = match?.author || '';
+                slot.cover = match?.cover || '';
+                slot.genre = match?.genre || '';
+                slot.year = match?.year || '';
+                slot.summary = match?.summary || '';
+                slot.format = slot.format || '-';
+                slot.lang = slot.lang || '';
+                slot.start = ''; slot.end = ''; slot.comment = ''; slot.rating = 0;
+                slot.isFavorite = false; slot.isBookClub = false;
+                added++;
+
+                results.insertAdjacentHTML('beforeend', `
+                    <div class="flex items-center gap-2 py-1">
+                        ${slot.cover ? `<img src="${slot.cover}" class="w-5 h-7 object-cover rounded shadow-sm shrink-0">` : '<div class="w-5 h-7 bg-slate-100 rounded shrink-0"></div>'}
+                        <span class="truncate flex-1">${slot.title}</span>
+                        <span class="text-[10px] shrink-0">${match ? '✅' : '⚠️'}</span>
+                    </div>
+                `);
+                results.scrollTop = results.scrollHeight;
+
+                done++;
+                bar.style.width = Math.round((done / titles.length) * 100) + '%';
+                await new Promise(r => setTimeout(r, 150));
+            }
+
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            updateFilterOptions();
+            render();
+
+            status.textContent = slotsFull
+                ? t('bulkImport.doneFull').replace('{n}', added)
+                : t('bulkImport.done').replace('{n}', added);
+
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'pointer-events-none');
+            submitBtn.setAttribute('data-i18n', 'shelf.close');
+            submitBtn.textContent = t('shelf.close');
+            submitBtn.onclick = closeBulkImport;
+        };
+
         window.deleteBook = async (id) => {
             if (!confirm(t("msg.deleteConfirm"))) return;
             const idx = library.findIndex(b => b.id === id);
