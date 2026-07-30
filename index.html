@@ -2378,7 +2378,7 @@
             animation: 150,
             ghostClass: 'sortable-ghost',
             filter: '.add-card',
-            preventOnFilter: true,
+            preventOnFilter: false,
             onEnd: async function () {
                 const newOrder = Array.from(gridEl.children)
                     .filter(el => el.dataset.id !== 'new')
