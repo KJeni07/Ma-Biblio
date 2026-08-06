@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Biblio 100 - Édition Prestige</title>
+    <title>Ma Biblio 100</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Ma Biblio">
@@ -488,8 +488,7 @@
             border-radius: 14px;
             padding: 22px 16px 16px;
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            overflow: hidden;
         }
         html.dark .bookcase {
             background:
@@ -499,13 +498,13 @@
             border-color: rgba(197, 160, 89, 0.25);
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.35);
         }
-        .bookshelf-row-wrap { margin-bottom: 22px; min-width: 900px; }
+        #bookcase-scaler { transform-origin: top left; }
+        .bookshelf-row-wrap { margin-bottom: 22px; }
         .bookshelf-row-wrap.bookshelf-row-wrap-last { margin-bottom: 4px; }
         .bookshelf-row {
             position: relative;
             height: 108px;
             padding: 4px 2px 0;
-            min-width: 900px;
         }
         .bookshelf-ledge {
             height: 10px;
@@ -513,7 +512,6 @@
             background: linear-gradient(180deg, #9c7040, #664020);
             border-radius: 0 0 5px 5px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
-            min-width: 900px;
         }
         .shelf-spine {
             border-radius: 4px 6px 2px 2px;
@@ -1445,13 +1443,13 @@
         function renderBookcaseRows() {
             const bookcase = document.getElementById('bookcase-container');
             if (!bookcase) return;
-            bookcase.innerHTML = Array.from({ length: SHELF_ROW_COUNT }, (_, i) => `
+            bookcase.innerHTML = `<div id="bookcase-scaler">${Array.from({ length: SHELF_ROW_COUNT }, (_, i) => `
                 <div class="bookshelf-row-wrap group relative ${i === SHELF_ROW_COUNT - 1 ? 'bookshelf-row-wrap-last' : ''}">
                     <button onclick="removeShelfRow(${i})" class="absolute -top-1 -right-1 z-10 w-6 h-6 rounded-full bg-white border border-red-200 text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 flex items-center justify-center shadow-sm" title="Supprimer cette rangée">×</button>
                     <div id="bookshelf-row-${i}" class="bookshelf-row" data-row="${i}"></div>
                     <div class="bookshelf-ledge"></div>
                 </div>
-            `).join('');
+            `).join('')}</div>`;
         }
 
         window.addShelfRow = () => {
@@ -2024,7 +2022,7 @@
                 if (activeShelfDrag) return;
                 activeShelfDrag = {
                     el, item, kind,
-                    dragOffsetX: e.clientX - el.getBoundingClientRect().left,
+                    dragOffsetX: (e.clientX - el.getBoundingClientRect().left) / currentShelfScale,
                     startX: e.clientX, startY: e.clientY,
                     moved: false,
                     lastLeft: parseFloat(el.style.left) || 0,
@@ -2062,9 +2060,10 @@
             if (targetRowEl !== el.parentElement) targetRowEl.appendChild(el);
 
             const rowRect = targetRowEl.getBoundingClientRect();
+            const rowWidth = targetRowEl.offsetWidth;
             const width = el.offsetWidth;
-            let newLeft = e.clientX - rowRect.left - drag.dragOffsetX;
-            newLeft = Math.max(0, Math.min(rowRect.width - width, newLeft));
+            let newLeft = (e.clientX - rowRect.left) / currentShelfScale - drag.dragOffsetX;
+            newLeft = Math.max(0, Math.min(rowWidth - width, newLeft));
 
             // Empêche le chevauchement avec les autres livres de la rangée
             const siblings = Array.from(targetRowEl.children).filter(c => c !== el && c.classList.contains('shelf-spine'));
@@ -2076,7 +2075,7 @@
                     newLeft = (drag.lastLeft <= sLeft) ? (sLeft - width) : sRight;
                 }
             });
-            newLeft = Math.max(0, Math.min(rowRect.width - width, newLeft));
+            newLeft = Math.max(0, Math.min(rowWidth - width, newLeft));
             el.style.left = newLeft + 'px';
             drag.lastLeft = newLeft;
         }
@@ -2163,18 +2162,34 @@
             updateBookcaseWidth();
         }
 
+        let currentShelfScale = 1;
+
         function updateBookcaseWidth() {
             const bookcase = document.getElementById('bookcase-container');
-            if (!bookcase) return;
-            let maxRight = 900;
-            bookcase.querySelectorAll('.shelf-spine, .shelf-decoration').forEach(el => {
+            const scaler = document.getElementById('bookcase-scaler');
+            if (!bookcase || !scaler) return;
+            let maxRight = 0;
+            scaler.querySelectorAll('.shelf-spine, .shelf-decoration').forEach(el => {
                 const left = parseFloat(el.style.left) || 0;
                 const width = el.offsetWidth || 104;
-                maxRight = Math.max(maxRight, left + width + 40);
+                maxRight = Math.max(maxRight, left + width + 20);
             });
-            document.querySelectorAll('.bookshelf-row, .bookshelf-ledge, .bookshelf-row-wrap').forEach(el => {
-                el.style.minWidth = maxRight + 'px';
-            });
+            if (maxRight === 0) { scaler.style.transform = 'none'; scaler.style.height = 'auto'; currentShelfScale = 1; return; }
+
+            const availableWidth = bookcase.clientWidth - 32;
+            const naturalHeight = scaler.scrollHeight || scaler.offsetHeight;
+            if (maxRight > availableWidth) {
+                const scale = availableWidth / maxRight;
+                scaler.style.transform = `scale(${scale})`;
+                scaler.style.width = maxRight + 'px';
+                bookcase.style.height = (naturalHeight * scale + 38) + 'px';
+                currentShelfScale = scale;
+            } else {
+                scaler.style.transform = 'none';
+                scaler.style.width = 'auto';
+                bookcase.style.height = 'auto';
+                currentShelfScale = 1;
+            }
         }
 
         // --- PSEUDO (unique) ---
