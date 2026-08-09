@@ -1863,7 +1863,7 @@
         function spineHTML(b) {
             const width = spineWidthFor(b);
             const height = spineHeightFor(b);
-            const initialColor = b.shelfColor || genreColor(b.genre) || (b.cover ? (shelfColorCache[b.cover] || '#c9c2b4') : hashColor(b.title || String(b.id)));
+            const initialColor = b.shelfColor || (b.cover ? (shelfColorCache[b.cover] || genreColor(b.genre) || '#c9c2b4') : (genreColor(b.genre) || hashColor(b.title || String(b.id))));
             const safeTitle = (b.title || '').replace(/"/g, '&quot;');
             const pattern = (b.shelfPattern !== undefined && b.shelfPattern !== null) ? b.shelfPattern : SPINE_PATTERNS[Math.abs(b.id * 13) % SPINE_PATTERNS.length];
             const textClass = textColorFor(initialColor) === 'dark' ? 'spine-text-dark' : 'spine-text-light';
@@ -2163,7 +2163,7 @@
             });
 
             books.forEach(b => {
-                if (b.shelfColor || genreColor(b.genre) || !b.cover || shelfColorCache[b.cover]) return;
+                if (b.shelfColor || !b.cover || shelfColorCache[b.cover]) return;
                 getAverageColor(b.cover).then(color => {
                     const finalColor = color || hashColor(b.title || String(b.id));
                     shelfColorCache[b.cover] = finalColor;
