@@ -1121,8 +1121,22 @@
                 <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.coverUrl">URL Couverture</label><input id="in-cover" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.format">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre" data-i18n="editModal.formatBook">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.language">Langue</label><input id="in-lang" class="modal-input"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.start">Début (ex: 01/05/2025)</label><input id="in-start" class="modal-input" placeholder="JJ/MM/AAAA"></div>
-                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.end">Fin (ex: 15/05/2025)</label><input id="in-end" class="modal-input" placeholder="JJ/MM/AAAA"></div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.start">Début (ex: 01/05/2025)</label>
+                    <div class="relative">
+                        <input id="in-start" class="modal-input pr-10" placeholder="JJ/MM/AAAA">
+                        <button type="button" onclick="openDatePicker('in-start')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gold-accent" title="Choisir une date">📅</button>
+                        <input type="date" id="in-start-picker" class="absolute opacity-0 w-0 h-0 pointer-events-none" onchange="applyPickedDate('in-start', this.value)">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.end">Fin (ex: 15/05/2025)</label>
+                    <div class="relative">
+                        <input id="in-end" class="modal-input pr-10" placeholder="JJ/MM/AAAA">
+                        <button type="button" onclick="openDatePicker('in-end')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gold-accent" title="Choisir une date">📅</button>
+                        <input type="date" id="in-end-picker" class="absolute opacity-0 w-0 h-0 pointer-events-none" onchange="applyPickedDate('in-end', this.value)">
+                    </div>
+                </div>
             </div>
             <textarea id="in-summary" class="modal-input h-24" data-i18n-placeholder="editModal.summaryPlaceholder" placeholder="Résumé..."></textarea>
             <textarea id="in-comment" class="modal-input h-24" data-i18n-placeholder="editModal.commentPlaceholder" placeholder="Mon avis..."></textarea>
@@ -2066,7 +2080,7 @@
             newLeft = Math.max(0, Math.min(rowWidth - width, newLeft));
 
             // Empêche le chevauchement avec les autres livres de la rangée
-            const siblings = Array.from(targetRowEl.children).filter(c => c !== el && c.classList.contains('shelf-spine'));
+            const siblings = Array.from(targetRowEl.children).filter(c => c !== el && (c.classList.contains('shelf-spine') || c.classList.contains('shelf-decoration')));
             siblings.forEach(sib => {
                 const sLeft = parseFloat(sib.style.left) || 0;
                 const sRight = sLeft + sib.offsetWidth;
@@ -2801,13 +2815,39 @@
             authorSelect.value = authors.includes(currentAuthor) ? currentAuthor : 'all';
         };
 
+        function normalizeDateInput(value) {
+            if (!value) return value;
+            const m = value.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+            if (!m) return value;
+            let [, d, mo, y] = m;
+            if (y.length === 2) y = (parseInt(y) <= 49 ? '20' : '19') + y;
+            return `${d.padStart(2,'0')}/${mo.padStart(2,'0')}/${y}`;
+        }
+
+        window.openDatePicker = (fieldId) => {
+            const textVal = document.getElementById(fieldId).value.trim();
+            const picker = document.getElementById(fieldId + '-picker');
+            const m = normalizeDateInput(textVal || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (m) picker.value = `${m[3]}-${m[2]}-${m[1]}`;
+            if (picker.showPicker) picker.showPicker(); else picker.click();
+        };
+
+        window.applyPickedDate = (fieldId, isoValue) => {
+            if (!isoValue) return;
+            const [y, mo, d] = isoValue.split('-');
+            document.getElementById(fieldId).value = `${d}/${mo}/${y}`;
+        };
+
         window.saveToFirebase = async () => {
             const id = parseInt(document.getElementById('modal-id').innerText);
             const idx = library.findIndex(b => b.id === id);
             const currentFav = library[idx].isFavorite || false;
             const currentBookClub = library[idx].isBookClub || false;
 
-            library[idx] = { id, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, year: document.getElementById('in-year').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: document.getElementById('in-start').value, end: document.getElementById('in-end').value, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav, isBookClub: currentBookClub };
+            const startDate = normalizeDateInput(document.getElementById('in-start').value);
+            const endDate = normalizeDateInput(document.getElementById('in-end').value);
+
+            library[idx] = { id, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, year: document.getElementById('in-year').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: startDate, end: endDate, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav, isBookClub: currentBookClub };
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             updateFilterOptions(); render(); closeModal();
         };
