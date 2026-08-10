@@ -1782,17 +1782,28 @@
                 img.referrerPolicy = 'no-referrer';
                 img.onload = () => {
                     try {
-                        const size = 10;
+                        const size = 12;
                         const canvas = document.createElement('canvas');
                         canvas.width = size; canvas.height = size;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, size, size);
                         const data = ctx.getImageData(0, 0, size, size).data;
-                        let r = 0, g = 0, b = 0, count = 0;
-                        for (let i = 0; i < data.length; i += 4) {
-                            r += data[i]; g += data[i + 1]; b += data[i + 2]; count++;
-                        }
-                        resolve(`rgb(${Math.round(r / count)}, ${Math.round(g / count)}, ${Math.round(b / count)})`);
+
+                        const zoneAvg = (rowStart, rowEnd) => {
+                            let r = 0, g = 0, b = 0, count = 0;
+                            for (let y = rowStart; y < rowEnd; y++) {
+                                for (let x = 0; x < size; x++) {
+                                    const i = (y * size + x) * 4;
+                                    r += data[i]; g += data[i + 1]; b += data[i + 2]; count++;
+                                }
+                            }
+                            return `rgb(${Math.round(r / count)}, ${Math.round(g / count)}, ${Math.round(b / count)})`;
+                        };
+
+                        const top = zoneAvg(0, Math.floor(size / 2));
+                        const bottom = zoneAvg(Math.floor(size / 2), size);
+                        const full = zoneAvg(0, size);
+                        resolve({ solid: full, gradient: `linear-gradient(180deg, ${top}, ${bottom})` });
                     } catch (e) {
                         resolve(null);
                     }
@@ -1860,14 +1871,19 @@
         }
 
         const SPINE_PATTERNS = ['', 'spine-pattern-dots', 'spine-pattern-stripes', 'spine-pattern-chevron', 'spine-pattern-hearts', 'spine-pattern-arch'];
+        const shelfColorStatus = {}; // 'pending' | couleur calculée | 'failed', cache par URL de couverture
+
         function spineHTML(b) {
             const width = spineWidthFor(b);
             const height = spineHeightFor(b);
-            const initialColor = b.shelfColor || (b.cover ? (shelfColorCache[b.cover] || genreColor(b.genre) || '#c9c2b4') : (genreColor(b.genre) || hashColor(b.title || String(b.id))));
+            const coverColor = b.cover ? shelfColorStatus[b.cover] : null;
+            const hasResolvedColor = coverColor && coverColor !== 'pending' && coverColor !== 'failed';
+            const solidColor = b.shelfColor || (hasResolvedColor ? coverColor.solid : (genreColor(b.genre) || hashColor(b.title || String(b.id))));
+            const backgroundValue = (!b.shelfColor && hasResolvedColor) ? coverColor.gradient : solidColor;
             const safeTitle = (b.title || '').replace(/"/g, '&quot;');
             const pattern = (b.shelfPattern !== undefined && b.shelfPattern !== null) ? b.shelfPattern : SPINE_PATTERNS[Math.abs(b.id * 13) % SPINE_PATTERNS.length];
-            const textClass = textColorFor(initialColor) === 'dark' ? 'spine-text-dark' : 'spine-text-light';
-            return `<div class="shelf-spine ${pattern} ${textClass}" data-id="${b.id}" style="width:${width}px; height:${height}px; --spine-color:${initialColor};">
+            const textClass = textColorFor(solidColor) === 'dark' ? 'spine-text-dark' : 'spine-text-light';
+            return `<div class="shelf-spine ${pattern} ${textClass}" data-id="${b.id}" style="width:${width}px; height:${height}px; --spine-color:${solidColor}; background:${backgroundValue};">
                 <div class="spine-label"><span class="shelf-spine-title">${safeTitle}</span></div>
             </div>`;
         }
@@ -2163,12 +2179,17 @@
             });
 
             books.forEach(b => {
-                if (b.shelfColor || !b.cover || shelfColorCache[b.cover]) return;
-                getAverageColor(b.cover).then(color => {
-                    const finalColor = color || hashColor(b.title || String(b.id));
-                    shelfColorCache[b.cover] = finalColor;
+                if (!b.cover || b.shelfColor || shelfColorStatus[b.cover]) return;
+                shelfColorStatus[b.cover] = 'pending';
+                getAverageColor(b.cover).then(result => {
+                    shelfColorStatus[b.cover] = result || 'failed';
+                    if (!result) return;
                     const el = document.querySelector(`.shelf-spine[data-id="${b.id}"]`);
-                    if (el) { el.style.setProperty('--spine-color', finalColor); applySpineTextColor(el, finalColor); }
+                    if (el) {
+                        el.style.setProperty('--spine-color', result.solid);
+                        el.style.background = result.gradient;
+                        applySpineTextColor(el, result.solid);
+                    }
                 });
             });
 
