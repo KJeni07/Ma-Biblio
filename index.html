@@ -1782,28 +1782,33 @@
                 img.referrerPolicy = 'no-referrer';
                 img.onload = () => {
                     try {
-                        const size = 12;
+                        const size = 24;
                         const canvas = document.createElement('canvas');
                         canvas.width = size; canvas.height = size;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, size, size);
                         const data = ctx.getImageData(0, 0, size, size).data;
 
-                        const zoneAvg = (rowStart, rowEnd) => {
-                            let r = 0, g = 0, b = 0, count = 0;
-                            for (let y = rowStart; y < rowEnd; y++) {
-                                for (let x = 0; x < size; x++) {
-                                    const i = (y * size + x) * 4;
-                                    r += data[i]; g += data[i + 1]; b += data[i + 2]; count++;
-                                }
-                            }
-                            return `rgb(${Math.round(r / count)}, ${Math.round(g / count)}, ${Math.round(b / count)})`;
-                        };
+                        // Regroupe les pixels par teinte proche (quantification) pour trouver les couleurs dominantes
+                        const buckets = {};
+                        const step = 32;
+                        for (let i = 0; i < data.length; i += 4) {
+                            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+                            if (a < 100) continue; // ignore le transparent
+                            const key = [Math.round(r / step), Math.round(g / step), Math.round(b / step)].join(',');
+                            if (!buckets[key]) buckets[key] = { r: 0, g: 0, b: 0, count: 0 };
+                            buckets[key].r += r; buckets[key].g += g; buckets[key].b += b; buckets[key].count++;
+                        }
+                        const sorted = Object.values(buckets).sort((a, c) => c.count - a.count);
+                        if (sorted.length === 0) { resolve(null); return; }
 
-                        const top = zoneAvg(0, Math.floor(size / 2));
-                        const bottom = zoneAvg(Math.floor(size / 2), size);
-                        const full = zoneAvg(0, size);
-                        resolve({ solid: full, gradient: `linear-gradient(180deg, ${top}, ${bottom})` });
+                        const toRgb = (bucket) => `rgb(${Math.round(bucket.r / bucket.count)}, ${Math.round(bucket.g / bucket.count)}, ${Math.round(bucket.b / bucket.count)})`;
+                        const first = sorted[0];
+                        const second = sorted.find(b2 => Math.abs(b2.r / b2.count - first.r / first.count) + Math.abs(b2.g / b2.count - first.g / first.count) + Math.abs(b2.b / b2.count - first.b / first.count) > 60) || sorted[1] || sorted[0];
+
+                        const color1 = toRgb(first);
+                        const color2 = toRgb(second);
+                        resolve({ solid: color1, gradient: `linear-gradient(135deg, ${color1}, ${color2})` });
                     } catch (e) {
                         resolve(null);
                     }
