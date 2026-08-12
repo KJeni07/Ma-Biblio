@@ -1814,7 +1814,9 @@
                     }
                 };
                 img.onerror = () => resolve(null);
-                img.src = imgUrl;
+                // On passe par un service gratuit qui ré-expose l'image avec les autorisations nécessaires
+                // pour pouvoir en lire les couleurs (la couverture d'origine, elle, ne les fournit pas toujours).
+                img.src = 'https://wsrv.nl/?url=' + encodeURIComponent(imgUrl) + '&w=48&h=48&fit=cover';
             });
         }
 
