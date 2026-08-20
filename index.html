@@ -312,6 +312,12 @@
         .star-filled { color: var(--gold-accent); }
         .star-empty { color: #cbd5e1; }
         html.dark .star-empty { color: #4b4b4b; }
+        .star-half { position: relative; display: inline-block; line-height: 1; }
+        .star-half .star-half-overlay {
+            position: absolute; top: 0; left: 0;
+            width: 50%; overflow: hidden;
+            display: inline-block; white-space: nowrap;
+        }
         .btn-gold-main { background-color: var(--gold-accent); color: white; transition: all 0.2s; }
         .btn-gold-main:hover { background-color: #A68548; }
         
@@ -600,6 +606,7 @@
         .decoration-svg { display: block; line-height: 0; }
         .decoration-emoji.decoration-svg svg { display: block; width: 104px; height: 104px; position: relative; z-index: 1; }
         .deco-statue .decoration-emoji.decoration-svg svg { width: 52px; height: 71px; }
+        .decoration-ai-img { display: block; width: 90px; height: 90px; object-fit: contain; filter: drop-shadow(1px 3px 2px rgba(0,0,0,0.25)); }
         .shelf-spine.dragging { cursor: grabbing; transition: none; z-index: 50; user-select: none; }
         .spine-cap { display: none; }
         .spine-label {
@@ -768,6 +775,10 @@
                     <input type="password" id="password" required class="modal-input !mb-0" placeholder="••••••••">
                     <button type="button" onclick="handleForgotPassword()" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-gold-accent mt-2" data-i18n="auth.forgotPassword">Mot de passe oublié ?</button>
                 </div>
+                <label class="flex items-center gap-2 mt-4 cursor-pointer select-none">
+                    <input type="checkbox" id="remember-me" checked class="w-4 h-4 rounded accent-[var(--gold-accent)] cursor-pointer">
+                    <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest" data-i18n="auth.rememberMe">Rester connecté</span>
+                </label>
                 <button type="submit" id="auth-submit-btn" class="w-full py-4 btn-gold-main rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg mt-4" data-i18n="auth.openCollection">Ouvrir ma collection</button>
             </form>
             <p id="auth-error" class="text-red-500 text-[11px] mt-4 font-bold uppercase hidden"></p>
@@ -1200,13 +1211,28 @@
                 <button onclick="addShelfDecoration('🖼️', 'frame')" class="decoration-picker-btn"><span class="decoration-svg" style="width:26px; height:26px;"><svg viewBox="0 0 64 64" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="48" height="48" rx="2" fill="#161616"/><rect x="14" y="14" width="36" height="36" fill="#ecdfbb"/><g transform="translate(15,15) scale(0.5625)"><path d="M17,6 C19,3 22,3 23,6 L26,14 C29,12 33,12 36,14 L38,6 C39,3 42,3 44,6 C46,10 44,15 41,17 C45,22 47,29 46,36 C45,44 40,50 33,53 C36,55 37,58 35,60 L14,60 C10,60 6,58 5,54 C4,50 6,46 10,45 C7,40 6,33 8,27 C10,20 14,16 19,14 C16,12 15,9 17,6 Z" fill="#161616"/><line x1="1" y1="21" x2="14" y2="24" stroke="#161616" stroke-width="1.4"/><line x1="1" y1="27" x2="14" y2="27" stroke="#161616" stroke-width="1.4"/><path d="M33,53 C40,50 46,44 48,36 C49,32 48,28 46,26" stroke="#161616" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="45" cy="30" r="7" fill="#161616"/><circle cx="57" cy="30" r="7" fill="#161616"/><polygon points="37,33 65,33 51,48" fill="#161616"/></g><rect x="26" y="56" width="12" height="3" rx="1" fill="#161616"/></svg></span><span class="decoration-picker-label" data-i18n="deco.frame">Cadre photo</span></button>
                 <button onclick="addShelfDecoration('🗿', 'statue')" class="decoration-picker-btn"><span class="decoration-svg" style="width:16px; height:22px;"><svg viewBox="0 0 44 60" width="16" height="22" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="marbleGradPrev" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f7f2e6"/><stop offset="55%" stop-color="#e7dcc2"/><stop offset="100%" stop-color="#cdbd98"/></linearGradient></defs><rect x="10" y="52" width="24" height="6" rx="1" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><path d="M22,13 C13,13 8,22 8,33 C8,44 13,52 22,52 C31,52 36,44 36,33 C36,22 31,13 22,13 Z" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><path d="M14,16 L18,7 L22,16 Z" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><path d="M30,16 L26,7 L22,16 Z" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><circle cx="16" cy="28" r="5.4" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><circle cx="28" cy="28" r="5.4" fill="url(#marbleGradPrev)" stroke="#b8a67d" stroke-width="1"/><circle cx="16" cy="28" r="1.9" fill="#a68f66"/><circle cx="28" cy="28" r="1.9" fill="#a68f66"/><path d="M20,34 L24,34 L22,38 Z" fill="#cdbd98" stroke="#b8a67d" stroke-width="0.6"/></svg></span><span class="decoration-picker-label" data-i18n="deco.statue">Statuette</span></button>
             </div>
+            <div class="mt-4 pt-4 border-t border-slate-100">
+                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-2" data-i18n="deco.customLabel">Ou décris l'objet que tu veux</p>
+                <div class="flex gap-2">
+                    <input id="custom-deco-input" type="text" placeholder="ex: petit vase bleu avec des fleurs" data-i18n-placeholder="deco.customPlaceholder" class="modal-input !mb-0 flex-1" onkeydown="if(event.key==='Enter'){event.preventDefault(); generateCustomDecoration();}">
+                    <button id="custom-deco-generate-btn" onclick="generateCustomDecoration()" class="px-4 py-2 rounded-lg bg-[var(--gold-accent)] text-white text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap" data-i18n="deco.customGenerate">Générer</button>
+                </div>
+                <div id="custom-deco-preview" class="hidden mt-3 flex flex-col items-center gap-2">
+                    <img id="custom-deco-preview-img" class="w-24 h-24 object-contain rounded" style="background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%); background-size: 12px 12px; background-position: 0 0, 0 6px, 6px -6px, -6px 0px;" alt="">
+                    <div class="flex gap-2">
+                        <button onclick="addGeneratedDecoration()" class="px-4 py-1.5 rounded-full bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest hover:opacity-90" data-i18n="deco.customUse">Utiliser celle-ci</button>
+                        <button onclick="generateCustomDecoration()" class="px-4 py-1.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-widest hover:bg-slate-200" data-i18n="deco.customRetry">Réessayer</button>
+                    </div>
+                </div>
+                <p class="text-[9px] text-slate-400 mt-2 leading-relaxed" data-i18n="deco.customHint">Généré par une IA d'illustration (Pollinations.AI, gratuite). Le résultat peut varier, n'hésite pas à réessayer ou reformuler.</p>
+            </div>
             <button onclick="clearAllShelfDecorations()" class="mt-4 w-full text-center text-[10px] font-bold uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors" data-i18n="deco.clearAll">Tout retirer de l'étagère</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, runTransaction, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -1237,7 +1263,7 @@
                 dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", readingPace: "Rythme de lecture (Livres par mois en", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée" },
                 account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
                 colors: { gold: "Doré", burgundy: "Bordeaux", forestGreen: "Vert forêt", navyBlue: "Bleu marine", terracotta: "Terracotta", plum: "Prune", anthracite: "Anthracite", custom: "Couleur personnalisée" },
-                auth: { backToHome: "← Retour à l'accueil", memberLogin: "Connexion Membre", memberSignup: "Création de Compte", emailAddress: "Adresse Email", password: "Mot de passe", forgotPassword: "Mot de passe oublié ?", openCollection: "Ouvrir ma collection", or: "ou", continueGoogle: "Continuer avec Google", noAccount: "Pas encore de compte ? S'inscrire", haveAccount: "Déjà un compte ? Se connecter" },
+                auth: { backToHome: "← Retour à l'accueil", memberLogin: "Connexion Membre", memberSignup: "Création de Compte", emailAddress: "Adresse Email", password: "Mot de passe", forgotPassword: "Mot de passe oublié ?", rememberMe: "Rester connecté", openCollection: "Ouvrir ma collection", or: "ou", continueGoogle: "Continuer avec Google", noAccount: "Pas encore de compte ? S'inscrire", haveAccount: "Déjà un compte ? Se connecter" },
                 landing: {
                     login: "Connexion", login2: "Se connecter",
                     heroTitle: "Ta bibliothèque personnelle,<br>enfin <span style=\"color: var(--gold-accent)\">bien rangée</span>.",
@@ -1251,7 +1277,7 @@
                 onboard: { title: "Choisis ton pseudo", body: "Il sera unique et te permettra d'être identifié(e) sur Ma Biblio.", placeholder: "ex: jeni_lit", later: "Plus tard" },
                 editModal: { title: "Modifier la Fiche #", autofill: "Remplissage Automatique", titlePlaceholder: "Commence à taper un titre...", authorPlaceholder: "Auteur...", autofillHint: "Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.", genre: "Genre", releaseYear: "Année de sortie", rating: "Note", coverUrl: "URL Couverture", format: "Format", formatBook: "Livre", language: "Langue", start: "Début (ex: 01/05/2025)", end: "Fin (ex: 15/05/2025)", summaryPlaceholder: "Résumé...", commentPlaceholder: "Mon avis...", cancel: "Annuler", save: "Enregistrer" },
                 shelf: { genreColor: "Couleur par genre", customizeSpine: "Personnaliser le dos", color: "Couleur", customColor: "Couleur personnalisée", pattern: "Motif", height: "Hauteur", thickness: "Épaisseur", close: "Fermer" },
-                deco: { plant: "Plante", lamp: "Lampe", candle: "Bougie", globe: "Globe", frame: "Cadre photo", statue: "Statuette", clearAll: "Tout retirer de l'étagère" },
+                deco: { plant: "Plante", lamp: "Lampe", candle: "Bougie", globe: "Globe", frame: "Cadre photo", statue: "Statuette", clearAll: "Tout retirer de l'étagère", customLabel: "Ou décris l'objet que tu veux", customPlaceholder: "ex: petit vase bleu avec des fleurs", customGenerate: "Générer", customUse: "Utiliser celle-ci", customRetry: "Réessayer", customError: "La génération a échoué, réessaie dans un instant.", customHint: "Généré par une IA d'illustration (Pollinations.AI, gratuite). Le résultat peut varier, n'hésite pas à réessayer ou reformuler." },
                 fiche: { backToGrid: "Retour Grille", backToLibrary: "Retour Bibliothèque" },
                 bulkImport: {
                     openBtn: "✨ Import rapide", title: "Import rapide",
@@ -1279,7 +1305,7 @@
                 dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", readingPace: "Reading pace (Books per month in", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row" },
                 account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
                 colors: { gold: "Gold", burgundy: "Burgundy", forestGreen: "Forest green", navyBlue: "Navy blue", terracotta: "Terracotta", plum: "Plum", anthracite: "Anthracite", custom: "Custom color" },
-                auth: { backToHome: "← Back to home", memberLogin: "Member Login", memberSignup: "Create Account", emailAddress: "Email Address", password: "Password", forgotPassword: "Forgot password?", openCollection: "Open my collection", or: "or", continueGoogle: "Continue with Google", noAccount: "No account yet? Sign up", haveAccount: "Already have an account? Log in" },
+                auth: { backToHome: "← Back to home", memberLogin: "Member Login", memberSignup: "Create Account", emailAddress: "Email Address", password: "Password", forgotPassword: "Forgot password?", rememberMe: "Stay signed in", openCollection: "Open my collection", or: "or", continueGoogle: "Continue with Google", noAccount: "No account yet? Sign up", haveAccount: "Already have an account? Log in" },
                 landing: {
                     login: "Log In", login2: "Log In",
                     heroTitle: "Your personal library,<br>finally <span style=\"color: var(--gold-accent)\">well organized</span>.",
@@ -1293,7 +1319,7 @@
                 onboard: { title: "Choose your username", body: "It will be unique and let you be identified on Ma Biblio.", placeholder: "e.g. jeni_reads", later: "Later" },
                 editModal: { title: "Edit Entry #", autofill: "Auto-fill", titlePlaceholder: "Start typing a title...", authorPlaceholder: "Author...", autofillHint: "Pick a suggestion to auto-fill the author, genre, year and cover.", genre: "Genre", releaseYear: "Release year", rating: "Rating", coverUrl: "Cover URL", format: "Format", formatBook: "Book", language: "Language", start: "Start (e.g. 05/01/2025)", end: "End (e.g. 05/15/2025)", summaryPlaceholder: "Summary...", commentPlaceholder: "My review...", cancel: "Cancel", save: "Save" },
                 shelf: { genreColor: "Color by genre", customizeSpine: "Customize spine", color: "Color", customColor: "Custom color", pattern: "Pattern", height: "Height", thickness: "Thickness", close: "Close" },
-                deco: { plant: "Plant", lamp: "Lamp", candle: "Candle", globe: "Globe", frame: "Photo frame", statue: "Statuette", clearAll: "Remove everything from the shelf" },
+                deco: { plant: "Plant", lamp: "Lamp", candle: "Candle", globe: "Globe", frame: "Photo frame", statue: "Statuette", clearAll: "Remove everything from the shelf", customLabel: "Or describe the object you want", customPlaceholder: "e.g. small blue vase with flowers", customGenerate: "Generate", customUse: "Use this one", customRetry: "Try again", customError: "Generation failed, try again in a moment.", customHint: "Generated by an illustration AI (Pollinations.AI, free). Results may vary, feel free to retry or rephrase." },
                 fiche: { backToGrid: "Back to Grid", backToLibrary: "Back to Library" },
                 bulkImport: {
                     openBtn: "✨ Quick import", title: "Quick import",
@@ -1389,7 +1415,11 @@
 
         // --- CONNEXION GOOGLE ---
         window.signInWithGoogle = async () => {
-            try { await signInWithPopup(auth, googleProvider); }
+            try {
+                const rememberMe = document.getElementById('remember-me').checked;
+                await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+                await signInWithPopup(auth, googleProvider);
+            }
             catch (err) { alert(err.message); }
         };
 
@@ -1549,6 +1579,103 @@
             shelfDecorations[id] = { row: 0, x: 4, emoji, key };
             saveShelfDecorations();
             renderShelfDecorations();
+            closeDecorationPicker();
+        };
+
+        function removeWhiteBackground(imgUrl) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const w = canvas.width, h = canvas.height;
+                        const imgData = ctx.getImageData(0, 0, w, h);
+                        const data = imgData.data;
+
+                        const at = (x, y) => { const i = (y * w + x) * 4; return [data[i], data[i+1], data[i+2]]; };
+                        const corners = [at(1,1), at(w-2,1), at(1,h-2), at(w-2,h-2), at(Math.floor(w/2),1)];
+                        const bg = corners.reduce((acc, c) => [acc[0]+c[0], acc[1]+c[1], acc[2]+c[2]], [0,0,0]).map(v => v / corners.length);
+
+                        const dist = (r,g,b) => Math.sqrt((r-bg[0])**2 + (g-bg[1])**2 + (b-bg[2])**2);
+                        const nearThreshold = 26;
+                        const farThreshold = 55;
+
+                        for (let i = 0; i < data.length; i += 4) {
+                            const d = dist(data[i], data[i+1], data[i+2]);
+                            if (d < nearThreshold) {
+                                data[i + 3] = 0;
+                            } else if (d < farThreshold) {
+                                data[i + 3] = Math.round(data[i + 3] * ((d - nearThreshold) / (farThreshold - nearThreshold)));
+                            }
+                        }
+                        ctx.putImageData(imgData, 0, 0);
+                        resolve(canvas.toDataURL('image/png'));
+                    } catch (e) { reject(e); }
+                };
+                img.onerror = reject;
+                img.src = 'https://wsrv.nl/?url=' + encodeURIComponent(imgUrl) + '&output=png';
+            });
+        }
+
+        window.generateCustomDecoration = () => {
+            const input = document.getElementById('custom-deco-input');
+            const desc = input.value.trim();
+            if (!desc) return;
+            const btn = document.getElementById('custom-deco-generate-btn');
+            const preview = document.getElementById('custom-deco-preview');
+            const previewImg = document.getElementById('custom-deco-preview-img');
+            btn.disabled = true;
+            btn.innerText = '...';
+            preview.classList.add('hidden');
+
+            const stylePrompt = `${desc}, product photo isolated on plain solid white background, studio product shot, single object centered, no room, no wall, no furniture, no shelf, no scene, no people, flat clean background, no text, no watermark`;
+            const seed = Math.floor(Math.random() * 1000000);
+            const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(stylePrompt)}?width=256&height=256&nologo=true&seed=${seed}`;
+
+            const showResult = (finalUrl) => {
+                previewImg.src = finalUrl;
+                preview.dataset.url = finalUrl;
+                preview.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerText = t('deco.customGenerate');
+            };
+
+            // On confirme d'abord que l'image se génère bien (patience, la génération peut prendre du temps)
+            const testImg = new Image();
+            const timeout = setTimeout(() => {
+                testImg.onload = testImg.onerror = null;
+                btn.disabled = false;
+                btn.innerText = t('deco.customGenerate');
+                alert(t('deco.customError'));
+            }, 40000);
+            testImg.onload = () => {
+                clearTimeout(timeout);
+                // Détourage du fond en bonus : si ça échoue, on garde quand même l'image telle quelle
+                removeWhiteBackground(url).then(showResult).catch(() => showResult(url));
+            };
+            testImg.onerror = () => {
+                clearTimeout(timeout);
+                btn.disabled = false;
+                btn.innerText = t('deco.customGenerate');
+                alert(t('deco.customError'));
+            };
+            testImg.src = url;
+        };
+
+        window.addGeneratedDecoration = () => {
+            const preview = document.getElementById('custom-deco-preview');
+            const url = preview.dataset.url;
+            if (!url) return;
+            const id = 'deco_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            shelfDecorations[id] = { row: 0, x: 4, emoji: '', key: null, img: url };
+            saveShelfDecorations();
+            renderShelfDecorations();
+            document.getElementById('custom-deco-input').value = '';
+            preview.classList.add('hidden');
             closeDecorationPicker();
         };
 
@@ -1718,6 +1845,8 @@
                     <image href="${deco.photo}" x="14" y="14" width="36" height="36" preserveAspectRatio="xMidYMid slice" clip-path="url(#frameClip-${id})"/>
                     <rect x="26" y="56" width="12" height="3" rx="1" fill="#161616"/>
                 </svg></span>`;
+            } else if (deco.img) {
+                visual = `<img src="${deco.img}" class="decoration-ai-img" alt="">`;
             } else {
                 visual = DECORATION_SVGS[deco.key]
                     ? `<span class="decoration-emoji decoration-svg">${DECORATION_SVGS[deco.key]}</span>`
@@ -2820,9 +2949,13 @@
         window.getStarsHtml = (rating, sizeClass = "text-[10px]") => {
             let html = "";
             for (let i = 1; i <= 5; i++) {
-                if (rating >= i) html += `<span class="${sizeClass} star-filled">★</span>`;
-                else if (rating >= i - 0.5) html += `<span class="${sizeClass} star-filled">⯪</span>`;
-                else html += `<span class="${sizeClass} star-empty">★</span>`;
+                if (rating >= i) {
+                    html += `<span class="${sizeClass} star-filled">★</span>`;
+                } else if (rating >= i - 0.5) {
+                    html += `<span class="${sizeClass} star-half"><span class="star-empty">★</span><span class="star-filled star-half-overlay">★</span></span>`;
+                } else {
+                    html += `<span class="${sizeClass} star-empty">★</span>`;
+                }
             }
             return html;
         };
@@ -2941,7 +3074,11 @@
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value, pass = document.getElementById('password').value;
-            try { isSignUp ? await createUserWithEmailAndPassword(auth, email, pass) : await signInWithEmailAndPassword(auth, email, pass); } catch (err) { alert(err.message); }
+            const rememberMe = document.getElementById('remember-me').checked;
+            try {
+                await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+                isSignUp ? await createUserWithEmailAndPassword(auth, email, pass) : await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) { alert(err.message); }
         });
         // --- AUTOCOMPLETION LIVRES (Open Library en priorité, Google Books en secours) ---
         let titleSuggestions = [];
