@@ -917,7 +917,7 @@
                                 <span id="best-book-fallback" class="best-book-fallback text-sm font-black">👑</span>
                             </div>
                             <div class="text-left truncate flex-1">
-                                <span class="best-book-label block text-[8px] font-black tracking-[0.2em] uppercase">👑 <span data-i18n="dash.bookOfYear">LIVRE DE L'ANNÉE</span> <span class="display-year">...</span></span>
+                                <span class="best-book-label block text-[8px] font-black tracking-[0.2em] uppercase" id="best-book-label-text">👑 <span data-i18n="dash.bookOfYear">LIVRE DE L'ANNÉE</span> <span class="display-year">...</span></span>
                                 <h3 id="best-book-title" class="font-serif text-sm font-bold uppercase tracking-tight text-slate-800 truncate leading-tight mt-0.5"></h3>
                                 <p id="best-book-author" class="best-book-author-label text-[9px] font-bold uppercase tracking-wider truncate"></p>
                             </div>
@@ -928,7 +928,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <div class="stat-card flex flex-col justify-center items-center">
                         <span class="text-xl mb-1" style="opacity:0.5">📚</span>
-                        <p class="section-label"><span data-i18n="dash.booksRead">Livres Lus en</span> <span class="display-year">...</span></p>
+                        <p class="section-label" id="books-read-label"><span data-i18n="dash.booksRead">Livres Lus en</span> <span class="display-year">...</span></p>
                         <div id="stat-count" class="stat-value">0</div>
                         <p id="stat-count-compare" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">&nbsp;</p>
                     </div>
@@ -959,7 +959,7 @@
                 </div>
                 
                 <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                    <p class="section-label mb-3"><span data-i18n="dash.readingPace">Rythme de lecture (Livres par mois en</span> <span class="display-year">...</span>)</p>
+                    <p class="section-label mb-3" id="reading-pace-label"><span data-i18n="dash.readingPace">Rythme de lecture (Livres par mois en</span> <span class="display-year">...</span>)</p>
                     <div class="h-64 w-full">
                         <canvas id="readingChart"></canvas>
                     </div>
@@ -1260,7 +1260,7 @@
                 nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
                 filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", reset: "Réinitialiser" },
                 months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
-                dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", readingPace: "Rythme de lecture (Livres par mois en", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée" },
+                dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE" },
                 account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
                 colors: { gold: "Doré", burgundy: "Bordeaux", forestGreen: "Vert forêt", navyBlue: "Bleu marine", terracotta: "Terracotta", plum: "Prune", anthracite: "Anthracite", custom: "Couleur personnalisée" },
                 auth: { backToHome: "← Retour à l'accueil", memberLogin: "Connexion Membre", memberSignup: "Création de Compte", emailAddress: "Adresse Email", password: "Mot de passe", forgotPassword: "Mot de passe oublié ?", rememberMe: "Rester connecté", openCollection: "Ouvrir ma collection", or: "ou", continueGoogle: "Continuer avec Google", noAccount: "Pas encore de compte ? S'inscrire", haveAccount: "Déjà un compte ? Se connecter" },
@@ -1302,7 +1302,7 @@
                 nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
                 filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", reset: "Reset" },
                 months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
-                dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", readingPace: "Reading pace (Books per month in", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row" },
+                dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK" },
                 account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
                 colors: { gold: "Gold", burgundy: "Burgundy", forestGreen: "Forest green", navyBlue: "Navy blue", terracotta: "Terracotta", plum: "Plum", anthracite: "Anthracite", custom: "Custom color" },
                 auth: { backToHome: "← Back to home", memberLogin: "Member Login", memberSignup: "Create Account", emailAddress: "Email Address", password: "Password", forgotPassword: "Forgot password?", rememberMe: "Stay signed in", openCollection: "Open my collection", or: "or", continueGoogle: "Continue with Google", noAccount: "No account yet? Sign up", haveAccount: "Already have an account? Log in" },
@@ -2542,6 +2542,14 @@
             const yearGrid = document.getElementById('filter-year-grid');
             const yearStats = document.getElementById('filter-year-stats');
             const yearShelf = document.getElementById('filter-year-shelf');
+
+            const optAllStats = document.createElement('option');
+            optAllStats.value = 'all';
+            optAllStats.setAttribute('data-i18n', 'dash.allYears');
+            optAllStats.innerText = t('dash.allYears');
+            optAllStats.selected = true;
+            yearStats.appendChild(optAllStats);
+
             for(let y = 2027; y >= 2000; y--) {
                 const optGrid = document.createElement('option');
                 optGrid.value = y; optGrid.innerText = y;
@@ -2549,7 +2557,6 @@
 
                 const optStats = document.createElement('option');
                 optStats.value = y; optStats.innerText = y;
-                if(y === currentYear) optStats.selected = true;
                 yearStats.appendChild(optStats);
 
                 const optShelf = document.createElement('option');
@@ -2687,8 +2694,17 @@
             const specF = document.getElementById('filter-special').value;
             const yGridF = document.getElementById('filter-year-grid').value;
             const yStatsF = document.getElementById('filter-year-stats').value;
+            const isAllYears = yStatsF === 'all';
 
-            document.querySelectorAll('.display-year').forEach(el => el.innerText = yStatsF);
+            if (isAllYears) {
+                document.getElementById('best-book-label-text').innerHTML = `👑 ${t('dash.bestBookAll')}`;
+                document.getElementById('books-read-label').innerHTML = t('dash.booksReadAll');
+                document.getElementById('reading-pace-label').innerHTML = t('dash.readingPaceAll');
+            } else {
+                document.getElementById('best-book-label-text').innerHTML = `👑 ${t('dash.bookOfYear')} <span class="display-year">${yStatsF}</span>`;
+                document.getElementById('books-read-label').innerHTML = `${t('dash.booksRead')} <span class="display-year">${yStatsF}</span>`;
+                document.getElementById('reading-pace-label').innerHTML = `${t('dash.readingPace')} <span class="display-year">${yStatsF}</span>)`;
+            }
 
             const filteredGrid = library.filter(b => {
                 const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
@@ -2713,19 +2729,25 @@
                 return matchSearch && matchRating && matchYear && matchGenre && matchAuthor && matchMonth && matchFavorite;
             });
 
-            const statLib = library.filter(b => b.title && b.end && b.end.includes(yStatsF));
+            const statLib = isAllYears
+                ? library.filter(b => b.title && b.end)
+                : library.filter(b => b.title && b.end && b.end.includes(yStatsF));
             document.getElementById('stat-count').innerText = statLib.length;
             document.getElementById('stat-avg').innerText = statLib.length ? (statLib.reduce((a,b)=>a+b.rating,0)/statLib.length).toFixed(1) : "0.0";
 
-            const prevYear = String(parseInt(yStatsF) - 1);
-            const prevYearLib = library.filter(b => b.title && b.end && b.end.includes(prevYear));
             const compareEl = document.getElementById('stat-count-compare');
-            if (prevYearLib.length > 0 || statLib.length > 0) {
-                const diff = statLib.length - prevYearLib.length;
-                const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '=';
-                compareEl.innerText = `${arrow} vs ${prevYearLib.length} en ${prevYear}`;
-            } else {
+            if (isAllYears) {
                 compareEl.innerHTML = '&nbsp;';
+            } else {
+                const prevYear = String(parseInt(yStatsF) - 1);
+                const prevYearLib = library.filter(b => b.title && b.end && b.end.includes(prevYear));
+                if (prevYearLib.length > 0 || statLib.length > 0) {
+                    const diff = statLib.length - prevYearLib.length;
+                    const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '=';
+                    compareEl.innerText = `${arrow} vs ${prevYearLib.length} en ${prevYear}`;
+                } else {
+                    compareEl.innerHTML = '&nbsp;';
+                }
             }
 
             const minEl = document.getElementById('stat-avg-min');
@@ -2759,7 +2781,14 @@
                 `;
             }).join('');
 
-            const bestBook = statLib.find(b => b.isFavorite === true);
+            let bestBook;
+            if (isAllYears) {
+                const favs = statLib.filter(b => b.isFavorite === true);
+                const pool = favs.length ? favs : statLib;
+                bestBook = pool.length ? pool.reduce((a, b) => ((b.rating || 0) > (a.rating || 0) ? b : a)) : null;
+            } else {
+                bestBook = statLib.find(b => b.isFavorite === true);
+            }
             const bestBookCard = document.getElementById('best-book-card');
             if (bestBook) {
                 bestBookCard.classList.remove('invisible');
@@ -2789,9 +2818,9 @@
                 <span class="rank-badge" style="background:transparent; font-size: 20px;">${podiumMedals[i]}</span>
                 <span class="text-xs font-bold uppercase truncate w-24">${g[0]}</span></div>
                 <span class="text-[10px] font-black text-slate-300">${g[1]} livre${g[1] > 1 ? 's' : ''}</span></div>
-            `).join('') || '<p class="text-[10px] text-slate-400 text-center italic py-4">Aucun bilan pour '+yStatsF+'</p>';
+            `).join('') || '<p class="text-[10px] text-slate-400 text-center italic py-4">' + (isAllYears ? t('dash.noReportAll') : t('dash.noReportFor') + ' ' + yStatsF) + '</p>';
 
-            updateChart(statLib);
+            updateChart(statLib, isAllYears);
             renderShelf(getShelfBooks());
 
             // HTML GRILLE
@@ -2913,20 +2942,38 @@
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         }
 
-        function updateChart(books) {
-            const counts = new Array(12).fill(0);
-            books.forEach(b => {
-                if(b.end && b.end.includes('/')) {
-                    const m = parseInt(b.end.split('/')[1]);
-                    if(m >= 1 && m <= 12) counts[m - 1]++;
-                }
-            });
+        function updateChart(books, byYear = false) {
             const ctx = document.getElementById('readingChart').getContext('2d');
             if(readingChart) readingChart.destroy();
             const chartColor = getComputedStyle(document.documentElement).getPropertyValue('--gold-accent').trim() || '#C5A059';
+
+            let labels, counts;
+            if (byYear) {
+                const countsByYear = {};
+                books.forEach(b => {
+                    if (b.end && b.end.includes('/')) {
+                        const parts = b.end.split('/');
+                        const y = parts[2] ? parts[2].trim() : '';
+                        if (y) countsByYear[y] = (countsByYear[y] || 0) + 1;
+                    }
+                });
+                labels = Object.keys(countsByYear).sort();
+                counts = labels.map(y => countsByYear[y]);
+                if (!labels.length) { labels = [String(new Date().getFullYear())]; counts = [0]; }
+            } else {
+                labels = ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"];
+                counts = new Array(12).fill(0);
+                books.forEach(b => {
+                    if(b.end && b.end.includes('/')) {
+                        const m = parseInt(b.end.split('/')[1]);
+                        if(m >= 1 && m <= 12) counts[m - 1]++;
+                    }
+                });
+            }
+
             readingChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels: ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"], datasets: [{ label: 'Livres', data: counts, borderColor: chartColor, backgroundColor: hexToRgba(chartColor, 0.1), fill: true, tension: 0.4 }] },
+                data: { labels: labels, datasets: [{ label: 'Livres', data: counts, borderColor: chartColor, backgroundColor: hexToRgba(chartColor, 0.1), fill: true, tension: 0.4 }] },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
