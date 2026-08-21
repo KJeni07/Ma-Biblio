@@ -2736,6 +2736,7 @@
             document.getElementById('stat-avg').innerText = statLib.length ? (statLib.reduce((a,b)=>a+b.rating,0)/statLib.length).toFixed(1) : "0.0";
 
             const compareEl = document.getElementById('stat-count-compare');
+            compareEl.classList.remove('text-green-500', 'text-red-400');
             if (isAllYears) {
                 compareEl.innerHTML = '&nbsp;';
             } else {
@@ -2745,6 +2746,8 @@
                     const diff = statLib.length - prevYearLib.length;
                     const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '=';
                     compareEl.innerText = `${arrow} vs ${prevYearLib.length} en ${prevYear}`;
+                    compareEl.classList.remove('text-green-500', 'text-red-400', 'text-slate-400');
+                    compareEl.classList.add(diff > 0 ? 'text-green-500' : diff < 0 ? 'text-red-400' : 'text-slate-400');
                 } else {
                     compareEl.innerHTML = '&nbsp;';
                 }
