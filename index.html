@@ -893,6 +893,12 @@
                             <option value="favorite" data-i18n="filters.bookOfYear">👑 Livre de l'année</option>
                             <option value="bookclub" data-i18n="filters.bookClub">📖 Book Club</option>
                         </select>
+
+                        <select id="filter-sort" onchange="render()" class="filter-select">
+                            <option value="none" data-i18n="filters.sortNone">Ordre habituel</option>
+                            <option value="date-desc" data-i18n="filters.sortDateDesc">Date de lecture ↓ (récent → ancien)</option>
+                            <option value="date-asc" data-i18n="filters.sortDateAsc">Date de lecture ↑ (ancien → récent)</option>
+                        </select>
                     </div>
 
                     <div class="flex items-center gap-2">
@@ -1258,7 +1264,7 @@
         const TRANSLATIONS = {
             fr: {
                 nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
-                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", reset: "Réinitialiser" },
+                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", reset: "Réinitialiser", sortNone: "Ordre habituel", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)" },
                 months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
                 dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE" },
                 account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
@@ -1300,7 +1306,7 @@
             },
             en: {
                 nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
-                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", reset: "Reset" },
+                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", reset: "Reset", sortNone: "Default order", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)" },
                 months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
                 dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK" },
                 account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
@@ -2335,6 +2341,14 @@
 
         let currentShelfScale = 1;
 
+        let bookcaseResizeTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(bookcaseResizeTimer);
+            bookcaseResizeTimer = setTimeout(() => {
+                if (typeof updateBookcaseWidth === 'function') updateBookcaseWidth();
+            }, 150);
+        });
+
         function updateBookcaseWidth() {
             const bookcase = document.getElementById('bookcase-container');
             const scaler = document.getElementById('bookcase-scaler');
@@ -2693,6 +2707,7 @@
             const mF = document.getElementById('filter-month').value;
             const specF = document.getElementById('filter-special').value;
             const yGridF = document.getElementById('filter-year-grid').value;
+            const sortF = document.getElementById('filter-sort').value;
             const yStatsF = document.getElementById('filter-year-stats').value;
             const isAllYears = yStatsF === 'all';
 
@@ -2728,6 +2743,24 @@
                 const matchFavorite = specF === "all" || (specF === "favorite" && !!b.isFavorite) || (specF === "bookclub" && !!b.isBookClub);
                 return matchSearch && matchRating && matchYear && matchGenre && matchAuthor && matchMonth && matchFavorite;
             });
+
+            if (sortF !== 'none') {
+                const parseDMY = (s) => {
+                    if (!s) return null;
+                    const m = s.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+                    if (!m) return null;
+                    return new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1])).getTime();
+                };
+                const sortByDate = (a, b) => {
+                    const da = parseDMY(a.end), db = parseDMY(b.end);
+                    if (da === null && db === null) return 0;
+                    if (da === null) return 1;
+                    if (db === null) return -1;
+                    return sortF === 'date-asc' ? da - db : db - da;
+                };
+                filteredGrid.sort(sortByDate);
+                filteredFiches.sort(sortByDate);
+            }
 
             const statLib = isAllYears
                 ? library.filter(b => b.title && b.end)
@@ -3098,6 +3131,9 @@
             document.getElementById('btn-' + id)?.classList.add('active');
             document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats' || id === 'compte');
             if (id === 'compte') openProfile();
+            if (id === 'stats' && typeof updateBookcaseWidth === 'function') {
+                setTimeout(updateBookcaseWidth, 0);
+            }
         };
 
         window.goToBibliotheque = () => {
@@ -3137,7 +3173,7 @@
             document.getElementById('edit-modal').classList.remove('hidden');
         };
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
-        window.resetFilters = () => { document.getElementById('search-input').value = ""; document.getElementById('filter-rating').value = "all"; document.getElementById('filter-genre').value = "all"; document.getElementById('filter-author').value = "all"; document.getElementById('filter-month').value = "all"; document.getElementById('filter-year-grid').value = "all"; document.getElementById('filter-special').value = "all"; render(); };
+        window.resetFilters = () => { document.getElementById('search-input').value = ""; document.getElementById('filter-rating').value = "all"; document.getElementById('filter-genre').value = "all"; document.getElementById('filter-author').value = "all"; document.getElementById('filter-month').value = "all"; document.getElementById('filter-year-grid').value = "all"; document.getElementById('filter-special').value = "all"; document.getElementById('filter-sort').value = "none"; render(); };
         window.logout = () => signOut(auth);
         // Menu déroulant profil : clic pour toggle (mobile/tactile), en plus du survol (desktop)
         document.getElementById('profile-avatar-btn').addEventListener('click', (e) => {
