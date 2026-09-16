@@ -825,8 +825,8 @@
                     <h1 class="text-2xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
                     
                     <div class="flex gap-8 items-center">
-                        <button onclick="showSection('bibliotheque', true)" id="btn-bibliotheque" class="tab-btn" data-i18n="nav.library">Bibliothèque</button>
-                        <button onclick="showSection('stats', true)" id="btn-stats" class="tab-btn active" data-i18n="nav.dashboard">Tableau de Bord</button>
+                        <button onclick="showSection('bibliotheque', true)" id="btn-bibliotheque" class="tab-btn active" data-i18n="nav.library">Bibliothèque</button>
+                        <button onclick="showSection('stats', true)" id="btn-stats" class="tab-btn" data-i18n="nav.dashboard">Tableau de Bord</button>
                         <button onclick="showSection('grille', true)" id="btn-grille" class="tab-btn" data-i18n="nav.grid">Ma Grille</button>
                         <button onclick="showSection('fiches', true)" id="btn-fiches" class="tab-btn" data-i18n="nav.fiches">Mes Fiches</button>
                     </div>
@@ -930,7 +930,7 @@
 
         <div class="max-w-6xl mx-auto px-6 py-4">
             
-            <section id="section-stats" class="view-section active">
+            <section id="section-stats" class="view-section">
                 <div class="flex flex-col sm:flex-row gap-6 items-center justify-between mb-4 w-full">
                     <div class="shrink-0">
                         <select id="filter-year-stats" onchange="render()" class="dashboard-year-select"></select>
@@ -1018,21 +1018,50 @@
                 <div id="fiches-content" class="space-y-20"></div>
             </section>
 
-            <section id="section-bibliotheque" class="view-section">
+            <section id="section-bibliotheque" class="view-section active">
                 <div id="bibliotheque-section" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                     <div class="flex items-center justify-between mb-4">
                         <p class="section-label mb-0" data-i18n="dash.myLibrary">Ma Bibliothèque</p>
                         <div class="flex items-center gap-3">
-                            <select id="filter-year-shelf" onchange="render()" class="dashboard-year-select !text-xs !py-1.5">
-                                <option value="all" data-i18n="filters.allYears">Toutes les années</option>
-                            </select>
-                            <select id="filter-author-shelf" onchange="render()" class="filter-select !text-xs !py-1.5">
-                                <option value="all" data-i18n="filters.allAuthors">Tous les auteurs</option>
-                            </select>
+                            <button onclick="toggleShelfFilters()" id="shelf-filter-toggle-btn" class="flex items-center gap-1.5 text-slate-400 hover:text-gold-accent text-xs font-bold uppercase tracking-widest" data-i18n-title="filters.toggleBtn" title="Filtre">
+                                <span>🔍</span> <span data-i18n="filters.toggleBtn">Filtre</span>
+                            </button>
                             <button onclick="openDecorationPicker()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.addDecoration" title="Ajouter une décoration">✨</button>
                             <button onclick="openShelfSettings()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.shelfSettings" title="Réglages de la bibliothèque">⚙️</button>
                         </div>
                     </div>
+
+                    <div id="shelf-filters-panel" class="hidden flex flex-wrap gap-2 items-center text-xs mb-4 pb-4 border-b border-slate-100">
+                        <select id="filter-year-shelf" onchange="render()" class="dashboard-year-select !text-xs !py-1.5">
+                            <option value="all" data-i18n="filters.allYears">Toutes les années</option>
+                        </select>
+                        <select id="filter-author-shelf" onchange="render()" class="filter-select !text-xs !py-1.5">
+                            <option value="all" data-i18n="filters.allAuthors">Tous les auteurs</option>
+                        </select>
+                        <select id="filter-genre-shelf" onchange="render()" class="filter-select !text-xs !py-1.5">
+                            <option value="all" data-i18n="filters.allGenres">Tous les genres</option>
+                        </select>
+                        <select id="filter-rating-shelf" onchange="render()" class="filter-select !text-xs !py-1.5">
+                            <option value="all" data-i18n="filters.allRatings">Toutes les notes</option>
+                            <option value="0">0 ★</option>
+                            <option value="1">1 ★</option>
+                            <option value="2">2 ★</option>
+                            <option value="2.5">2.5 ★</option>
+                            <option value="3">3 ★</option>
+                            <option value="3.5">3.5 ★</option>
+                            <option value="4">4 ★</option>
+                            <option value="4.5">4.5 ★</option>
+                            <option value="5">5 ★</option>
+                        </select>
+                        <select id="filter-special-shelf" onchange="render()" class="filter-select !text-xs !py-1.5">
+                            <option value="all" data-i18n="filters.allBooks">Tous les livres</option>
+                            <option value="favorite" data-i18n="filters.bookOfYear">👑 Livre de l'année</option>
+                            <option value="bookclub" data-i18n="filters.bookClub">📖 Book Club</option>
+                            <option value="dnf" data-i18n="filters.dnf">🚫 DNF</option>
+                        </select>
+                        <button onclick="resetShelfFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto" data-i18n="filters.reset">Réinitialiser</button>
+                    </div>
+
                     <div id="bookcase-container" class="bookcase"></div>
                     <button onclick="addShelfRow()" class="mt-3 mx-auto flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-gold-accent hover:text-gold-accent transition-colors" data-i18n-title="dash.addRow" title="Ajouter une rangée">+</button>
                 </div>
@@ -1314,7 +1343,7 @@
         const TRANSLATIONS = {
             fr: {
                 nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", library: "Bibliothèque", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
-                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Réinitialiser", sortNone: "Ordre habituel", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)" },
+                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Réinitialiser", sortNone: "Ordre habituel", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)" },
                 months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
                 dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", dnfCount: "Livres Abandonnés (DNF)", ofBooks: "des livres", languagesRead: "Langues Lues", authorsRead: "Livres par Auteur", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE" },
                 account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
@@ -1356,7 +1385,7 @@
             },
             en: {
                 nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", library: "Library", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
-                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Reset", sortNone: "Default order", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)" },
+                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Reset", sortNone: "Default order", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)" },
                 months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
                 dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", dnfCount: "Dropped Books (DNF)", ofBooks: "of books", languagesRead: "Languages Read", authorsRead: "Books per Author", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK" },
                 account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
@@ -2343,11 +2372,22 @@
         function getShelfBooks() {
             const yearSelect = document.getElementById('filter-year-shelf');
             const authorSelect = document.getElementById('filter-author-shelf');
+            const genreSelect = document.getElementById('filter-genre-shelf');
+            const ratingSelect = document.getElementById('filter-rating-shelf');
+            const specialSelect = document.getElementById('filter-special-shelf');
             const y = yearSelect ? yearSelect.value : 'all';
             const a = authorSelect ? authorSelect.value : 'all';
+            const g = genreSelect ? genreSelect.value : 'all';
+            const r = ratingSelect ? ratingSelect.value : 'all';
+            const spec = specialSelect ? specialSelect.value : 'all';
             let result = library.filter(b => b.title);
             if (y !== 'all') result = result.filter(b => b.end && b.end.includes(y));
             if (a !== 'all') result = result.filter(b => b.author === a);
+            if (g !== 'all') result = result.filter(b => b.genre === g);
+            if (r !== 'all') result = result.filter(b => b.rating == r);
+            if (spec === 'favorite') result = result.filter(b => !!b.isFavorite);
+            if (spec === 'bookclub') result = result.filter(b => !!b.isBookClub);
+            if (spec === 'dnf') result = result.filter(b => !!b.isDNF);
             return result;
         }
 
@@ -3203,9 +3243,11 @@
             const genreSelect = document.getElementById('filter-genre');
             const authorSelect = document.getElementById('filter-author');
             const authorShelfSelect = document.getElementById('filter-author-shelf');
+            const genreShelfSelect = document.getElementById('filter-genre-shelf');
             const currentGenre = genreSelect.value;
             const currentAuthor = authorSelect.value;
             const currentAuthorShelf = authorShelfSelect ? authorShelfSelect.value : 'all';
+            const currentGenreShelf = genreShelfSelect ? genreShelfSelect.value : 'all';
 
             genreSelect.innerHTML = `<option value="all">${t('filters.allGenres')}</option>` + genres.map(g => `<option value="${g}">${g}</option>`).join('');
             authorSelect.innerHTML = `<option value="all">${t('filters.allAuthors')}</option>` + authors.map(a => `<option value="${a}">${a}</option>`).join('');
@@ -3213,9 +3255,29 @@
                 authorShelfSelect.innerHTML = `<option value="all">${t('filters.allAuthors')}</option>` + authors.map(a => `<option value="${a}">${a}</option>`).join('');
                 authorShelfSelect.value = authors.includes(currentAuthorShelf) ? currentAuthorShelf : 'all';
             }
+            if (genreShelfSelect) {
+                genreShelfSelect.innerHTML = `<option value="all">${t('filters.allGenres')}</option>` + genres.map(g => `<option value="${g}">${g}</option>`).join('');
+                genreShelfSelect.value = genres.includes(currentGenreShelf) ? currentGenreShelf : 'all';
+            }
 
             genreSelect.value = genres.includes(currentGenre) ? currentGenre : 'all';
             authorSelect.value = authors.includes(currentAuthor) ? currentAuthor : 'all';
+        };
+
+        window.toggleShelfFilters = () => {
+            const panel = document.getElementById('shelf-filters-panel');
+            const btn = document.getElementById('shelf-filter-toggle-btn');
+            const isHidden = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden');
+            btn.classList.toggle('text-gold-accent', isHidden);
+        };
+
+        window.resetShelfFilters = () => {
+            ['filter-year-shelf', 'filter-author-shelf', 'filter-genre-shelf', 'filter-rating-shelf', 'filter-special-shelf'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = 'all';
+            });
+            render();
         };
 
         function normalizeDateInput(value) {
