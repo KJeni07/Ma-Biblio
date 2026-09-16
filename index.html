@@ -303,6 +303,22 @@
             justify-content: center; font-size: 10px; font-weight: 900; color: white;
         }
 
+        /* --- PODIUM AUTEURS (style JO) --- */
+        .olympic-podium { display: flex; align-items: flex-end; justify-content: center; gap: 8px; height: 118px; }
+        .olympic-step { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 32%; }
+        .olympic-step-name { font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--deep-black); }
+        .olympic-step-count { font-size: 9px; font-weight: 900; color: #94a3b8; margin-bottom: 4px; }
+        .olympic-step-bar { width: 100%; border-radius: 8px 8px 0 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; font-size: 17px; }
+
+        /* --- BARRES HORIZONTALES LANGUES --- */
+        .lang-bar-row { display: flex; align-items: center; gap: 8px; }
+        .lang-bar-label { font-size: 10px; font-weight: 800; text-transform: uppercase; width: 64px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .lang-bar-track { flex: 1; background: #f1f5f9; border-radius: 999px; height: 10px; overflow: hidden; }
+        .lang-bar-fill { height: 100%; border-radius: 999px; background: var(--gold-accent); }
+        .lang-bar-count { font-size: 10px; font-weight: 900; color: #94a3b8; width: 20px; text-align: right; flex-shrink: 0; }
+        html.dark .lang-bar-track { background: #2f2f2f; }
+        html.dark .olympic-step-name { color: #F2F0EA; }
+
         /* --- UI UTILS --- */
         .modal-input {
             width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px;
@@ -809,6 +825,7 @@
                     <h1 class="text-2xl font-black italic uppercase tracking-tighter font-serif">Ma Biblio <span style="color: var(--gold-accent)">100</span></h1>
                     
                     <div class="flex gap-8 items-center">
+                        <button onclick="showSection('bibliotheque', true)" id="btn-bibliotheque" class="tab-btn" data-i18n="nav.library">Bibliothèque</button>
                         <button onclick="showSection('stats', true)" id="btn-stats" class="tab-btn active" data-i18n="nav.dashboard">Tableau de Bord</button>
                         <button onclick="showSection('grille', true)" id="btn-grille" class="tab-btn" data-i18n="nav.grid">Ma Grille</button>
                         <button onclick="showSection('fiches', true)" id="btn-fiches" class="tab-btn" data-i18n="nav.fiches">Mes Fiches</button>
@@ -892,12 +909,15 @@
                             <option value="all" data-i18n="filters.allBooks">Tous les livres</option>
                             <option value="favorite" data-i18n="filters.bookOfYear">👑 Livre de l'année</option>
                             <option value="bookclub" data-i18n="filters.bookClub">📖 Book Club</option>
+                            <option value="dnf" data-i18n="filters.dnf">🚫 DNF</option>
                         </select>
 
                         <select id="filter-sort" onchange="render()" class="filter-select">
                             <option value="none" data-i18n="filters.sortNone">Ordre habituel</option>
                             <option value="date-desc" data-i18n="filters.sortDateDesc">Date de lecture ↓ (récent → ancien)</option>
                             <option value="date-asc" data-i18n="filters.sortDateAsc">Date de lecture ↑ (ancien → récent)</option>
+                            <option value="rating-desc" data-i18n="filters.sortRatingDesc">Note ↓ (meilleure → pire)</option>
+                            <option value="rating-asc" data-i18n="filters.sortRatingAsc">Note ↑ (pire → meilleure)</option>
                         </select>
                     </div>
 
@@ -963,6 +983,23 @@
                         <div id="genre-podium" class="space-y-1 overflow-y-auto" style="max-height: 140px;"></div>
                     </div>
                 </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="stat-card flex flex-col justify-center items-center">
+                        <span class="text-xl mb-1" style="opacity:0.5">🚫</span>
+                        <p class="section-label" data-i18n="dash.dnfCount">Livres Abandonnés (DNF)</p>
+                        <div id="stat-dnf" class="stat-value">0</div>
+                        <p id="stat-dnf-pct" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">&nbsp;</p>
+                    </div>
+                    <div class="stat-card text-left px-8">
+                        <p class="section-label text-center mb-2" data-i18n="dash.languagesRead">Langues Lues</p>
+                        <div id="lang-podium" class="space-y-1 overflow-y-auto" style="max-height: 140px;"></div>
+                    </div>
+                    <div class="stat-card text-left px-8">
+                        <p class="section-label text-center mb-2" data-i18n="dash.authorsRead">Livres par Auteur</p>
+                        <div id="author-podium"></div>
+                    </div>
+                </div>
                 
                 <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                     <p class="section-label mb-3" id="reading-pace-label"><span data-i18n="dash.readingPace">Rythme de lecture (Livres par mois en</span> <span class="display-year">...</span>)</p>
@@ -971,20 +1008,6 @@
                     </div>
                 </div>
 
-                <div id="bibliotheque-section" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm mt-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <p class="section-label mb-0" data-i18n="dash.myLibrary">Ma Bibliothèque</p>
-                        <div class="flex items-center gap-3">
-                            <select id="filter-year-shelf" onchange="render()" class="dashboard-year-select !text-xs !py-1.5">
-                                <option value="all" data-i18n="filters.allYears">Toutes les années</option>
-                            </select>
-                            <button onclick="openDecorationPicker()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.addDecoration" title="Ajouter une décoration">✨</button>
-                            <button onclick="openShelfSettings()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.shelfSettings" title="Réglages de la bibliothèque">⚙️</button>
-                        </div>
-                    </div>
-                    <div id="bookcase-container" class="bookcase"></div>
-                    <button onclick="addShelfRow()" class="mt-3 mx-auto flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-gold-accent hover:text-gold-accent transition-colors" data-i18n-title="dash.addRow" title="Ajouter une rangée">+</button>
-                </div>
             </section>
 
             <section id="section-grille" class="view-section">
@@ -993,6 +1016,26 @@
 
             <section id="section-fiches" class="view-section">
                 <div id="fiches-content" class="space-y-20"></div>
+            </section>
+
+            <section id="section-bibliotheque" class="view-section">
+                <div id="bibliotheque-section" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="section-label mb-0" data-i18n="dash.myLibrary">Ma Bibliothèque</p>
+                        <div class="flex items-center gap-3">
+                            <select id="filter-year-shelf" onchange="render()" class="dashboard-year-select !text-xs !py-1.5">
+                                <option value="all" data-i18n="filters.allYears">Toutes les années</option>
+                            </select>
+                            <select id="filter-author-shelf" onchange="render()" class="filter-select !text-xs !py-1.5">
+                                <option value="all" data-i18n="filters.allAuthors">Tous les auteurs</option>
+                            </select>
+                            <button onclick="openDecorationPicker()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.addDecoration" title="Ajouter une décoration">✨</button>
+                            <button onclick="openShelfSettings()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.shelfSettings" title="Réglages de la bibliothèque">⚙️</button>
+                        </div>
+                    </div>
+                    <div id="bookcase-container" class="bookcase"></div>
+                    <button onclick="addShelfRow()" class="mt-3 mx-auto flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-gold-accent hover:text-gold-accent transition-colors" data-i18n-title="dash.addRow" title="Ajouter une rangée">+</button>
+                </div>
             </section>
 
             <section id="section-compte" class="view-section">
@@ -1135,6 +1178,13 @@
                         <option value="5">5</option>
                     </select>
                 </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.dnf">Abandonné (DNF)</label>
+                    <label class="modal-input !mb-0 flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="in-dnf" class="w-4 h-4 accent-[color:var(--gold-accent)] cursor-pointer shrink-0">
+                        <span class="text-xs font-semibold text-gray-500" data-i18n="editModal.dnfHint">Cocher si abandonné</span>
+                    </label>
+                </div>
                 <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.coverUrl">URL Couverture</label><input id="in-cover" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.format">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre" data-i18n="editModal.formatBook">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.language">Langue</label><input id="in-lang" class="modal-input"></div>
@@ -1263,10 +1313,10 @@
         // --- TRADUCTION (FR / EN) ---
         const TRANSLATIONS = {
             fr: {
-                nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
-                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", reset: "Réinitialiser", sortNone: "Ordre habituel", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)" },
+                nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", library: "Bibliothèque", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
+                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Réinitialiser", sortNone: "Ordre habituel", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)" },
                 months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
-                dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE" },
+                dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", dnfCount: "Livres Abandonnés (DNF)", ofBooks: "des livres", languagesRead: "Langues Lues", authorsRead: "Livres par Auteur", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE" },
                 account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
                 colors: { gold: "Doré", burgundy: "Bordeaux", forestGreen: "Vert forêt", navyBlue: "Bleu marine", terracotta: "Terracotta", plum: "Prune", anthracite: "Anthracite", custom: "Couleur personnalisée" },
                 auth: { backToHome: "← Retour à l'accueil", memberLogin: "Connexion Membre", memberSignup: "Création de Compte", emailAddress: "Adresse Email", password: "Mot de passe", forgotPassword: "Mot de passe oublié ?", rememberMe: "Rester connecté", openCollection: "Ouvrir ma collection", or: "ou", continueGoogle: "Continuer avec Google", noAccount: "Pas encore de compte ? S'inscrire", haveAccount: "Déjà un compte ? Se connecter" },
@@ -1281,7 +1331,7 @@
                     screenshotSoon: "Capture d'écran à venir"
                 },
                 onboard: { title: "Choisis ton pseudo", body: "Il sera unique et te permettra d'être identifié(e) sur Ma Biblio.", placeholder: "ex: jeni_lit", later: "Plus tard" },
-                editModal: { title: "Modifier la Fiche #", autofill: "Remplissage Automatique", titlePlaceholder: "Commence à taper un titre...", authorPlaceholder: "Auteur...", autofillHint: "Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.", genre: "Genre", releaseYear: "Année de sortie", rating: "Note", coverUrl: "URL Couverture", format: "Format", formatBook: "Livre", language: "Langue", start: "Début (ex: 01/05/2025)", end: "Fin (ex: 15/05/2025)", summaryPlaceholder: "Résumé...", commentPlaceholder: "Mon avis...", cancel: "Annuler", save: "Enregistrer" },
+                editModal: { title: "Modifier la Fiche #", autofill: "Remplissage Automatique", titlePlaceholder: "Commence à taper un titre...", authorPlaceholder: "Auteur...", autofillHint: "Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.", genre: "Genre", releaseYear: "Année de sortie", rating: "Note", dnf: "Abandonné (DNF)", dnfHint: "Cocher si abandonné", coverUrl: "URL Couverture", format: "Format", formatBook: "Livre", language: "Langue", start: "Début (ex: 01/05/2025)", end: "Fin (ex: 15/05/2025)", summaryPlaceholder: "Résumé...", commentPlaceholder: "Mon avis...", cancel: "Annuler", save: "Enregistrer" },
                 shelf: { genreColor: "Couleur par genre", customizeSpine: "Personnaliser le dos", color: "Couleur", customColor: "Couleur personnalisée", pattern: "Motif", height: "Hauteur", thickness: "Épaisseur", close: "Fermer" },
                 deco: { plant: "Plante", lamp: "Lampe", candle: "Bougie", globe: "Globe", frame: "Cadre photo", statue: "Statuette", clearAll: "Tout retirer de l'étagère", customLabel: "Ou décris l'objet que tu veux", customPlaceholder: "ex: petit vase bleu avec des fleurs", customGenerate: "Générer", customUse: "Utiliser celle-ci", customRetry: "Réessayer", customError: "La génération a échoué, réessaie dans un instant.", customHint: "Généré par une IA d'illustration (Pollinations.AI, gratuite). Le résultat peut varier, n'hésite pas à réessayer ou reformuler." },
                 fiche: { backToGrid: "Retour Grille", backToLibrary: "Retour Bibliothèque", favoriteBook: "Livre préféré", electFavoriteBook: "Élire livre préféré", elect: "Élire" },
@@ -1305,10 +1355,10 @@
                 }
             },
             en: {
-                nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
-                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", reset: "Reset", sortNone: "Default order", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)" },
+                nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", library: "Library", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
+                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Reset", sortNone: "Default order", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)" },
                 months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
-                dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK" },
+                dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", dnfCount: "Dropped Books (DNF)", ofBooks: "of books", languagesRead: "Languages Read", authorsRead: "Books per Author", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK" },
                 account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
                 colors: { gold: "Gold", burgundy: "Burgundy", forestGreen: "Forest green", navyBlue: "Navy blue", terracotta: "Terracotta", plum: "Plum", anthracite: "Anthracite", custom: "Custom color" },
                 auth: { backToHome: "← Back to home", memberLogin: "Member Login", memberSignup: "Create Account", emailAddress: "Email Address", password: "Password", forgotPassword: "Forgot password?", rememberMe: "Stay signed in", openCollection: "Open my collection", or: "or", continueGoogle: "Continue with Google", noAccount: "No account yet? Sign up", haveAccount: "Already have an account? Log in" },
@@ -1323,7 +1373,7 @@
                     screenshotSoon: "Screenshot coming soon"
                 },
                 onboard: { title: "Choose your username", body: "It will be unique and let you be identified on Ma Biblio.", placeholder: "e.g. jeni_reads", later: "Later" },
-                editModal: { title: "Edit Entry #", autofill: "Auto-fill", titlePlaceholder: "Start typing a title...", authorPlaceholder: "Author...", autofillHint: "Pick a suggestion to auto-fill the author, genre, year and cover.", genre: "Genre", releaseYear: "Release year", rating: "Rating", coverUrl: "Cover URL", format: "Format", formatBook: "Book", language: "Language", start: "Start (e.g. 05/01/2025)", end: "End (e.g. 05/15/2025)", summaryPlaceholder: "Summary...", commentPlaceholder: "My review...", cancel: "Cancel", save: "Save" },
+                editModal: { title: "Edit Entry #", autofill: "Auto-fill", titlePlaceholder: "Start typing a title...", authorPlaceholder: "Author...", autofillHint: "Pick a suggestion to auto-fill the author, genre, year and cover.", genre: "Genre", releaseYear: "Release year", rating: "Rating", dnf: "Did Not Finish (DNF)", dnfHint: "Check if dropped", coverUrl: "Cover URL", format: "Format", formatBook: "Book", language: "Language", start: "Start (e.g. 05/01/2025)", end: "End (e.g. 05/15/2025)", summaryPlaceholder: "Summary...", commentPlaceholder: "My review...", cancel: "Cancel", save: "Save" },
                 shelf: { genreColor: "Color by genre", customizeSpine: "Customize spine", color: "Color", customColor: "Custom color", pattern: "Pattern", height: "Height", thickness: "Thickness", close: "Close" },
                 deco: { plant: "Plant", lamp: "Lamp", candle: "Candle", globe: "Globe", frame: "Photo frame", statue: "Statuette", clearAll: "Remove everything from the shelf", customLabel: "Or describe the object you want", customPlaceholder: "e.g. small blue vase with flowers", customGenerate: "Generate", customUse: "Use this one", customRetry: "Try again", customError: "Generation failed, try again in a moment.", customHint: "Generated by an illustration AI (Pollinations.AI, free). Results may vary, feel free to retry or rephrase." },
                 fiche: { backToGrid: "Back to Grid", backToLibrary: "Back to Library", favoriteBook: "Favorite book", electFavoriteBook: "Elect favorite book", elect: "Elect" },
@@ -2023,9 +2073,12 @@
             const solidColor = b.shelfColor || (hasResolvedColor ? coverColor.solid : (genreColor(b.genre) || hashColor(b.title || String(b.id))));
             const backgroundValue = (!b.shelfColor && hasResolvedColor) ? coverColor.gradient : solidColor;
             const safeTitle = (b.title || '').replace(/"/g, '&quot;');
-            const pattern = (b.shelfPattern !== undefined && b.shelfPattern !== null) ? b.shelfPattern : SPINE_PATTERNS[Math.abs(b.id * 13) % SPINE_PATTERNS.length];
+            const seedStr = b.uid || b.title || String(b.id);
+            let seedHash = 0;
+            for (let i = 0; i < seedStr.length; i++) seedHash = seedStr.charCodeAt(i) + ((seedHash << 5) - seedHash);
+            const pattern = (b.shelfPattern !== undefined && b.shelfPattern !== null) ? b.shelfPattern : SPINE_PATTERNS[Math.abs(seedHash * 13) % SPINE_PATTERNS.length];
             const textClass = textColorFor(solidColor) === 'dark' ? 'spine-text-dark' : 'spine-text-light';
-            return `<div class="shelf-spine ${pattern} ${textClass}" data-id="${b.id}" style="width:${width}px; height:${height}px; --spine-color:${solidColor}; background:${backgroundValue};">
+            return `<div class="shelf-spine ${pattern} ${textClass}" data-id="${b.uid || b.id}" style="width:${width}px; height:${height}px; --spine-color:${solidColor}; background:${backgroundValue};">
                 <div class="spine-label"><span class="shelf-spine-title">${safeTitle}</span></div>
             </div>`;
         }
@@ -2163,23 +2216,23 @@
         // les emplacements déjà choisis par l'utilisateur.
         function reconcileShelfPositions(allBooks, visibleBooks) {
             visibleBooks = visibleBooks || allBooks;
-            const idSet = new Set(allBooks.map(b => b.id));
-            Object.keys(shelfPositions).forEach(id => { if (!idSet.has(parseInt(id))) delete shelfPositions[id]; });
+            const idSet = new Set(allBooks.map(b => b.uid));
+            Object.keys(shelfPositions).forEach(id => { if (!idSet.has(id)) delete shelfPositions[id]; });
 
             const rowExtent = Array(SHELF_ROW_COUNT).fill(0);
             Object.entries(shelfPositions).forEach(([id, pos]) => {
-                const book = allBooks.find(b => b.id === parseInt(id));
+                const book = allBooks.find(b => b.uid === id);
                 if (!book) return;
                 rowExtent[pos.row] = Math.max(rowExtent[pos.row], pos.x + spineWidthFor(book));
             });
 
             visibleBooks.forEach(b => {
-                if (shelfPositions[b.id]) return;
+                if (shelfPositions[b.uid]) return;
                 let shortest = 0;
                 for (let i = 1; i < SHELF_ROW_COUNT; i++) {
                     if (rowExtent[i] < rowExtent[shortest]) shortest = i;
                 }
-                shelfPositions[b.id] = { row: shortest, x: Math.round(rowExtent[shortest]) };
+                shelfPositions[b.uid] = { row: shortest, x: Math.round(rowExtent[shortest]) };
                 rowExtent[shortest] += spineWidthFor(b) + 6;
             });
         }
@@ -2271,7 +2324,7 @@
                 shelfDecorations[item.id].x = Math.round(parseFloat(el.style.left) || 0);
                 await saveShelfDecorations();
             } else {
-                shelfPositions[item.id] = { row: parseInt(rowEl.dataset.row), x: Math.round(parseFloat(el.style.left) || 0) };
+                shelfPositions[item.uid] = { row: parseInt(rowEl.dataset.row), x: Math.round(parseFloat(el.style.left) || 0) };
                 await saveShelfPositions();
             }
         }
@@ -2289,10 +2342,13 @@
 
         function getShelfBooks() {
             const yearSelect = document.getElementById('filter-year-shelf');
+            const authorSelect = document.getElementById('filter-author-shelf');
             const y = yearSelect ? yearSelect.value : 'all';
-            const base = library.filter(b => b.title);
-            if (y === 'all') return base;
-            return base.filter(b => b.end && b.end.includes(y));
+            const a = authorSelect ? authorSelect.value : 'all';
+            let result = library.filter(b => b.title);
+            if (y !== 'all') result = result.filter(b => b.end && b.end.includes(y));
+            if (a !== 'all') result = result.filter(b => b.author === a);
+            return result;
         }
 
         function renderShelf(books) {
@@ -2310,7 +2366,7 @@
             rowElements.forEach(el => { if (el) el.innerHTML = ''; });
 
             books.forEach(b => {
-                const pos = shelfPositions[b.id];
+                const pos = shelfPositions[b.uid];
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = spineHTML(b);
                 const spineEl = wrapper.firstElementChild;
@@ -2326,7 +2382,7 @@
                 getAverageColor(b.cover).then(result => {
                     shelfColorStatus[b.cover] = result || 'failed';
                     if (!result) return;
-                    const el = document.querySelector(`.shelf-spine[data-id="${b.id}"]`);
+                    const el = document.querySelector(`.shelf-spine[data-id="${b.uid || b.id}"]`);
                     if (el) {
                         el.style.setProperty('--spine-color', result.solid);
                         el.style.background = result.gradient;
@@ -2680,21 +2736,33 @@
             document.getElementById('landing-page').classList.remove('hidden');
         };
 
+        function generateUid() {
+            return 'b' + Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+        }
+
         async function loadUserLibrary() {
             const docRef = doc(db, "users_libs", currentUser.uid);
             const docSnap = await getDoc(docRef);
+            let needsSave = false;
             if (docSnap.exists()) {
                 library = docSnap.data().books;
                 if (library.length < 100) {
                     while (library.length < 100) {
-                        library.push({ id: library.length + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false });
+                        library.push({ id: library.length + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false, isDNF: false });
                     }
-                    await setDoc(docRef, { books: library });
+                    needsSave = true;
                 }
             } else {
-                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false }));
-                await setDoc(docRef, { books: library });
+                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false, isDNF: false }));
+                needsSave = true;
             }
+            // Identifiant stable par livre : ne change jamais, même quand l'ordre
+            // dans la Grille (et donc le champ id) est modifié. Sert de clé pour
+            // la position sur l'étagère afin qu'elle ne bouge pas avec le tri.
+            library.forEach(b => {
+                if (b.title && !b.uid) { b.uid = generateUid(); needsSave = true; }
+            });
+            if (needsSave) await setDoc(docRef, { books: library });
             updateFilterOptions();
             render();
         }
@@ -2728,7 +2796,7 @@
                 const matchGenre = gF === "all" || b.genre === gF;
                 const matchAuthor = aF === "all" || b.author === aF;
                 const matchMonth = mF === "all" || (b.end && b.end.includes('/') && b.end.split('/')[1].trim() === mF);
-                const matchFavorite = specF === "all" || (specF === "favorite" && !!b.isFavorite) || (specF === "bookclub" && !!b.isBookClub);
+                const matchFavorite = specF === "all" || (specF === "favorite" && !!b.isFavorite) || (specF === "bookclub" && !!b.isBookClub) || (specF === "dnf" && !!b.isDNF);
                 return b.title && matchSearch && matchRating && matchYear && matchGenre && matchAuthor && matchMonth && matchFavorite; 
             });
 
@@ -2740,7 +2808,7 @@
                 const matchGenre = gF === "all" || b.genre === gF;
                 const matchAuthor = aF === "all" || b.author === aF;
                 const matchMonth = mF === "all" || (b.end && b.end.includes('/') && b.end.split('/')[1].trim() === mF);
-                const matchFavorite = specF === "all" || (specF === "favorite" && !!b.isFavorite) || (specF === "bookclub" && !!b.isBookClub);
+                const matchFavorite = specF === "all" || (specF === "favorite" && !!b.isFavorite) || (specF === "bookclub" && !!b.isBookClub) || (specF === "dnf" && !!b.isDNF);
                 return matchSearch && matchRating && matchYear && matchGenre && matchAuthor && matchMonth && matchFavorite;
             });
 
@@ -2758,8 +2826,13 @@
                     if (db === null) return -1;
                     return sortF === 'date-asc' ? da - db : db - da;
                 };
-                filteredGrid.sort(sortByDate);
-                filteredFiches.sort(sortByDate);
+                const sortByRating = (a, b) => {
+                    const ra = a.rating || 0, rb = b.rating || 0;
+                    return sortF === 'rating-asc' ? ra - rb : rb - ra;
+                };
+                const sortFn = (sortF === 'rating-asc' || sortF === 'rating-desc') ? sortByRating : sortByDate;
+                filteredGrid.sort(sortFn);
+                filteredFiches.sort(sortFn);
             }
 
             const statLib = isAllYears
@@ -2861,6 +2934,53 @@
                 <span class="text-[10px] font-black text-slate-300">${g[1]} livre${g[1] > 1 ? 's' : ''}</span></div>
             `).join('') || '<p class="text-[10px] text-slate-400 text-center italic py-4">' + (isAllYears ? t('dash.noReportAll') : t('dash.noReportFor') + ' ' + yStatsF) + '</p>';
 
+            const dnfLib = isAllYears
+                ? library.filter(b => b.title && b.isDNF)
+                : library.filter(b => b.title && b.isDNF && b.end && b.end.includes(yStatsF));
+            document.getElementById('stat-dnf').innerText = dnfLib.length;
+            const dnfPctEl = document.getElementById('stat-dnf-pct');
+            if (statLib.length > 0) {
+                dnfPctEl.innerText = Math.round((dnfLib.length / statLib.length) * 100) + '% ' + t('dash.ofBooks');
+            } else {
+                dnfPctEl.innerHTML = '&nbsp;';
+            }
+
+            const langCounts = {};
+            statLib.forEach(b => { if (b.lang) langCounts[b.lang] = (langCounts[b.lang] || 0) + 1; });
+            const sortedLangs = Object.entries(langCounts).sort((a, b) => b[1] - a[1]);
+            const maxLangCount = Math.max(1, ...sortedLangs.map(l => l[1]));
+            document.getElementById('lang-podium').innerHTML = sortedLangs.map(l => `
+                <div class="lang-bar-row">
+                    <span class="lang-bar-label" title="${l[0]}">${l[0]}</span>
+                    <div class="lang-bar-track"><div class="lang-bar-fill" style="width:${Math.round((l[1] / maxLangCount) * 100)}%;"></div></div>
+                    <span class="lang-bar-count">${l[1]}</span>
+                </div>
+            `).join('') || '<p class="text-[10px] text-slate-400 text-center italic py-4">' + (isAllYears ? t('dash.noReportAll') : t('dash.noReportFor') + ' ' + yStatsF) + '</p>';
+
+            const authorCounts = {};
+            statLib.forEach(b => { if (b.author) authorCounts[b.author] = (authorCounts[b.author] || 0) + 1; });
+            const sortedAuthors = Object.entries(authorCounts).sort((a, b) => b[1] - a[1]);
+            const top3Authors = sortedAuthors.slice(0, 3);
+            if (top3Authors.length === 0) {
+                document.getElementById('author-podium').innerHTML = '<p class="text-[10px] text-slate-400 text-center italic py-4">' + (isAllYears ? t('dash.noReportAll') : t('dash.noReportFor') + ' ' + yStatsF) + '</p>';
+            } else {
+                const podiumOrder = [1, 0, 2];
+                const podiumHeights = [85, 58, 36];
+                const podiumBarColors = ['#C5A059', '#A8A8A8', '#CD7F32'];
+                const podiumMedalIcons = ['🥇', '🥈', '🥉'];
+                document.getElementById('author-podium').innerHTML = '<div class="olympic-podium">' + podiumOrder.map(rank => {
+                    const entry = top3Authors[rank];
+                    if (!entry) return '<div class="olympic-step" style="visibility:hidden;"></div>';
+                    const [name, count] = entry;
+                    return `
+                        <div class="olympic-step">
+                            <span class="olympic-step-name" title="${name}">${name}</span>
+                            <span class="olympic-step-count">${count} livre${count > 1 ? 's' : ''}</span>
+                            <div class="olympic-step-bar" style="height:${podiumHeights[rank]}px; background:${podiumBarColors[rank]};">${podiumMedalIcons[rank]}</div>
+                        </div>`;
+                }).join('') + '</div>';
+            }
+
             updateChart(statLib, isAllYears);
             renderShelf(getShelfBooks());
 
@@ -2869,7 +2989,7 @@
             document.getElementById('grid-content').innerHTML = filteredGrid.map(b => `
                 <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
                     <div class="grid-thumb relative">
-                        ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<div class="flex flex-col items-center justify-center text-center px-3 py-2 h-full w-full"><span class="grid-thumb-title font-serif font-black uppercase leading-tight text-[15px]">${b.title}</span><span class="mt-2 text-[10px] font-bold uppercase tracking-wide" style="color: var(--gold-accent);">${b.author || ''}</span></div>`}
+                        ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover ${b.isDNF ? 'grayscale opacity-50' : ''}">` : `<div class="flex flex-col items-center justify-center text-center px-3 py-2 h-full w-full ${b.isDNF ? 'grayscale opacity-50' : ''}"><span class="grid-thumb-title font-serif font-black uppercase leading-tight text-[15px]">${b.title}</span><span class="mt-2 text-[10px] font-bold uppercase tracking-wide" style="color: var(--gold-accent);">${b.author || ''}</span></div>`}
                         
                         <!-- Badge Favori -->
                         ${b.isFavorite ? `<span class="absolute top-2 right-2 backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg" style="background: color-mix(in srgb, var(--gold-accent) 25%, transparent); border: 1px solid color-mix(in srgb, var(--gold-accent) 40%, transparent);">👑</span>` : ''}
@@ -2881,7 +3001,7 @@
     ${b.isBookClub ? `<span class="absolute bottom-2 left-2 bg-blue-500/80 backdrop-blur-md text-white text-[10px] w-6 h-6 flex items-center justify-center rounded-full shadow-lg border border-white/20">📖</span>` : ''}
                     </div>
 
-                    <div class="flex gap-1">${getStarsHtml(b.rating, "text-base")}</div>
+                    <div class="flex gap-1">${getRatingOrDnfHtml(b, "text-base")}</div>
                 </div>
             `).join('') + (nextEmptyBook ? `
                 <div class="grid-item add-card" data-id="new" onclick="openEdit(${nextEmptyBook.id})">
@@ -2918,14 +3038,14 @@
                     </div>
                     <div class="flex flex-col md:flex-row gap-10">
                         <div class="cover-box shrink-0">
-                            ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
+                            ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover ${book.isDNF ? 'grayscale opacity-50' : ''}">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
                         </div>
                         <div class="flex-1">
                             <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
                             <h3 class="fiche-author">${book.author || 'AUTEUR INCONNU'}</h3>
                             <div class="mb-6">
                                 <p class="section-label">Note :</p>
-                                <div class="flex gap-1">${getStarsHtml(book.rating, "text-2xl")}</div>
+                                <div class="flex gap-1">${getRatingOrDnfHtml(book, "text-2xl")}</div>
                             </div>
                             <p class="section-label">Résumé :</p>
                             <p class="fiche-summary">${book.summary || 'Aucun résumé.'}</p>
@@ -3069,17 +3189,30 @@
             return html;
         };
 
+        window.getRatingOrDnfHtml = (book, sizeClass = "text-[10px]") => {
+            if (book.isDNF) {
+                return `<span class="${sizeClass} font-black uppercase tracking-widest" style="color: #9ca3af; letter-spacing: 0.1em;">DNF</span>`;
+            }
+            return getStarsHtml(book.rating, sizeClass);
+        };
+
         window.updateFilterOptions = () => {
             const genres = [...new Set(library.map(b => b.genre).filter(g => g))].sort();
             const authors = [...new Set(library.map(b => b.author).filter(a => a))].sort();
 
             const genreSelect = document.getElementById('filter-genre');
             const authorSelect = document.getElementById('filter-author');
+            const authorShelfSelect = document.getElementById('filter-author-shelf');
             const currentGenre = genreSelect.value;
             const currentAuthor = authorSelect.value;
+            const currentAuthorShelf = authorShelfSelect ? authorShelfSelect.value : 'all';
 
             genreSelect.innerHTML = `<option value="all">${t('filters.allGenres')}</option>` + genres.map(g => `<option value="${g}">${g}</option>`).join('');
             authorSelect.innerHTML = `<option value="all">${t('filters.allAuthors')}</option>` + authors.map(a => `<option value="${a}">${a}</option>`).join('');
+            if (authorShelfSelect) {
+                authorShelfSelect.innerHTML = `<option value="all">${t('filters.allAuthors')}</option>` + authors.map(a => `<option value="${a}">${a}</option>`).join('');
+                authorShelfSelect.value = authors.includes(currentAuthorShelf) ? currentAuthorShelf : 'all';
+            }
 
             genreSelect.value = genres.includes(currentGenre) ? currentGenre : 'all';
             authorSelect.value = authors.includes(currentAuthor) ? currentAuthor : 'all';
@@ -3114,11 +3247,12 @@
             const currentFav = library[idx].isFavorite || false;
             const currentBookClub = library[idx].isBookClub || false;
             const currentAllTimeFav = library[idx].isAllTimeFavorite || false;
+            const currentUid = library[idx].uid || generateUid();
 
             const startDate = normalizeDateInput(document.getElementById('in-start').value);
             const endDate = normalizeDateInput(document.getElementById('in-end').value);
 
-            library[idx] = { id, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, year: document.getElementById('in-year').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: startDate, end: endDate, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav, isBookClub: currentBookClub, isAllTimeFavorite: currentAllTimeFav };
+            library[idx] = { id, uid: currentUid, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, year: document.getElementById('in-year').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: startDate, end: endDate, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav, isBookClub: currentBookClub, isAllTimeFavorite: currentAllTimeFav, isDNF: document.getElementById('in-dnf').checked };
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             updateFilterOptions(); render(); closeModal();
         };
@@ -3129,24 +3263,15 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
             document.getElementById('btn-' + id)?.classList.add('active');
-            document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats' || id === 'compte');
+            document.getElementById('search-bar-container').classList.toggle('hidden', id === 'stats' || id === 'compte' || id === 'bibliotheque');
             if (id === 'compte') openProfile();
-            if (id === 'stats' && typeof updateBookcaseWidth === 'function') {
+            if ((id === 'stats' || id === 'bibliotheque') && typeof updateBookcaseWidth === 'function') {
                 setTimeout(updateBookcaseWidth, 0);
             }
         };
 
         window.goToBibliotheque = () => {
-            showSection('stats');
-            setTimeout(() => {
-                const el = document.getElementById('bibliotheque-section');
-                if (el) {
-                    const header = document.querySelector('.sticky.top-0');
-                    const headerHeight = header ? header.offsetHeight : 0;
-                    const top = el.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
-                    window.scrollTo({ top, behavior: 'instant' });
-                }
-            }, 0);
+            showSection('bibliotheque', true);
         };
 
         window.jumpToFiche = (id) => { 
@@ -3170,6 +3295,7 @@
             ['title', 'author', 'cover', 'rating', 'genre', 'year', 'format', 'lang', 'start', 'end', 'summary', 'comment'].forEach(f => {
                 document.getElementById('in-' + f).value = b[f] || (f === 'rating' ? 0 : "");
             });
+            document.getElementById('in-dnf').checked = !!b.isDNF;
             document.getElementById('edit-modal').classList.remove('hidden');
         };
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
@@ -3444,7 +3570,8 @@
                 slot.format = slot.format || '-';
                 slot.lang = slot.lang || '';
                 slot.start = ''; slot.end = ''; slot.comment = ''; slot.rating = 0;
-                slot.isFavorite = false; slot.isBookClub = false; slot.isAllTimeFavorite = false;
+                slot.isFavorite = false; slot.isBookClub = false; slot.isAllTimeFavorite = false; slot.isDNF = false;
+                slot.uid = slot.uid || generateUid();
                 added++;
 
                 results.insertAdjacentHTML('beforeend', `
@@ -3480,7 +3607,7 @@
             if (!confirm(t("msg.deleteConfirm"))) return;
             const idx = library.findIndex(b => b.id === id);
             library.splice(idx, 1);
-            library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false });
+            library.push({ id: 100, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false, isDNF: false });
             library.forEach((b, i) => b.id = i + 1);
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             updateFilterOptions();
