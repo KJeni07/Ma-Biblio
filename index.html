@@ -511,6 +511,7 @@
             padding: 22px 16px 16px;
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
             overflow: hidden;
+            user-select: none;
         }
         html.dark .bookcase {
             background:
@@ -542,7 +543,7 @@
             cursor: grab;
             overflow: hidden;
             touch-action: none;
-            transition: transform 0.15s ease;
+            transition: left 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s ease;
             border: 1px solid rgba(0,0,0,0.15);
             background-color: var(--spine-color, #c9c2b4);
             box-shadow: 1px 2px 3px rgba(0,0,0,0.18);
@@ -584,7 +585,7 @@
             cursor: grab;
             user-select: none;
             touch-action: none;
-            transition: transform 0.15s ease;
+            transition: transform 0.15s ease, left 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
             filter: drop-shadow(1px 3px 2px rgba(0,0,0,0.25));
         }
         .shelf-decoration:hover { transform: translateY(-6px); z-index: 3; }
@@ -624,6 +625,16 @@
         .deco-statue .decoration-emoji.decoration-svg svg { width: 52px; height: 71px; }
         .decoration-ai-img { display: block; width: 90px; height: 90px; object-fit: contain; filter: drop-shadow(1px 3px 2px rgba(0,0,0,0.25)); }
         .shelf-spine.dragging { cursor: grabbing; transition: none; z-index: 50; user-select: none; }
+        .shelf-spine.selected { outline: 3px solid var(--gold-accent); outline-offset: 1px; z-index: 4; }
+        #shelf-marquee {
+            position: fixed;
+            border: 1.5px solid var(--gold-accent);
+            background: rgba(197, 160, 89, 0.15);
+            pointer-events: none;
+            z-index: 100;
+            border-radius: 2px;
+        }
+        .shelf-spine.group-drag-active { z-index: 50; }
         .spine-cap { display: none; }
         .spine-label {
             position: absolute;
@@ -1031,6 +1042,8 @@
                         </div>
                     </div>
 
+                    <p id="shelf-selection-hint" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 -mt-2" data-i18n="filters.multiSelectHint">Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.</p>
+
                     <div id="shelf-filters-panel" class="hidden flex flex-wrap gap-2 items-center text-xs mb-4 pb-4 border-b border-slate-100">
                         <select id="filter-year-shelf" onchange="render()" class="dashboard-year-select !text-xs !py-1.5">
                             <option value="all" data-i18n="filters.allYears">Toutes les années</option>
@@ -1343,7 +1356,7 @@
         const TRANSLATIONS = {
             fr: {
                 nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", library: "Bibliothèque", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
-                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Réinitialiser", sortNone: "Ordre habituel", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)" },
+                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", multiSelectBtn: "Sélection", multiSelectHint: "Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.", multiSelectHintActive: "livre(s) sélectionné(s) — glisse-en un pour les déplacer ensemble.", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Réinitialiser", sortNone: "Ordre habituel", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)" },
                 months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
                 dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", dnfCount: "Livres Abandonnés (DNF)", ofBooks: "des livres", languagesRead: "Langues Lues", authorsRead: "Livres par Auteur", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE" },
                 account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
@@ -1385,7 +1398,7 @@
             },
             en: {
                 nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", library: "Library", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
-                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Reset", sortNone: "Default order", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)" },
+                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", multiSelectBtn: "Select", multiSelectHint: "Drag a box around several books to select them, then drag one to move them all together.", multiSelectHintActive: "book(s) selected — drag one to move them all together.", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", dnf: "🚫 DNF", reset: "Reset", sortNone: "Default order", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)" },
                 months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
                 dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", dnfCount: "Dropped Books (DNF)", ofBooks: "of books", languagesRead: "Languages Read", authorsRead: "Books per Author", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK" },
                 account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
@@ -1572,6 +1585,7 @@
         function renderBookcaseRows() {
             const bookcase = document.getElementById('bookcase-container');
             if (!bookcase) return;
+            initShelfMarquee();
             bookcase.innerHTML = `<div id="bookcase-scaler">${Array.from({ length: SHELF_ROW_COUNT }, (_, i) => `
                 <div class="bookshelf-row-wrap group relative ${i === SHELF_ROW_COUNT - 1 ? 'bookshelf-row-wrap-last' : ''}">
                     <button onclick="removeShelfRow(${i})" class="absolute -top-1 -right-1 z-10 w-6 h-6 rounded-full bg-white border border-red-200 text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 flex items-center justify-center shadow-sm" title="Supprimer cette rangée">×</button>
@@ -1644,9 +1658,90 @@
             renderShelf(getShelfBooks());
         };
 
-        let shelfPositions = {}; // { [bookId]: { row, x } }
+        let shelfPositions = {}; // { [bookUid]: { row, x } }
         let shelfDecorations = {}; // { [decoId]: { row, x, emoji } }
-        let activeShelfDrag = null; // { el, item, kind, dragOffsetX, startX, startY, moved, lastLeft, pointerId }
+        let activeShelfDrag = null; // { el, item, kind, dragOffsetX, startX, startY, moved, lastLeft, pointerId, group }
+        let selectedShelfUids = new Set();
+        let shelfMarquee = null; // { startX, startY, box, pointerId, moved, additive, baseSelection }
+
+        function initShelfMarquee() {
+            const container = document.getElementById('bookcase-container');
+            if (!container || container.dataset.marqueeInit) return;
+            container.dataset.marqueeInit = '1';
+            container.addEventListener('pointerdown', (e) => {
+                if (activeShelfDrag || shelfMarquee) return;
+                if (e.target.closest('.shelf-spine, .shelf-decoration, button')) return;
+                const additive = e.shiftKey || e.metaKey || e.ctrlKey;
+                const box = document.createElement('div');
+                box.id = 'shelf-marquee';
+                document.body.appendChild(box);
+                shelfMarquee = {
+                    startX: e.clientX, startY: e.clientY, box, pointerId: e.pointerId,
+                    moved: false, additive, baseSelection: additive ? new Set(selectedShelfUids) : new Set(),
+                };
+                try { container.setPointerCapture(e.pointerId); } catch (err) {}
+            });
+        }
+
+        function onShelfMarqueeMove(e) {
+            const m = shelfMarquee;
+            if (!m || e.pointerId !== m.pointerId) return;
+            const dx = Math.abs(e.clientX - m.startX), dy = Math.abs(e.clientY - m.startY);
+            if (!m.moved) {
+                if (dx < 4 && dy < 4) return;
+                m.moved = true;
+            }
+            const left = Math.min(m.startX, e.clientX);
+            const top = Math.min(m.startY, e.clientY);
+            const width = Math.abs(e.clientX - m.startX);
+            const height = Math.abs(e.clientY - m.startY);
+            Object.assign(m.box.style, { left: left + 'px', top: top + 'px', width: width + 'px', height: height + 'px' });
+
+            const sel = { left, top, right: left + width, bottom: top + height };
+            const newSet = new Set(m.additive ? m.baseSelection : []);
+            document.querySelectorAll('.shelf-spine').forEach(spine => {
+                const r = spine.getBoundingClientRect();
+                const intersects = !(r.right < sel.left || r.left > sel.right || r.bottom < sel.top || r.top > sel.bottom);
+                if (intersects) newSet.add(spine.dataset.id);
+            });
+            selectedShelfUids = newSet;
+            updateShelfSelectionVisuals();
+        }
+
+        function onShelfMarqueeUp(e) {
+            const m = shelfMarquee;
+            if (!m || e.pointerId !== m.pointerId) return;
+            shelfMarquee = null;
+            if (m.box && m.box.parentNode) m.box.parentNode.removeChild(m.box);
+            try { document.getElementById('bookcase-container').releasePointerCapture(e.pointerId); } catch (err) {}
+            if (!m.moved && !m.additive) {
+                selectedShelfUids.clear();
+                updateShelfSelectionVisuals();
+            }
+        }
+
+        document.addEventListener('pointermove', onShelfMarqueeMove);
+        document.addEventListener('pointerup', onShelfMarqueeUp);
+
+        function toggleShelfSelection(uid) {
+            if (selectedShelfUids.has(uid)) selectedShelfUids.delete(uid);
+            else selectedShelfUids.add(uid);
+            updateShelfSelectionVisuals();
+        }
+
+        function updateShelfSelectionVisuals() {
+            document.querySelectorAll('.shelf-spine').forEach(el => {
+                el.classList.toggle('selected', selectedShelfUids.has(el.dataset.id));
+            });
+            const hint = document.getElementById('shelf-selection-hint');
+            if (hint) {
+                if (selectedShelfUids.size > 0) {
+                    hint.innerText = selectedShelfUids.size + ' ' + t('filters.multiSelectHintActive');
+                } else {
+                    hint.innerText = t('filters.multiSelectHint');
+                }
+            }
+        }
         let shelfColorCache = {};
 
         async function saveShelfDecorations() {
@@ -2274,6 +2369,29 @@
 
             el.addEventListener('pointerdown', (e) => {
                 if (activeShelfDrag) return;
+
+                let group = null;
+                if (kind === 'book' && selectedShelfUids.has(item.uid) && selectedShelfUids.size > 1) {
+                    const anchorRow = parseInt(el.closest('.bookshelf-row').dataset.row);
+                    const anchorX = parseFloat(el.style.left) || 0;
+                    const members = [];
+                    selectedShelfUids.forEach(uid => {
+                        if (uid === item.uid) return;
+                        const memberEl = document.querySelector(`.shelf-spine[data-id="${uid}"]`);
+                        if (!memberEl) return;
+                        members.push({
+                            id: uid, el: memberEl,
+                            originalRow: parseInt(memberEl.closest('.bookshelf-row').dataset.row),
+                            originalX: parseFloat(memberEl.style.left) || 0,
+                        });
+                    });
+                    group = { anchorOriginalRow: anchorRow, anchorOriginalX: anchorX, members };
+                } else if (kind === 'book' && selectedShelfUids.size > 0 && !selectedShelfUids.has(item.uid)) {
+                    // On démarre une action sur un livre hors sélection : on efface l'ancienne sélection
+                    selectedShelfUids.clear();
+                    updateShelfSelectionVisuals();
+                }
+
                 activeShelfDrag = {
                     el, item, kind,
                     dragOffsetX: (e.clientX - el.getBoundingClientRect().left) / currentShelfScale,
@@ -2281,6 +2399,7 @@
                     moved: false,
                     lastLeft: parseFloat(el.style.left) || 0,
                     pointerId: e.pointerId,
+                    group,
                 };
                 try { el.setPointerCapture(e.pointerId); } catch (err) {}
                 cancelHideShelfTooltip();
@@ -2299,6 +2418,10 @@
                 if (dx < 4 && dy < 4) return;
                 drag.moved = true;
                 el.classList.add('dragging');
+                if (drag.group) {
+                    el.classList.add('group-drag-active');
+                    drag.group.members.forEach(m => { m.el.classList.add('dragging', 'group-drag-active'); });
+                }
             }
 
             // Rangée la plus proche du curseur (par distance au centre), plus fiable qu'une zone étendue
@@ -2319,19 +2442,50 @@
             let newLeft = (e.clientX - rowRect.left) / currentShelfScale - drag.dragOffsetX;
             newLeft = Math.max(0, Math.min(rowWidth - width, newLeft));
 
-            // Empêche le chevauchement avec les autres livres de la rangée
-            const siblings = Array.from(targetRowEl.children).filter(c => c !== el && (c.classList.contains('shelf-spine') || c.classList.contains('shelf-decoration')));
-            siblings.forEach(sib => {
-                const sLeft = parseFloat(sib.style.left) || 0;
-                const sRight = sLeft + sib.offsetWidth;
-                const right = newLeft + width;
-                if (newLeft < sRight && right > sLeft) {
-                    newLeft = (drag.lastLeft <= sLeft) ? (sLeft - width) : sRight;
-                }
+            // Les voisins s'écartent en douceur pour laisser passer, puis reviennent à leur place
+            // dès qu'ils ne sont plus gênés — sans jamais réorganiser toute la rangée.
+            if (!drag.rowCache) drag.rowCache = {};
+            const movingEls = new Set([el, ...(drag.group ? drag.group.members.map(m => m.el) : [])]);
+            const rowIndex = parseInt(targetRowEl.dataset.row);
+            if (!drag.rowCache[rowIndex]) {
+                drag.rowCache[rowIndex] = Array.from(targetRowEl.children)
+                    .filter(c => (c.classList.contains('shelf-spine') || c.classList.contains('shelf-decoration')) && !movingEls.has(c))
+                    .map(c => ({ el: c, originalLeft: parseFloat(c.style.left) || 0, width: c.offsetWidth }));
+            }
+            // Remet chaque voisin connu (de n'importe quelle rangée visitée) à sa place de repos...
+            Object.values(drag.rowCache).forEach(items => {
+                items.forEach(it => { it.el.style.left = it.originalLeft + 'px'; });
             });
-            newLeft = Math.max(0, Math.min(rowWidth - width, newLeft));
+            // ...puis écarte seulement ceux qui gênent réellement le passage dans la rangée actuelle
+            const SHELF_GAP = 6;
+            const movingRight = newLeft + width;
+            drag.rowCache[rowIndex].forEach(({ el: sib, originalLeft, width: sWidth }) => {
+                const overlap = newLeft < originalLeft + sWidth + SHELF_GAP && movingRight + SHELF_GAP > originalLeft;
+                if (!overlap) return;
+                const pushLeft = (originalLeft + sWidth / 2) < (newLeft + width / 2);
+                const pushed = pushLeft ? Math.max(0, newLeft - sWidth - SHELF_GAP) : movingRight + SHELF_GAP;
+                sib.style.left = pushed + 'px';
+            });
+
             el.style.left = newLeft + 'px';
             drag.lastLeft = newLeft;
+
+            // Déplace le reste du groupe sélectionné avec le même décalage, en restant bien visible
+            if (drag.group) {
+                const newRow = rowIndex;
+                const rowDelta = newRow - drag.group.anchorOriginalRow;
+                const xDelta = newLeft - drag.group.anchorOriginalX;
+                drag.group.members.forEach(m => {
+                    const targetRow = Math.max(0, Math.min(SHELF_ROW_COUNT - 1, m.originalRow + rowDelta));
+                    const mRowEl = document.getElementById(`bookshelf-row-${targetRow}`);
+                    if (!mRowEl) return;
+                    if (m.el.parentElement !== mRowEl) mRowEl.appendChild(m.el);
+                    const mRowWidth = mRowEl.offsetWidth;
+                    const mWidth = m.el.offsetWidth;
+                    const mLeft = Math.max(0, Math.min(mRowWidth - mWidth, m.originalX + xDelta));
+                    m.el.style.left = mLeft + 'px';
+                });
+            }
         }
 
         async function onShelfPointerUp(e) {
@@ -2339,30 +2493,87 @@
             if (!drag || e.pointerId !== drag.pointerId) return;
             const el = drag.el, item = drag.item;
             activeShelfDrag = null;
-            el.classList.remove('dragging');
+            el.classList.remove('dragging', 'group-drag-active');
+            if (drag.group) drag.group.members.forEach(m => m.el.classList.remove('dragging', 'group-drag-active'));
             try { el.releasePointerCapture(e.pointerId); } catch (err) {}
 
             if (!drag.moved) {
-                if (drag.kind === 'book') jumpToFiche(item.id);
+                if (drag.kind === 'book') {
+                    if (selectedShelfUids.size > 1 && selectedShelfUids.has(item.uid)) {
+                        toggleShelfSelection(item.uid);
+                    } else {
+                        if (selectedShelfUids.size > 0) { selectedShelfUids.clear(); updateShelfSelectionVisuals(); }
+                        jumpToFiche(item.id);
+                    }
+                }
                 return;
             }
+
             const rowEl = el.closest('.bookshelf-row');
             if (drag.kind === 'decoration') {
                 if (!shelfDecorations[item.id]) return;
                 shelfDecorations[item.id].row = parseInt(rowEl.dataset.row);
                 shelfDecorations[item.id].x = Math.round(parseFloat(el.style.left) || 0);
                 await saveShelfDecorations();
-            } else {
-                shelfPositions[item.uid] = { row: parseInt(rowEl.dataset.row), x: Math.round(parseFloat(el.style.left) || 0) };
-                await saveShelfPositions();
+                return;
             }
+
+            shelfPositions[item.uid] = { row: parseInt(rowEl.dataset.row), x: Math.round(parseFloat(el.style.left) || 0) };
+            if (drag.group) {
+                drag.group.members.forEach(m => {
+                    const mRowEl = m.el.closest('.bookshelf-row');
+                    shelfPositions[m.id] = { row: parseInt(mRowEl.dataset.row), x: Math.round(parseFloat(m.el.style.left) || 0) };
+                });
+            }
+            // Les voisins réellement écartés pour laisser la place gardent leur nouvelle position
+            let decosChanged = false;
+            if (drag.rowCache) {
+                Object.values(drag.rowCache).forEach(items => {
+                    items.forEach(({ el: sib, originalLeft }) => {
+                        const currentLeft = Math.round(parseFloat(sib.style.left) || 0);
+                        if (currentLeft === Math.round(originalLeft)) return;
+                        const sibRowEl = sib.closest('.bookshelf-row');
+                        const sibRow = parseInt(sibRowEl.dataset.row);
+                        if (sib.dataset.id) {
+                            shelfPositions[sib.dataset.id] = { row: sibRow, x: currentLeft };
+                        } else if (sib.dataset.decoId && shelfDecorations[sib.dataset.decoId]) {
+                            shelfDecorations[sib.dataset.decoId].row = sibRow;
+                            shelfDecorations[sib.dataset.decoId].x = currentLeft;
+                            decosChanged = true;
+                        }
+                    });
+                });
+            }
+            await saveShelfPositions();
+            if (decosChanged) await saveShelfDecorations();
         }
 
         function onShelfPointerCancel(e) {
             const drag = activeShelfDrag;
             if (!drag || e.pointerId !== drag.pointerId) return;
             activeShelfDrag = null;
-            drag.el.classList.remove('dragging');
+            drag.el.classList.remove('dragging', 'group-drag-active');
+            if (drag.group) drag.group.members.forEach(m => m.el.classList.remove('dragging', 'group-drag-active'));
+            if (drag.rowCache) {
+                Object.values(drag.rowCache).forEach(items => {
+                    items.forEach(({ el: sib, originalLeft }) => { sib.style.left = originalLeft + 'px'; });
+                });
+            }
+            if (drag.moved && drag.kind === 'book') {
+                const origPos = shelfPositions[drag.item.uid];
+                if (origPos) {
+                    const origRowEl = document.getElementById(`bookshelf-row-${origPos.row}`);
+                    if (origRowEl && drag.el.parentElement !== origRowEl) origRowEl.appendChild(drag.el);
+                    drag.el.style.left = origPos.x + 'px';
+                }
+                if (drag.group) {
+                    drag.group.members.forEach(m => {
+                        const origRowEl = document.getElementById(`bookshelf-row-${m.originalRow}`);
+                        if (origRowEl && m.el.parentElement !== origRowEl) origRowEl.appendChild(m.el);
+                        m.el.style.left = m.originalX + 'px';
+                    });
+                }
+            }
         }
 
         document.addEventListener('pointermove', onShelfPointerMove);
@@ -2433,6 +2644,7 @@
 
             renderShelfDecorations();
             updateBookcaseWidth();
+            updateShelfSelectionVisuals();
         }
 
         let currentShelfScale = 1;
