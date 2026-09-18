@@ -2442,50 +2442,90 @@
             let newLeft = (e.clientX - rowRect.left) / currentShelfScale - drag.dragOffsetX;
             newLeft = Math.max(0, Math.min(rowWidth - width, newLeft));
 
-            // Les voisins s'écartent en douceur pour laisser passer, puis reviennent à leur place
-            // dès qu'ils ne sont plus gênés — sans jamais réorganiser toute la rangée.
-            if (!drag.rowCache) drag.rowCache = {};
-            const movingEls = new Set([el, ...(drag.group ? drag.group.members.map(m => m.el) : [])]);
-            const rowIndex = parseInt(targetRowEl.dataset.row);
-            if (!drag.rowCache[rowIndex]) {
-                drag.rowCache[rowIndex] = Array.from(targetRowEl.children)
-                    .filter(c => (c.classList.contains('shelf-spine') || c.classList.contains('shelf-decoration')) && !movingEls.has(c))
-                    .map(c => ({ el: c, originalLeft: parseFloat(c.style.left) || 0, width: c.offsetWidth }));
-            }
-            // Remet chaque voisin connu (de n'importe quelle rangée visitée) à sa place de repos...
-            Object.values(drag.rowCache).forEach(items => {
-                items.forEach(it => { it.el.style.left = it.originalLeft + 'px'; });
-            });
-            // ...puis écarte seulement ceux qui gênent réellement le passage dans la rangée actuelle
-            const SHELF_GAP = 6;
-            const movingRight = newLeft + width;
-            drag.rowCache[rowIndex].forEach(({ el: sib, originalLeft, width: sWidth }) => {
-                const overlap = newLeft < originalLeft + sWidth + SHELF_GAP && movingRight + SHELF_GAP > originalLeft;
-                if (!overlap) return;
-                const pushLeft = (originalLeft + sWidth / 2) < (newLeft + width / 2);
-                const pushed = pushLeft ? Math.max(0, newLeft - sWidth - SHELF_GAP) : movingRight + SHELF_GAP;
-                sib.style.left = pushed + 'px';
-            });
-
             el.style.left = newLeft + 'px';
             drag.lastLeft = newLeft;
 
-            // Déplace le reste du groupe sélectionné avec le même décalage, en restant bien visible
+            // Calcule d'abord la position du reste du groupe sélectionné (même décalage)
+            const rowIndex = parseInt(targetRowEl.dataset.row);
+            const groupTargets = []; // { rowIndex, left, width, el }
             if (drag.group) {
-                const newRow = rowIndex;
-                const rowDelta = newRow - drag.group.anchorOriginalRow;
+                const rowDelta = rowIndex - drag.group.anchorOriginalRow;
                 const xDelta = newLeft - drag.group.anchorOriginalX;
                 drag.group.members.forEach(m => {
-                    const targetRow = Math.max(0, Math.min(SHELF_ROW_COUNT - 1, m.originalRow + rowDelta));
-                    const mRowEl = document.getElementById(`bookshelf-row-${targetRow}`);
+                    const mRow = Math.max(0, Math.min(SHELF_ROW_COUNT - 1, m.originalRow + rowDelta));
+                    const mRowEl = document.getElementById(`bookshelf-row-${mRow}`);
                     if (!mRowEl) return;
                     if (m.el.parentElement !== mRowEl) mRowEl.appendChild(m.el);
-                    const mRowWidth = mRowEl.offsetWidth;
                     const mWidth = m.el.offsetWidth;
+                    const mRowWidth = mRowEl.offsetWidth;
                     const mLeft = Math.max(0, Math.min(mRowWidth - mWidth, m.originalX + xDelta));
                     m.el.style.left = mLeft + 'px';
+                    groupTargets.push({ rowIndex: mRow, left: mLeft, width: mWidth, el: m.el });
                 });
             }
+
+            // Écarte les voisins pour éviter tout chevauchement. On trie tous les éléments de la
+            // rangée (livre déplacé compris) par position, puis on balaye deux fois — gauche→droite
+            // puis droite→gauche — pour garantir un espacement minimum partout, y compris en chaîne
+            // et dans les cas limites en bord de rangée.
+            if (!drag.rowCache) drag.rowCache = {};
+            const movingEls = new Set([el, ...(drag.group ? drag.group.members.map(m => m.el) : [])]);
+            const affectedRows = new Set([rowIndex, ...groupTargets.map(g => g.rowIndex)]);
+            affectedRows.forEach(rIdx => {
+                if (drag.rowCache[rIdx]) return;
+                const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
+                if (!rEl) return;
+                drag.rowCache[rIdx] = Array.from(rEl.children)
+                    .filter(c => (c.classList.contains('shelf-spine') || c.classList.contains('shelf-decoration')) && !movingEls.has(c))
+                    .map(c => ({ el: c, originalLeft: parseFloat(c.style.left) || 0, width: c.offsetWidth, left: 0 }));
+            });
+            // Remet chaque voisin connu à sa place de repos avant de recalculer les écarts du jour
+            Object.values(drag.rowCache).forEach(items => { items.forEach(it => { it.left = it.originalLeft; }); });
+
+            const SHELF_GAP = 6;
+            affectedRows.forEach(rIdx => {
+                const siblings = drag.rowCache[rIdx];
+                if (!siblings || !siblings.length) return;
+                const fixedInRow = [];
+                if (rIdx === rowIndex) fixedInRow.push({ left: newLeft, width });
+                groupTargets.filter(g => g.rowIndex === rIdx).forEach(g => fixedInRow.push({ left: g.left, width: g.width }));
+                if (!fixedInRow.length) return;
+
+                const all = [
+                    ...fixedInRow.map(f => ({ left: f.left, width: f.width, fixed: true })),
+                    ...siblings.map(s => ({ ref: s, left: s.left, width: s.width, fixed: false })),
+                ].sort((a, b) => a.left - b.left);
+
+                // Plusieurs passes gauche→droite puis droite→gauche pour garantir un espacement minimum
+                // constant partout, y compris en chaîne (plusieurs livres qui se poussent les uns les
+                // autres). Les livres non déplacés ne sont JAMAIS recalés de force sur les bords (0 ou
+                // largeur de la rangée) : ça cassait la garantie d'espacement et provoquait des
+                // chevauchements. Seul le livre tenu par le curseur reste borné à la rangée (déjà fait
+                // plus haut) ; ses voisins peuvent au besoin déborder très légèrement plutôt que de se
+                // superposer.
+                for (let pass = 0; pass < 4; pass++) {
+                    for (let i = 1; i < all.length; i++) {
+                        const prev = all[i - 1], cur = all[i];
+                        const minLeft = prev.left + prev.width + SHELF_GAP;
+                        if (cur.left < minLeft) {
+                            if (!cur.fixed) cur.left = minLeft;
+                            else if (!prev.fixed) prev.left = cur.left - prev.width - SHELF_GAP;
+                        }
+                    }
+                    for (let i = all.length - 2; i >= 0; i--) {
+                        const cur = all[i], next = all[i + 1];
+                        if (cur.fixed) continue;
+                        const maxLeft = next.left - cur.width - SHELF_GAP;
+                        if (cur.left > maxLeft) cur.left = maxLeft;
+                    }
+                }
+
+                all.forEach(a => { if (!a.fixed) a.ref.left = a.left; });
+            });
+
+            Object.values(drag.rowCache).forEach(items => {
+                items.forEach(it => { it.el.style.left = it.left + 'px'; });
+            });
         }
 
         async function onShelfPointerUp(e) {
