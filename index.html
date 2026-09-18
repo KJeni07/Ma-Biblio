@@ -317,6 +317,12 @@
         .lang-bar-fill { height: 100%; border-radius: 999px; background: var(--gold-accent); }
         .lang-bar-count { font-size: 10px; font-weight: 900; color: #94a3b8; width: 20px; text-align: right; flex-shrink: 0; }
         html.dark .lang-bar-track { background: #2f2f2f; }
+        .donut-track { stroke: #f1f5f9; }
+        html.dark .donut-track { stroke: #2f2f2f; }
+        .donut-legend-row { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .donut-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .donut-segment { cursor: pointer; transition: opacity 0.15s ease; }
+        .donut-segment:hover { opacity: 0.75; }
         html.dark .olympic-step-name { color: #F2F0EA; }
 
         /* --- UI UTILS --- */
@@ -1002,9 +1008,9 @@
                         <div id="stat-dnf" class="stat-value">0</div>
                         <p id="stat-dnf-pct" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">&nbsp;</p>
                     </div>
-                    <div class="stat-card text-left px-8">
+                    <div class="stat-card text-left px-6">
                         <p class="section-label text-center mb-2" data-i18n="dash.languagesRead">Langues Lues</p>
-                        <div id="lang-podium" class="space-y-1 overflow-y-auto" style="max-height: 140px;"></div>
+                        <div id="lang-podium" class="flex items-center gap-3" style="height: 140px;"></div>
                     </div>
                     <div class="stat-card text-left px-8">
                         <p class="section-label text-center mb-2" data-i18n="dash.authorsRead">Livres par Auteur</p>
@@ -3240,14 +3246,36 @@
             const langCounts = {};
             statLib.forEach(b => { if (b.lang) langCounts[b.lang] = (langCounts[b.lang] || 0) + 1; });
             const sortedLangs = Object.entries(langCounts).sort((a, b) => b[1] - a[1]);
-            const maxLangCount = Math.max(1, ...sortedLangs.map(l => l[1]));
-            document.getElementById('lang-podium').innerHTML = sortedLangs.map(l => `
-                <div class="lang-bar-row">
-                    <span class="lang-bar-label" title="${l[0]}">${l[0]}</span>
-                    <div class="lang-bar-track"><div class="lang-bar-fill" style="width:${Math.round((l[1] / maxLangCount) * 100)}%;"></div></div>
-                    <span class="lang-bar-count">${l[1]}</span>
-                </div>
-            `).join('') || '<p class="text-[10px] text-slate-400 text-center italic py-4">' + (isAllYears ? t('dash.noReportAll') : t('dash.noReportFor') + ' ' + yStatsF) + '</p>';
+            const langTotal = sortedLangs.reduce((s, l) => s + l[1], 0);
+            const DONUT_PALETTE = ['#C5A059', '#7B3F3F', '#35506B', '#3E5C50', '#5B4B8A', '#B5651D', '#2E6B6B', '#8A4A6B', '#4A4A4A', '#4E6B2E'];
+            if (langTotal === 0) {
+                document.getElementById('lang-podium').innerHTML = '<p class="text-[10px] text-slate-400 text-center italic py-4 w-full">' + (isAllYears ? t('dash.noReportAll') : t('dash.noReportFor') + ' ' + yStatsF) + '</p>';
+            } else {
+                const R = 34, CX = 48, CY = 48, STROKE = 14;
+                const circumference = 2 * Math.PI * R;
+                let acc = 0;
+                const segments = sortedLangs.map((l, i) => {
+                    const frac = l[1] / langTotal;
+                    const dash = frac * circumference;
+                    const seg = `<circle class="donut-segment" cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${DONUT_PALETTE[i % DONUT_PALETTE.length]}" stroke-width="${STROKE}" stroke-dasharray="${dash} ${circumference - dash}" stroke-dashoffset="${-acc}" transform="rotate(-90 ${CX} ${CY})"><title>${l[0]} — ${l[1]} livre${l[1] > 1 ? 's' : ''} (${Math.round(frac * 100)}%)</title></circle>`;
+                    acc += dash;
+                    return seg;
+                }).join('');
+                const legend = sortedLangs.map((l, i) => `
+                    <div class="donut-legend-row">
+                        <span class="donut-legend-dot" style="background:${DONUT_PALETTE[i % DONUT_PALETTE.length]};"></span>
+                        <span class="truncate">${l[0]}</span>
+                        <span class="text-slate-400 ml-auto pl-1">${Math.round((l[1] / langTotal) * 100)}%</span>
+                    </div>
+                `).join('');
+                document.getElementById('lang-podium').innerHTML = `
+                    <svg width="96" height="96" viewBox="0 0 96 96" class="shrink-0">
+                        <circle class="donut-track" cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke-width="${STROKE}"></circle>
+                        ${segments}
+                    </svg>
+                    <div class="flex-1 min-w-0 space-y-1 overflow-y-auto" style="max-height: 130px;">${legend}</div>
+                `;
+            }
 
             const authorCounts = {};
             statLib.forEach(b => { if (b.author) authorCounts[b.author] = (authorCounts[b.author] || 0) + 1; });
