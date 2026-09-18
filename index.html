@@ -1666,6 +1666,7 @@
 
         let shelfPositions = {}; // { [bookUid]: { row, x } }
         let shelfDecorations = {}; // { [decoId]: { row, x, emoji } }
+        const DECORATION_WIDTH = 64;
         let activeShelfDrag = null; // { el, item, kind, dragOffsetX, startX, startY, moved, lastLeft, pointerId, group }
         let selectedShelfUids = new Set();
         let shelfMarquee = null; // { startX, startY, box, pointerId, moved, additive, baseSelection }
@@ -1762,7 +1763,7 @@
 
         window.addShelfDecoration = (emoji, key) => {
             const id = 'deco_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-            shelfDecorations[id] = { row: 0, x: 4, emoji, key };
+            shelfDecorations[id] = { ...findFreeShelfSpot(DECORATION_WIDTH), emoji, key };
             saveShelfDecorations();
             renderShelfDecorations();
             closeDecorationPicker();
@@ -1857,7 +1858,7 @@
             const url = preview.dataset.url;
             if (!url) return;
             const id = 'deco_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-            shelfDecorations[id] = { row: 0, x: 4, emoji: '', key: null, img: url };
+            shelfDecorations[id] = { ...findFreeShelfSpot(DECORATION_WIDTH), emoji: '', key: null, img: url };
             saveShelfDecorations();
             renderShelfDecorations();
             document.getElementById('custom-deco-input').value = '';
@@ -2355,6 +2356,11 @@
                 if (!book) return;
                 rowExtent[pos.row] = Math.max(rowExtent[pos.row], pos.x + spineWidthFor(book));
             });
+            Object.values(shelfDecorations).forEach(d => {
+                if (typeof d.row === 'number' && d.row >= 0 && d.row < SHELF_ROW_COUNT) {
+                    rowExtent[d.row] = Math.max(rowExtent[d.row], d.x + DECORATION_WIDTH);
+                }
+            });
 
             visibleBooks.forEach(b => {
                 if (shelfPositions[b.uid]) return;
@@ -2362,9 +2368,30 @@
                 for (let i = 1; i < SHELF_ROW_COUNT; i++) {
                     if (rowExtent[i] < rowExtent[shortest]) shortest = i;
                 }
-                shelfPositions[b.uid] = { row: shortest, x: Math.round(rowExtent[shortest]) };
+                shelfPositions[b.uid] = { row: shortest, x: Math.round(rowExtent[shortest] ? rowExtent[shortest] + 6 : 4) };
                 rowExtent[shortest] += spineWidthFor(b) + 6;
             });
+        }
+
+        // Trouve un emplacement libre (rangée la moins chargée) pour un nouvel objet posé sur
+        // l'étagère (livre ou décoration), afin qu'il n'apparaisse jamais superposé à un objet existant.
+        function findFreeShelfSpot(width) {
+            const rowExtent = Array(SHELF_ROW_COUNT).fill(0);
+            library.forEach(b => {
+                if (b.title && shelfPositions[b.uid]) {
+                    rowExtent[shelfPositions[b.uid].row] = Math.max(rowExtent[shelfPositions[b.uid].row], shelfPositions[b.uid].x + spineWidthFor(b));
+                }
+            });
+            Object.values(shelfDecorations).forEach(d => {
+                if (typeof d.row === 'number' && d.row >= 0 && d.row < SHELF_ROW_COUNT) {
+                    rowExtent[d.row] = Math.max(rowExtent[d.row], d.x + DECORATION_WIDTH);
+                }
+            });
+            let shortest = 0;
+            for (let i = 1; i < SHELF_ROW_COUNT; i++) {
+                if (rowExtent[i] < rowExtent[shortest]) shortest = i;
+            }
+            return { row: shortest, x: Math.round(rowExtent[shortest] ? rowExtent[shortest] + 6 : 4) };
         }
 
         function initShelfDrag(el, item, kind = 'book') {
@@ -2417,6 +2444,7 @@
             const drag = activeShelfDrag;
             if (!drag || e.pointerId !== drag.pointerId) return;
             const el = drag.el;
+            const SHELF_GAP_CONST = 6;
 
             if (!drag.moved) {
                 const dx = Math.abs(e.clientX - drag.startX);
@@ -2448,11 +2476,47 @@
             let newLeft = (e.clientX - rowRect.left) / currentShelfScale - drag.dragOffsetX;
             newLeft = Math.max(0, Math.min(rowWidth - width, newLeft));
 
+            // Prépare/retrouve la liste des voisins de la rangée ciblée (hors éléments en cours de
+            // déplacement), en conservant leur position de repos d'origine.
+            const rowIndex = parseInt(targetRowEl.dataset.row);
+            if (!drag.rowCache) drag.rowCache = {};
+            const movingEls = new Set([el, ...(drag.group ? drag.group.members.map(m => m.el) : [])]);
+            const ensureRowCache = (rIdx) => {
+                if (drag.rowCache[rIdx]) return drag.rowCache[rIdx];
+                const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
+                if (!rEl) return null;
+                drag.rowCache[rIdx] = Array.from(rEl.children)
+                    .filter(c => (c.classList.contains('shelf-spine') || c.classList.contains('shelf-decoration')) && !movingEls.has(c))
+                    .map(c => ({ el: c, originalLeft: parseFloat(c.style.left) || 0, width: c.offsetWidth, left: 0 }));
+                return drag.rowCache[rIdx];
+            };
+
+            // Borne physiquement le livre tenu par le curseur : il ne peut pas être poussé plus loin que
+            // ce que les voisins occuperaient s'ils étaient tassés au maximum contre chaque bord. Ainsi,
+            // écarter les voisins pour lui faire de la place ne les fera jamais déborder de l'étagère.
+            if (!drag.group) {
+                const rowSiblings = ensureRowCache(rowIndex);
+                if (rowSiblings && rowSiblings.length) {
+                    const ordered = [...rowSiblings].sort((a, b) => a.originalLeft - b.originalLeft);
+                    const center = newLeft + width / 2;
+                    let idx = 0;
+                    while (idx < ordered.length && ordered[idx].originalLeft + ordered[idx].width / 2 < center) idx++;
+                    let leftPack = 0;
+                    for (let i = 0; i < idx; i++) leftPack += ordered[i].width + SHELF_GAP_CONST;
+                    let rightPack = 0;
+                    for (let i = idx; i < ordered.length; i++) rightPack += ordered[i].width + SHELF_GAP_CONST;
+                    const minBound = leftPack;
+                    const maxBound = rowWidth - width - rightPack;
+                    if (minBound <= maxBound) {
+                        newLeft = Math.max(minBound, Math.min(maxBound, newLeft));
+                    }
+                }
+            }
+
             el.style.left = newLeft + 'px';
             drag.lastLeft = newLeft;
 
             // Calcule d'abord la position du reste du groupe sélectionné (même décalage)
-            const rowIndex = parseInt(targetRowEl.dataset.row);
             const groupTargets = []; // { rowIndex, left, width, el }
             if (drag.group) {
                 const rowDelta = rowIndex - drag.group.anchorOriginalRow;
@@ -2474,21 +2538,13 @@
             // rangée (livre déplacé compris) par position, puis on balaye deux fois — gauche→droite
             // puis droite→gauche — pour garantir un espacement minimum partout, y compris en chaîne
             // et dans les cas limites en bord de rangée.
-            if (!drag.rowCache) drag.rowCache = {};
-            const movingEls = new Set([el, ...(drag.group ? drag.group.members.map(m => m.el) : [])]);
             const affectedRows = new Set([rowIndex, ...groupTargets.map(g => g.rowIndex)]);
-            affectedRows.forEach(rIdx => {
-                if (drag.rowCache[rIdx]) return;
-                const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
-                if (!rEl) return;
-                drag.rowCache[rIdx] = Array.from(rEl.children)
-                    .filter(c => (c.classList.contains('shelf-spine') || c.classList.contains('shelf-decoration')) && !movingEls.has(c))
-                    .map(c => ({ el: c, originalLeft: parseFloat(c.style.left) || 0, width: c.offsetWidth, left: 0 }));
-            });
+            affectedRows.forEach(rIdx => { ensureRowCache(rIdx); });
             // Remet chaque voisin connu à sa place de repos avant de recalculer les écarts du jour
             Object.values(drag.rowCache).forEach(items => { items.forEach(it => { it.left = it.originalLeft; }); });
 
-            const SHELF_GAP = 6;
+            const SHELF_GAP = SHELF_GAP_CONST;
+            const SHELF_OVERFLOW_MARGIN = 0; // le livre tenu est désormais borné en amont : plus de débordement nécessaire
             affectedRows.forEach(rIdx => {
                 const siblings = drag.rowCache[rIdx];
                 if (!siblings || !siblings.length) return;
@@ -2497,18 +2553,14 @@
                 groupTargets.filter(g => g.rowIndex === rIdx).forEach(g => fixedInRow.push({ left: g.left, width: g.width }));
                 if (!fixedInRow.length) return;
 
+                const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
+                const rowW = rEl ? rEl.offsetWidth : Infinity;
+
                 const all = [
                     ...fixedInRow.map(f => ({ left: f.left, width: f.width, fixed: true })),
                     ...siblings.map(s => ({ ref: s, left: s.left, width: s.width, fixed: false })),
                 ].sort((a, b) => a.left - b.left);
 
-                // Plusieurs passes gauche→droite puis droite→gauche pour garantir un espacement minimum
-                // constant partout, y compris en chaîne (plusieurs livres qui se poussent les uns les
-                // autres). Les livres non déplacés ne sont JAMAIS recalés de force sur les bords (0 ou
-                // largeur de la rangée) : ça cassait la garantie d'espacement et provoquait des
-                // chevauchements. Seul le livre tenu par le curseur reste borné à la rangée (déjà fait
-                // plus haut) ; ses voisins peuvent au besoin déborder très légèrement plutôt que de se
-                // superposer.
                 for (let pass = 0; pass < 4; pass++) {
                     for (let i = 1; i < all.length; i++) {
                         const prev = all[i - 1], cur = all[i];
@@ -2525,6 +2577,13 @@
                         if (cur.left > maxLeft) cur.left = maxLeft;
                     }
                 }
+
+                // Filet de sécurité (surtout pour les déplacements de groupe, non bornés en amont) :
+                // on limite juste un peu le débordement possible hors de la rangée.
+                all.forEach(a => {
+                    if (a.fixed) return;
+                    a.left = Math.max(-SHELF_OVERFLOW_MARGIN, Math.min(rowW + SHELF_OVERFLOW_MARGIN - a.width, a.left));
+                });
 
                 all.forEach(a => { if (!a.fixed) a.ref.left = a.left; });
             });
