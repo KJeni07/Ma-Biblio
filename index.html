@@ -1642,7 +1642,9 @@
         async function saveShelfSettings() {
             if (!currentUser) return;
             try {
-                await setDoc(doc(db, "user_profiles", currentUser.uid), { genreColorOverrides, shelfRowCount: SHELF_ROW_COUNT }, { merge: true });
+                // mergeFields pour genreColorOverrides : évite qu'une couleur de genre réinitialisée
+                // localement ne soit jamais retirée côté serveur (merge:true fusionnerait en profondeur).
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { genreColorOverrides, shelfRowCount: SHELF_ROW_COUNT }, { mergeFields: ["genreColorOverrides", "shelfRowCount"] });
             } catch (err) { /* pas grave */ }
         }
 
@@ -1812,7 +1814,11 @@
         async function saveShelfDecorations() {
             if (!currentUser) return;
             try {
-                await setDoc(doc(db, "user_profiles", currentUser.uid), { shelfDecorations }, { merge: true });
+                // mergeFields (et non merge:true) : merge:true fusionnerait en profondeur l'objet
+                // shelfDecorations avec l'ancien, donc une décoration supprimée localement ne serait
+                // jamais retirée côté serveur (elle réapparaîtrait après actualisation). mergeFields
+                // remplace ce champ dans son intégralité, sans toucher aux autres champs du document.
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { shelfDecorations }, { mergeFields: ["shelfDecorations"] });
             } catch (err) { /* pas grave */ }
         }
 
@@ -2197,7 +2203,11 @@
         async function saveShelfPositions() {
             if (!currentUser) return;
             try {
-                await setDoc(doc(db, "user_profiles", currentUser.uid), { shelfPositions }, { merge: true });
+                // mergeFields (et non merge:true) : merge:true fusionnerait en profondeur l'objet
+                // shelfPositions avec l'ancien, donc une position supprimée localement ne serait
+                // jamais retirée côté serveur. mergeFields remplace ce champ dans son intégralité,
+                // sans toucher aux autres champs du document.
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { shelfPositions }, { mergeFields: ["shelfPositions"] });
             } catch (err) { /* pas grave */ }
         }
 
