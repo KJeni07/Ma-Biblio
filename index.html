@@ -265,6 +265,15 @@
             box-shadow: none;
         }
         .grid-thumb-add:hover { background: rgba(197, 160, 89, 0.06); border-color: var(--gold-accent); }
+        .grid-item-selected .grid-thumb { outline: 3px solid var(--gold-accent); outline-offset: 3px; }
+        .grid-select-checkbox {
+            position: absolute; top: 8px; left: 8px; z-index: 6;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(255,255,255,0.85); border: 2px solid var(--gold-accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 900; color: var(--gold-accent);
+        }
+        .grid-select-checkbox.checked { background: var(--gold-accent); color: #fff; }
         html.dark .grid-thumb-add { background: transparent !important; }
 
         .sortable-ghost { opacity: 0.3; }
@@ -944,7 +953,19 @@
 
                     <div class="flex items-center gap-2">
                         <button onclick="openBulkImport()" id="bulk-import-btn" class="flex items-center gap-1.5 text-[9px] font-black text-white uppercase tracking-widest bg-[var(--gold-accent)] px-3 py-1.5 rounded-full hover:opacity-90 transition-opacity" data-i18n="bulkImport.openBtn">✨ Import rapide</button>
+                        <button onclick="toggleGridSelectMode()" id="grid-select-toggle-btn" class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 px-3 py-1.5 rounded-full hover:bg-slate-200 transition-colors" data-i18n="filters.gridSelectBtn">☑️ Sélectionner</button>
                         <button onclick="resetFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto" data-i18n="filters.reset">Réinitialiser</button>
+                    </div>
+
+                    <div id="grid-select-bar" class="hidden flex items-center justify-between text-xs mt-2 pt-2 border-t border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <button onclick="selectAllGridBooks()" class="text-[9px] font-black text-slate-500 uppercase tracking-widest hover:underline" data-i18n="filters.gridSelectAll">Tout sélectionner</button>
+                            <span id="grid-select-count" class="font-bold text-slate-400 uppercase tracking-widest text-[10px]"></span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="deleteSelectedGridBooks()" id="grid-delete-selected-btn" class="hidden text-[9px] font-black text-red-500 uppercase tracking-widest hover:underline" data-i18n="filters.gridDeleteSelected">🗑 Supprimer</button>
+                            <button onclick="cancelGridSelectMode()" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest hover:underline" data-i18n="filters.gridCancelSelection">Annuler</button>
+                        </div>
                     </div>
                 </div>
         </div>
@@ -1145,6 +1166,14 @@
                         </div>
                     </div>
 
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <p class="section-label mb-2" data-i18n="account.importSectionTitle">Importer ma bibliothèque</p>
+                            <p class="text-[11px] text-gray-400" data-i18n="account.importSectionBody">Récupère automatiquement tes livres depuis Goodreads (fichier .csv exporté).</p>
+                        </div>
+                        <button onclick="openGoodreadsImport()" id="goodreads-import-btn" class="shrink-0 flex items-center gap-1.5 text-[9px] font-black text-white uppercase tracking-widest bg-[#382110] px-4 py-2.5 rounded-full hover:opacity-90 transition-opacity" data-i18n="goodreads.openBtn">📗 Importer depuis Goodreads</button>
+                    </div>
+
                     <div id="profile-password-section" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 hidden">
                         <p class="section-label mb-4" data-i18n="account.changePassword">Changer le mot de passe</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-3">
@@ -1212,6 +1241,44 @@
             <div class="flex gap-3 mt-6">
                 <button id="bulk-import-cancel-btn" onclick="closeBulkImport()" class="flex-1 py-3 text-[10px] font-black uppercase bg-slate-50 rounded-xl" data-i18n="editModal.cancel">Annuler</button>
                 <button id="bulk-import-submit-btn" onclick="runBulkImport()" class="flex-1 py-3 text-[10px] font-black uppercase btn-gold-main rounded-xl" data-i18n="bulkImport.launch">Lancer l'import</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="goodreads-import-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-black uppercase tracking-tight font-serif" data-i18n="goodreads.title">Importer depuis Goodreads</h2>
+                <button onclick="closeGoodreadsImport()" class="text-slate-300 hover:text-black text-2xl">&times;</button>
+            </div>
+
+            <ol class="text-xs text-slate-500 leading-relaxed mb-4 list-decimal pl-4 space-y-1">
+                <li data-i18n="goodreads.step1">Va sur la page d'export de Goodreads (bouton ci-dessous) et connecte-toi si besoin.</li>
+                <li data-i18n="goodreads.step2">Clique sur "Export Library" et attends que le fichier se génère (actualise la page si besoin).</li>
+                <li data-i18n="goodreads.step3">Télécharge le fichier .csv généré, puis sélectionne-le ci-dessous.</li>
+            </ol>
+            <a href="https://www.goodreads.com/review/import" target="_blank" rel="noopener" class="inline-block mb-4 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full bg-slate-50 hover:bg-slate-100 transition-colors" data-i18n="goodreads.openGoodreadsBtn">↗ Ouvrir la page d'export Goodreads</a>
+
+            <input type="file" id="goodreads-file-input" accept=".csv" class="modal-input w-full !mb-0 text-xs">
+            <p id="goodreads-file-name" class="text-[10px] text-slate-400 mt-2"></p>
+
+            <label class="flex items-center gap-2 mt-4 cursor-pointer select-none">
+                <input type="checkbox" id="goodreads-fetch-covers" checked class="w-4 h-4 accent-[color:var(--gold-accent)] cursor-pointer">
+                <span class="text-[10px] font-bold text-gray-500" data-i18n="goodreads.fetchCoversLabel">Récupérer aussi les couvertures automatiquement (via ISBN)</span>
+            </label>
+            <p class="text-[10px] text-slate-400 mt-3" data-i18n="goodreads.hint">Les statuts Goodreads sont repris automatiquement : "read" → fiche complète avec note et date, "to-read" → ajouté à ta liste "à lire", "currently-reading" → importé avec une date de début. Le genre et le résumé restent à compléter à la main.</p>
+
+            <div id="goodreads-import-progress" class="hidden mt-5">
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="goodreads-import-bar" class="h-full bg-[var(--gold-accent)] transition-all" style="width:0%"></div>
+                </div>
+                <p id="goodreads-import-status" class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-2 text-center"></p>
+            </div>
+            <div id="goodreads-import-results" class="hidden mt-4 max-h-40 overflow-y-auto space-y-1 text-xs"></div>
+
+            <div class="flex gap-3 mt-6">
+                <button id="goodreads-import-cancel-btn" onclick="closeGoodreadsImport()" class="flex-1 py-3 text-[10px] font-black uppercase bg-slate-50 rounded-xl" data-i18n="editModal.cancel">Annuler</button>
+                <button id="goodreads-import-submit-btn" onclick="runGoodreadsImport()" class="flex-1 py-3 text-[10px] font-black uppercase btn-gold-main rounded-xl" data-i18n="goodreads.launch">Lancer l'import</button>
             </div>
         </div>
     </div>
@@ -1392,10 +1459,10 @@
         const TRANSLATIONS = {
             fr: {
                 nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", library: "Bibliothèque", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
-                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", multiSelectBtn: "Sélection", multiSelectHint: "Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.", multiSelectHintActive: "livre(s) sélectionné(s) — glisse-en un pour les déplacer ensemble.", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 À lire", toReadShort: "À LIRE", reset: "Réinitialiser", sortNone: "Ordre habituel", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)", addBook: "+ Ajouter un livre", emptyFichesTitle: "Aucune fiche pour l'instant", emptyFichesBody: "Commence par ajouter un livre pour voir apparaître sa fiche ici.", emptyFichesBtn: "+ Ajouter mon premier livre" },
+                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", multiSelectBtn: "Sélection", multiSelectHint: "Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.", multiSelectHintActive: "livre(s) sélectionné(s) — glisse-en un pour les déplacer ensemble.", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 À lire", toReadShort: "À LIRE", reset: "Réinitialiser", sortNone: "Ordre habituel", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)", addBook: "+ Ajouter un livre", gridSelectBtn: "☑️ Sélectionner", gridSelectAll: "Tout sélectionner", gridSelectedCount: "{n} sélectionné(s)", gridDeleteSelected: "🗑 Supprimer", gridCancelSelection: "Annuler", emptyFichesTitle: "Aucune fiche pour l'instant", emptyFichesBody: "Commence par ajouter un livre pour voir apparaître sa fiche ici.", emptyFichesBtn: "+ Ajouter mon premier livre" },
                 months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
                 dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", dnfCount: "Livres Abandonnés (DNF)", ofBooks: "des livres", languagesRead: "Langues Lues", authorsRead: "Livres par Auteur", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE" },
-                account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
+                account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", importSectionTitle: "Importer ma bibliothèque", importSectionBody: "Récupère automatiquement tes livres depuis Goodreads (fichier .csv exporté).", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
                 colors: { gold: "Doré", burgundy: "Bordeaux", forestGreen: "Vert forêt", navyBlue: "Bleu marine", terracotta: "Terracotta", plum: "Prune", anthracite: "Anthracite", custom: "Couleur personnalisée" },
                 auth: { backToHome: "← Retour à l'accueil", memberLogin: "Connexion Membre", memberSignup: "Création de Compte", emailAddress: "Adresse Email", password: "Mot de passe", forgotPassword: "Mot de passe oublié ?", rememberMe: "Rester connecté", openCollection: "Ouvrir ma collection", or: "ou", continueGoogle: "Continuer avec Google", noAccount: "Pas encore de compte ? S'inscrire", haveAccount: "Déjà un compte ? Se connecter" },
                 landing: {
@@ -1419,6 +1486,7 @@
                         { icon: "📈", title: "Le graphique", body: "Ce graphique affiche ton rythme de lecture mois par mois (ou année par année), pour visualiser tes habitudes de lecture.", target: "#reading-pace-card", section: "stats" },
                         { icon: "🖼️", title: "Ma Grille", body: "Toutes les couvertures de tes livres, en un coup d'œil, avec des filtres par année, genre, auteur, note...", target: "#grid-content", section: "grille", scrollBlock: "start" },
                         { icon: "⚡", title: "Import rapide", body: "Déjà beaucoup de livres lus ? Colle une liste de titres ici et laisse l'app remplir les fiches automatiquement.", target: "#bulk-import-btn", section: "grille" },
+                        { icon: "📗", title: "Import depuis Goodreads", body: "Tu utilisais Goodreads ? Retrouve le bouton d'import dans ton Compte pour récupérer toute ta bibliothèque en un clic (fichier .csv exporté).", target: "#goodreads-import-btn", section: "compte" },
                         { icon: "📖", title: "Mes Fiches", body: "Chaque livre a sa fiche détaillée : résumé, note, avis personnel. Élis ton Livre de l'année ou ton Livre préféré.", target: "#fiches-content", section: "fiches", scrollBlock: "start" },
                         { icon: "🎉", title: "Besoin d'aide plus tard ?", body: "Tu peux revoir ce guide à tout moment en cliquant sur ce bouton « ? ».", target: "#help-toggle-btn", section: "fiches" }
                     ]
@@ -1436,10 +1504,26 @@
                     done: "{n} livre(s) importé(s). Ajoute tes notes et avis dans Mes Fiches !",
                     doneFull: "{n} livre(s) importé(s), étagère pleine (100/100) : le reste n'a pas pu être ajouté."
                 },
+                goodreads: {
+                    openBtn: "📗 Importer depuis Goodreads", title: "Importer depuis Goodreads",
+                    step1: "Va sur la page d'export de Goodreads (bouton ci-dessous) et connecte-toi si besoin.",
+                    step2: "Clique sur \"Export Library\" et attends que le fichier se génère (actualise la page si besoin).",
+                    step3: "Télécharge le fichier .csv généré, puis sélectionne-le ci-dessous.",
+                    openGoodreadsBtn: "↗ Ouvrir la page d'export Goodreads",
+                    fetchCoversLabel: "Récupérer aussi les couvertures automatiquement (via ISBN)",
+                    hint: "Les statuts Goodreads sont repris automatiquement : \"read\" → fiche complète avec note et date, \"to-read\" → ajouté à ta liste \"à lire\", \"currently-reading\" → importé avec une date de début. Le genre et le résumé restent à compléter à la main.",
+                    launch: "Lancer l'import",
+                    noFile: "Choisis d'abord un fichier .csv exporté depuis Goodreads.",
+                    parseError: "Impossible de lire ce fichier. Vérifie que c'est bien l'export CSV de Goodreads.",
+                    done: "{n} livre(s) importé(s) depuis Goodreads.",
+                    doneFull: "{n} livre(s) importé(s), étagère pleine (100/100) : le reste n'a pas pu être ajouté.",
+                    doneUpdated: "{n} livre(s) déjà présents mis à jour."
+                },
                 msg: {
                     maxRows: "Nombre maximum de rangées atteint.", minRows: "Il doit rester au moins une rangée.",
                     clearDecorConfirm: "Retirer toutes les décorations de l'étagère ?",
                     deleteConfirm: "Supprimer ?",
+                    deleteConfirmMultiple: "Supprimer {n} livre(s) ?",
                     emailFirst: "Renseigne ton email ci-dessus d'abord.", resetEmailSent: "Email envoyé ! Vérifie ta boîte de réception (et les spams).",
                     pseudoSaved: "Pseudo enregistré !",
                     fillBothFields: "Remplis les deux champs.", passwordTooShort: "Le nouveau mot de passe doit faire au moins 6 caractères.", passwordUpdated: "Mot de passe mis à jour !",
@@ -1448,10 +1532,10 @@
             },
             en: {
                 nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", library: "Library", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
-                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", multiSelectBtn: "Select", multiSelectHint: "Drag a box around several books to select them, then drag one to move them all together.", multiSelectHintActive: "book(s) selected — drag one to move them all together.", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 To read", toReadShort: "TO READ", reset: "Reset", sortNone: "Default order", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)", addBook: "+ Add a book", emptyFichesTitle: "No sheets yet", emptyFichesBody: "Start by adding a book to see its sheet appear here.", emptyFichesBtn: "+ Add my first book" },
+                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", multiSelectBtn: "Select", multiSelectHint: "Drag a box around several books to select them, then drag one to move them all together.", multiSelectHintActive: "book(s) selected — drag one to move them all together.", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 To read", toReadShort: "TO READ", reset: "Reset", sortNone: "Default order", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)", addBook: "+ Add a book", gridSelectBtn: "☑️ Select", gridSelectAll: "Select all", gridSelectedCount: "{n} selected", gridDeleteSelected: "🗑 Delete", gridCancelSelection: "Cancel", emptyFichesTitle: "No sheets yet", emptyFichesBody: "Start by adding a book to see its sheet appear here.", emptyFichesBtn: "+ Add my first book" },
                 months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
                 dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", dnfCount: "Dropped Books (DNF)", ofBooks: "of books", languagesRead: "Languages Read", authorsRead: "Books per Author", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK" },
-                account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
+                account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", importSectionTitle: "Import my library", importSectionBody: "Automatically pull in your books from Goodreads (exported .csv file).", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
                 colors: { gold: "Gold", burgundy: "Burgundy", forestGreen: "Forest green", navyBlue: "Navy blue", terracotta: "Terracotta", plum: "Plum", anthracite: "Anthracite", custom: "Custom color" },
                 auth: { backToHome: "← Back to home", memberLogin: "Member Login", memberSignup: "Create Account", emailAddress: "Email Address", password: "Password", forgotPassword: "Forgot password?", rememberMe: "Stay signed in", openCollection: "Open my collection", or: "or", continueGoogle: "Continue with Google", noAccount: "No account yet? Sign up", haveAccount: "Already have an account? Log in" },
                 landing: {
@@ -1475,6 +1559,7 @@
                         { icon: "📈", title: "The chart", body: "This chart shows your reading pace month by month (or year by year), so you can visualize your reading habits.", target: "#reading-pace-card", section: "stats" },
                         { icon: "🖼️", title: "My Grid", body: "Every book cover at a glance, with filters by year, genre, author, rating...", target: "#grid-content", section: "grille", scrollBlock: "start" },
                         { icon: "⚡", title: "Quick Import", body: "Already read a lot of books? Paste a list of titles here and let the app fill in the sheets automatically.", target: "#bulk-import-btn", section: "grille" },
+                        { icon: "📗", title: "Import from Goodreads", body: "Used Goodreads before? Find the import button in your Account page to bring in your whole library in one click (exported .csv file).", target: "#goodreads-import-btn", section: "compte" },
                         { icon: "📖", title: "My Sheets", body: "Each book has a detailed sheet: summary, rating, personal review. Elect your Book of the Year or your Favorite Book.", target: "#fiches-content", section: "fiches", scrollBlock: "start" },
                         { icon: "🎉", title: "Need help later?", body: "You can replay this guide anytime with this \"?\" button.", target: "#help-toggle-btn", section: "fiches" }
                     ]
@@ -1492,10 +1577,26 @@
                     done: "{n} book(s) imported. Add your ratings and reviews in My Sheets!",
                     doneFull: "{n} book(s) imported, shelf full (100/100): the rest could not be added."
                 },
+                goodreads: {
+                    openBtn: "📗 Import from Goodreads", title: "Import from Goodreads",
+                    step1: "Go to the Goodreads export page (button below) and sign in if needed.",
+                    step2: "Click \"Export Library\" and wait for the file to be generated (refresh the page if needed).",
+                    step3: "Download the generated .csv file, then select it below.",
+                    openGoodreadsBtn: "↗ Open the Goodreads export page",
+                    fetchCoversLabel: "Also fetch covers automatically (via ISBN)",
+                    hint: "Goodreads statuses are picked up automatically: \"read\" → full entry with rating and date, \"to-read\" → added to your \"to read\" list, \"currently-reading\" → imported with a start date. Genre and summary still need to be filled in by hand.",
+                    launch: "Start import",
+                    noFile: "First choose a .csv file exported from Goodreads.",
+                    parseError: "Couldn't read this file. Make sure it's the CSV export from Goodreads.",
+                    done: "{n} book(s) imported from Goodreads.",
+                    doneFull: "{n} book(s) imported, shelf full (100/100): the rest could not be added.",
+                    doneUpdated: "{n} existing book(s) updated."
+                },
                 msg: {
                     maxRows: "Maximum number of rows reached.", minRows: "At least one row must remain.",
                     clearDecorConfirm: "Remove all decorations from the shelf?",
                     deleteConfirm: "Delete?",
+                    deleteConfirmMultiple: "Delete {n} book(s)?",
                     emailFirst: "Enter your email above first.", resetEmailSent: "Email sent! Check your inbox (and spam folder).",
                     pseudoSaved: "Username saved!",
                     fillBothFields: "Fill in both fields.", passwordTooShort: "The new password must be at least 6 characters.", passwordUpdated: "Password updated!",
@@ -1729,6 +1830,8 @@
         const DECORATION_WIDTH = 64;
         let activeShelfDrag = null; // { el, item, kind, dragOffsetX, startX, startY, moved, lastLeft, pointerId, group }
         let selectedShelfUids = new Set();
+        let gridSelectMode = false;
+        let selectedGridIds = new Set();
         let shelfMarquee = null; // { startX, startY, box, pointerId, moved, additive, baseSelection }
 
         function initShelfMarquee() {
@@ -3541,8 +3644,9 @@
             // HTML GRILLE
             const nextEmptyBook = library.find(b => !b.title);
             document.getElementById('grid-content').innerHTML = filteredGrid.map(b => `
-                <div class="grid-item" data-id="${b.id}" onclick="jumpToFiche(${b.id})">
+                <div class="grid-item ${gridSelectMode && selectedGridIds.has(b.id) ? 'grid-item-selected' : ''}" data-id="${b.id}" onclick="${gridSelectMode ? `toggleGridSelection(${b.id})` : `jumpToFiche(${b.id})`}">
                     <div class="grid-thumb relative">
+                        ${gridSelectMode ? `<span class="grid-select-checkbox ${selectedGridIds.has(b.id) ? 'checked' : ''}">${selectedGridIds.has(b.id) ? '✓' : ''}</span>` : ''}
                         ${b.cover ? `<img src="${b.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover ${b.isDNF ? 'grayscale opacity-50' : (b.isToRead ? 'saturate-[.35] brightness-95' : '')}">` : `<div class="flex flex-col items-center justify-center text-center px-3 py-2 h-full w-full ${b.isDNF ? 'grayscale opacity-50' : (b.isToRead ? 'saturate-[.35] brightness-95' : '')}"><span class="grid-thumb-title font-serif font-black uppercase leading-tight text-[15px]">${b.title}</span><span class="mt-2 text-[10px] font-bold uppercase tracking-wide" style="color: var(--gold-accent);">${b.author || ''}</span></div>`}
                         ${b.isToRead ? `<div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"><div class="absolute" style="width:150px; height:150px; border-radius:9999px; background: radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 55%, transparent 75%);"></div><svg width="190" height="190" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="position:relative;"><rect x="14" y="6" width="36" height="6" rx="3" fill="var(--gold-accent)" opacity="0.9"/><rect x="14" y="52" width="36" height="6" rx="3" fill="var(--gold-accent)" opacity="0.9"/><path d="M20,12 L44,12 C44,20 38,29 33,32 C38,35 44,44 44,52 L20,52 C20,44 26,35 31,32 C26,29 20,20 20,12 Z" fill="var(--gold-accent)" opacity="0.9"/></svg></div>` : ''}
                         
@@ -4195,6 +4299,274 @@
             submitBtn.setAttribute('data-i18n', 'shelf.close');
             submitBtn.textContent = t('shelf.close');
             submitBtn.onclick = closeBulkImport;
+        };
+
+        // --- IMPORT GOODREADS (fichier CSV exporté depuis Goodreads) ---
+        function parseCSVText(text) {
+            const rows = [];
+            let row = [], field = '', inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i], next = text[i + 1];
+                if (inQuotes) {
+                    if (c === '"' && next === '"') { field += '"'; i++; }
+                    else if (c === '"') { inQuotes = false; }
+                    else field += c;
+                } else {
+                    if (c === '"') inQuotes = true;
+                    else if (c === ',') { row.push(field); field = ''; }
+                    else if (c === '\r') { /* ignoré */ }
+                    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+                    else field += c;
+                }
+            }
+            if (field.length || row.length) { row.push(field); rows.push(row); }
+            return rows.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ''));
+        }
+
+        // Goodreads entoure certains champs numériques (ISBN...) de ="..." pour éviter que les
+        // tableurs ne les convertissent en nombre.
+        function cleanGoodreadsField(v) {
+            if (!v) return '';
+            const trimmed = v.trim();
+            const m = trimmed.match(/^="?(.*?)"?$/);
+            return (m ? m[1] : trimmed).trim();
+        }
+
+        // Convertit une date Goodreads (YYYY/MM/DD) au format DD/MM/YYYY utilisé par l'app.
+        function convertGoodreadsDate(v) {
+            const cleaned = cleanGoodreadsField(v);
+            const m = cleaned.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+            if (!m) return '';
+            return `${m[3].padStart(2, '0')}/${m[2].padStart(2, '0')}/${m[1]}`;
+        }
+
+        window.openGoodreadsImport = () => {
+            document.getElementById('goodreads-file-input').value = '';
+            document.getElementById('goodreads-file-name').textContent = '';
+            document.getElementById('goodreads-import-progress').classList.add('hidden');
+            document.getElementById('goodreads-import-results').classList.add('hidden');
+            document.getElementById('goodreads-import-results').innerHTML = '';
+            document.getElementById('goodreads-import-bar').style.width = '0%';
+            document.getElementById('goodreads-import-cancel-btn').classList.remove('hidden');
+            const submitBtn = document.getElementById('goodreads-import-submit-btn');
+            submitBtn.setAttribute('data-i18n', 'goodreads.launch');
+            submitBtn.textContent = t('goodreads.launch');
+            submitBtn.onclick = runGoodreadsImport;
+            document.getElementById('goodreads-import-modal').classList.remove('hidden');
+        };
+        window.closeGoodreadsImport = () => document.getElementById('goodreads-import-modal').classList.add('hidden');
+
+        document.getElementById('goodreads-file-input').addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            document.getElementById('goodreads-file-name').textContent = f ? f.name : '';
+        });
+
+        window.runGoodreadsImport = async () => {
+            const fileInput = document.getElementById('goodreads-file-input');
+            const file = fileInput.files[0];
+            if (!file) { alert(t('goodreads.noFile')); return; }
+
+            const submitBtn = document.getElementById('goodreads-import-submit-btn');
+            const cancelBtn = document.getElementById('goodreads-import-cancel-btn');
+            const progress = document.getElementById('goodreads-import-progress');
+            const bar = document.getElementById('goodreads-import-bar');
+            const status = document.getElementById('goodreads-import-status');
+            const results = document.getElementById('goodreads-import-results');
+            const fetchCovers = document.getElementById('goodreads-fetch-covers').checked;
+
+            let text;
+            try { text = await file.text(); } catch (err) { alert(t('goodreads.parseError')); return; }
+
+            const rows = parseCSVText(text);
+            if (rows.length < 2) { alert(t('goodreads.parseError')); return; }
+
+            const headers = rows[0].map(h => h.trim().toLowerCase());
+            const col = (name) => headers.indexOf(name);
+            const idx = {
+                title: col('title'),
+                author: col('author'),
+                authorLf: col('author l-f'),
+                isbn13: col('isbn13'),
+                isbn: col('isbn'),
+                myRating: col('my rating'),
+                yearOrig: col('original publication year'),
+                yearPub: col('year published'),
+                dateRead: col('date read'),
+                dateAdded: col('date added'),
+                shelves: col('bookshelves'),
+                exclusiveShelf: col('exclusive shelf'),
+                review: col('my review'),
+            };
+            const dataRows = rows.slice(1).filter(r => r.some(c => c.trim() !== ''));
+            if (!dataRows.length) { alert(t('goodreads.parseError')); return; }
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'pointer-events-none');
+            cancelBtn.classList.add('hidden');
+            progress.classList.remove('hidden');
+            results.classList.remove('hidden');
+            results.innerHTML = '';
+
+            const normKey = (title, author) => (title || '').trim().toLowerCase() + '|' + (author || '').trim().toLowerCase();
+            const existingByKey = new Map();
+            library.forEach(b => { if (b.title) existingByKey.set(normKey(b.title, b.author), b); });
+
+            let done = 0, added = 0, updated = 0, slotsFull = false;
+            for (const r of dataRows) {
+                status.textContent = `${done + 1} / ${dataRows.length}`;
+
+                const get = (i) => (i >= 0 && r[i] !== undefined) ? r[i] : '';
+                const title = get(idx.title).trim();
+                if (!title) { done++; continue; }
+                const authorVal = cleanGoodreadsField(get(idx.author)) || cleanGoodreadsField(get(idx.authorLf)) || '';
+
+                const key = normKey(title, authorVal);
+                let slot = existingByKey.get(key);
+                const isUpdate = !!slot;
+                if (!slot) {
+                    slot = library.find(b => !b.title);
+                    if (!slot) { slotsFull = true; break; }
+                }
+
+                const isbn = cleanGoodreadsField(get(idx.isbn13)) || cleanGoodreadsField(get(idx.isbn));
+                const exclusiveShelf = cleanGoodreadsField(get(idx.exclusiveShelf)).toLowerCase();
+                const shelvesRaw = cleanGoodreadsField(get(idx.shelves));
+                const shelfList = shelvesRaw ? shelvesRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : [];
+                const isDNF = shelfList.some(s => s.includes('dnf') || s.includes('did-not-finish') || s.includes('abandon'));
+                const guessedGenre = shelfList.find(s => !['read', 'to-read', 'currently-reading'].includes(s) && !s.includes('dnf') && !s.includes('did-not-finish') && !s.includes('abandon')) || '';
+
+                const rating = parseInt(get(idx.myRating)) || 0;
+                const dateRead = convertGoodreadsDate(get(idx.dateRead));
+                const dateAdded = convertGoodreadsDate(get(idx.dateAdded));
+                const year = cleanGoodreadsField(get(idx.yearOrig)) || cleanGoodreadsField(get(idx.yearPub)) || '';
+                const review = get(idx.review) || '';
+
+                slot.title = title;
+                slot.author = authorVal;
+                // Sur une mise à jour, on ne remplace pas ce que l'utilisateur a pu compléter à la main
+                // (couverture déjà présente, genre déjà renseigné, résumé déjà écrit).
+                if (!isUpdate || !slot.cover) {
+                    slot.cover = (fetchCovers && isbn) ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : (slot.cover || '');
+                }
+                if (!isUpdate || !slot.genre) slot.genre = guessedGenre || slot.genre || '';
+                if (!isUpdate) slot.summary = '';
+                slot.year = slot.year || year;
+                slot.format = slot.format || '-';
+                slot.lang = slot.lang || '';
+                // Le commentaire (ma critique Goodreads) est ré-importé et mis à jour à chaque fois
+                if (review) slot.comment = review;
+                slot.isDNF = isDNF;
+                slot.isToRead = exclusiveShelf === 'to-read';
+
+                if (exclusiveShelf === 'to-read') {
+                    slot.start = ''; slot.end = ''; slot.rating = 0;
+                } else if (exclusiveShelf === 'currently-reading') {
+                    slot.start = dateAdded; slot.end = ''; slot.rating = 0;
+                } else {
+                    slot.start = ''; slot.end = dateRead || dateAdded; slot.rating = rating;
+                }
+                slot.uid = slot.uid || generateUid();
+                existingByKey.set(key, slot);
+                if (isUpdate) updated++; else added++;
+
+                results.insertAdjacentHTML('beforeend', `
+                    <div class="flex items-center gap-2 py-1">
+                        ${slot.cover ? `<img src="${slot.cover}" class="w-5 h-7 object-cover rounded shadow-sm shrink-0">` : '<div class="w-5 h-7 bg-slate-100 rounded shrink-0"></div>'}
+                        <span class="truncate flex-1">${slot.title}</span>
+                        <span class="text-[10px] shrink-0">${isUpdate ? '🔄' : (exclusiveShelf === 'to-read' ? '📌' : (exclusiveShelf === 'currently-reading' ? '📖' : '✅'))}</span>
+                    </div>
+                `);
+                results.scrollTop = results.scrollHeight;
+
+                done++;
+                bar.style.width = Math.round((done / dataRows.length) * 100) + '%';
+            }
+
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            updateFilterOptions();
+            render();
+
+            status.textContent = (slotsFull ? t('goodreads.doneFull').replace('{n}', added) : t('goodreads.done').replace('{n}', added))
+                + (updated > 0 ? ' ' + t('goodreads.doneUpdated').replace('{n}', updated) : '');
+
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'pointer-events-none');
+            submitBtn.setAttribute('data-i18n', 'shelf.close');
+            submitBtn.textContent = t('shelf.close');
+            submitBtn.onclick = closeGoodreadsImport;
+        };
+
+        window.toggleGridSelectMode = () => {
+            gridSelectMode = !gridSelectMode;
+            if (!gridSelectMode) selectedGridIds.clear();
+            updateGridSelectUI();
+            render();
+        };
+
+        window.cancelGridSelectMode = () => {
+            gridSelectMode = false;
+            selectedGridIds.clear();
+            updateGridSelectUI();
+            render();
+        };
+
+        window.toggleGridSelection = (id) => {
+            if (selectedGridIds.has(id)) selectedGridIds.delete(id);
+            else selectedGridIds.add(id);
+            updateGridSelectUI();
+            render();
+        };
+
+        window.selectAllGridBooks = () => {
+            document.querySelectorAll('#grid-content .grid-item[data-id]').forEach(el => {
+                const id = parseInt(el.dataset.id);
+                if (!isNaN(id)) selectedGridIds.add(id);
+            });
+            updateGridSelectUI();
+            render();
+        };
+
+        function updateGridSelectUI() {
+            const toggleBtn = document.getElementById('grid-select-toggle-btn');
+            if (toggleBtn) {
+                toggleBtn.classList.toggle('bg-slate-200', gridSelectMode);
+                toggleBtn.classList.toggle('bg-slate-100', !gridSelectMode);
+            }
+            const bar = document.getElementById('grid-select-bar');
+            const count = document.getElementById('grid-select-count');
+            const deleteBtn = document.getElementById('grid-delete-selected-btn');
+            if (bar && count) {
+                bar.classList.toggle('hidden', !gridSelectMode);
+                if (selectedGridIds.size > 0) {
+                    count.textContent = t('filters.gridSelectedCount').replace('{n}', selectedGridIds.size);
+                    if (deleteBtn) deleteBtn.classList.remove('hidden');
+                } else {
+                    count.textContent = '';
+                    if (deleteBtn) deleteBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        window.deleteSelectedGridBooks = async () => {
+            if (selectedGridIds.size === 0) return;
+            if (!confirm(t("msg.deleteConfirmMultiple").replace('{n}', selectedGridIds.size))) return;
+            let removed = 0;
+            for (let i = library.length - 1; i >= 0; i--) {
+                if (library[i].title && selectedGridIds.has(library[i].id)) {
+                    library.splice(i, 1);
+                    removed++;
+                }
+            }
+            for (let i = 0; i < removed; i++) {
+                library.push({ id: 0, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false, isDNF: false, isToRead: false });
+            }
+            library.forEach((b, i) => b.id = i + 1);
+            selectedGridIds.clear();
+            gridSelectMode = false;
+            updateGridSelectUI();
+            await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            updateFilterOptions();
+            render();
         };
 
         window.deleteBook = async (id) => {
