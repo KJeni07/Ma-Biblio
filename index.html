@@ -1303,7 +1303,7 @@
 
             <label class="flex items-center gap-2 mt-4 cursor-pointer select-none">
                 <input type="checkbox" id="goodreads-fetch-covers" checked class="w-4 h-4 accent-[color:var(--gold-accent)] cursor-pointer">
-                <span class="text-[10px] font-bold text-gray-500" data-i18n="goodreads.fetchCoversLabel">Récupérer aussi les couvertures automatiquement (via ISBN)</span>
+                <span class="text-[10px] font-bold text-gray-500" data-i18n="goodreads.fetchCoversLabel">Récupérer aussi les couvertures automatiquement</span>
             </label>
             <p class="text-[10px] text-slate-400 mt-3" data-i18n="goodreads.hint">Les statuts Goodreads sont repris automatiquement : "read" → fiche complète avec note et date, "to-read" → ajouté à ta liste "à lire", "currently-reading" → importé avec une date de début. Le genre et le résumé restent à compléter à la main.</p>
 
@@ -1489,6 +1489,8 @@
         const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
 
+        // Nombre maximum de livres (emplacements) par bibliothèque.
+        const MAX_BOOKS = 300;
         let library = [];
         let currentUser = null;
         let readingChart = null;
@@ -1544,7 +1546,7 @@
                     hint: "Un titre par ligne. Les correspondances sont choisies automatiquement parmi les bases OpenLibrary / Google Books — vérifie et complète ensuite chaque fiche si besoin.",
                     launch: "Lancer l'import",
                     done: "{n} livre(s) importé(s). Ajoute tes notes et avis dans Mes Fiches !",
-                    doneFull: "{n} livre(s) importé(s), étagère pleine (100/100) : le reste n'a pas pu être ajouté."
+                    doneFull: "{n} livre(s) importé(s), étagère pleine : le reste n'a pas pu être ajouté."
                 },
                 goodreads: {
                     openBtn: "📗 Importer depuis Goodreads", title: "Importer depuis Goodreads",
@@ -1552,13 +1554,13 @@
                     step2: "Clique sur \"Export Library\" et attends que le fichier se génère (actualise la page si besoin).",
                     step3: "Télécharge le fichier .csv généré, puis sélectionne-le ci-dessous.",
                     openGoodreadsBtn: "↗ Ouvrir la page d'export Goodreads",
-                    fetchCoversLabel: "Récupérer aussi les couvertures automatiquement (via ISBN)",
+                    fetchCoversLabel: "Récupérer aussi les couvertures automatiquement",
                     hint: "Les statuts Goodreads sont repris automatiquement : \"read\" → fiche complète avec note et date, \"to-read\" → ajouté à ta liste \"à lire\", \"currently-reading\" → importé avec une date de début. Le genre et le résumé restent à compléter à la main.",
                     launch: "Lancer l'import",
                     noFile: "Choisis d'abord un fichier .csv exporté depuis Goodreads.",
                     parseError: "Impossible de lire ce fichier. Vérifie que c'est bien l'export CSV de Goodreads.",
                     done: "{n} livre(s) importé(s) depuis Goodreads.",
-                    doneFull: "{n} livre(s) importé(s), étagère pleine (100/100) : le reste n'a pas pu être ajouté.",
+                    doneFull: "{n} livre(s) importé(s), étagère pleine : le reste n'a pas pu être ajouté.",
                     doneUpdated: "{n} livre(s) déjà présents mis à jour."
                 },
                 msg: {
@@ -1620,7 +1622,7 @@
                     hint: "One title per line. Matches are picked automatically from the OpenLibrary / Google Books databases — check and complete each entry afterwards if needed.",
                     launch: "Start import",
                     done: "{n} book(s) imported. Add your ratings and reviews in My Sheets!",
-                    doneFull: "{n} book(s) imported, shelf full (100/100): the rest could not be added."
+                    doneFull: "{n} book(s) imported, shelf full: the rest could not be added."
                 },
                 goodreads: {
                     openBtn: "📗 Import from Goodreads", title: "Import from Goodreads",
@@ -1628,13 +1630,13 @@
                     step2: "Click \"Export Library\" and wait for the file to be generated (refresh the page if needed).",
                     step3: "Download the generated .csv file, then select it below.",
                     openGoodreadsBtn: "↗ Open the Goodreads export page",
-                    fetchCoversLabel: "Also fetch covers automatically (via ISBN)",
+                    fetchCoversLabel: "Also fetch covers automatically",
                     hint: "Goodreads statuses are picked up automatically: \"read\" → full entry with rating and date, \"to-read\" → added to your \"to read\" list, \"currently-reading\" → imported with a start date. Genre and summary still need to be filled in by hand.",
                     launch: "Start import",
                     noFile: "First choose a .csv file exported from Goodreads.",
                     parseError: "Couldn't read this file. Make sure it's the CSV export from Goodreads.",
                     done: "{n} book(s) imported from Goodreads.",
-                    doneFull: "{n} book(s) imported, shelf full (100/100): the rest could not be added.",
+                    doneFull: "{n} book(s) imported, shelf full: the rest could not be added.",
                     doneUpdated: "{n} existing book(s) updated."
                 },
                 msg: {
@@ -3500,14 +3502,14 @@
             let needsSave = false;
             if (docSnap.exists()) {
                 library = docSnap.data().books;
-                if (library.length < 100) {
-                    while (library.length < 100) {
+                if (library.length < MAX_BOOKS) {
+                    while (library.length < MAX_BOOKS) {
                         library.push({ id: library.length + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false, isDNF: false, isToRead: false, isMyFavorite: false });
                     }
                     needsSave = true;
                 }
             } else {
-                library = Array.from({length: 100}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false, isDNF: false, isToRead: false, isMyFavorite: false }));
+                library = Array.from({length: MAX_BOOKS}, (_, i) => ({ id: i + 1, title: "", author: "", cover: "", rating: 0, summary: "", end: "", genre: "", format: "-", lang: "", start: "", comment: "", isFavorite: false, isAllTimeFavorite: false, isDNF: false, isToRead: false, isMyFavorite: false }));
                 needsSave = true;
             }
             // Identifiant stable par livre : ne change jamais, même quand l'ordre
@@ -4306,15 +4308,21 @@
         // Cherche un livre sur plusieurs requêtes (titre brut, puis titre nettoyé si besoin)
         // et sur les deux bases (OpenLibrary + Google Books). Choisit le résultat dont le
         // titre ressemble le plus à ce qui a été cherché — pas juste le premier qui a une image.
-        async function findBestBookMatch(rawTitle) {
+        async function findBestBookMatch(rawTitle, author = '') {
             const cleaned = cleanTitleForSearch(rawTitle);
             const queries = [...new Set([rawTitle.trim(), cleaned].filter(q => q))];
             let candidates = [];
 
             for (const q of queries) {
                 try {
-                    const olRes = await searchOpenLibrary(q);
-                    candidates.push(...olRes);
+                    if (author) {
+                        const olAuth = await searchOpenLibrary(q + ' ' + author);
+                        candidates.push(...olAuth);
+                    }
+                    if (!author || !candidates.some(c => titleSimilarity(rawTitle, c.title) >= 0.85 && c.cover)) {
+                        const olRes = await searchOpenLibrary(q);
+                        candidates.push(...olRes);
+                    }
                 } catch (e) { /* pas grave, on tente la suite */ }
                 if (candidates.some(c => titleSimilarity(rawTitle, c.title) >= 0.85)) break;
 
@@ -4343,6 +4351,10 @@
             // Si même le meilleur résultat ne ressemble pas assez au titre cherché,
             // mieux vaut ne pas se tromper de livre que d'ajouter une mauvaise couverture.
             if (best.sim < 0.35) return null;
+            if (!best.c.cover) {
+                const alt = scored.find(x => x.c.cover && x.sim >= Math.max(0.6, best.sim - 0.15));
+                if (alt) return { ...best.c, cover: alt.c.cover };
+            }
             return best.c;
         }
 
@@ -4573,6 +4585,15 @@
                 shelves: col('bookshelves'),
                 exclusiveShelf: col('exclusive shelf'),
                 review: col('my review'),
+                // Colonnes OPTIONNELLES (absentes d'un export Goodreads classique, donc sans effet dessus)
+                genre: col('genre'),
+                format: col('format'),
+                lang: col('language'),
+                coverUrl: col('cover url'),
+                bookOfYear: col('book of the year'),
+                allTimeFav: col('favorite book'),
+                myFav: col('my favorites'),
+                bookClub: col('book club'),
             };
             const dataRows = rows.slice(1).filter(r => r.some(c => c.trim() !== ''));
             if (!dataRows.length) { alert(t('goodreads.parseError')); return; }
@@ -4612,24 +4633,49 @@
                 const isDNF = shelfList.some(s => s.includes('dnf') || s.includes('did-not-finish') || s.includes('abandon'));
                 const guessedGenre = shelfList.find(s => !['read', 'to-read', 'currently-reading'].includes(s) && !s.includes('dnf') && !s.includes('did-not-finish') && !s.includes('abandon')) || '';
 
-                const rating = parseInt(get(idx.myRating)) || 0;
+                const rating = parseFloat(get(idx.myRating)) || 0;
                 const dateRead = convertGoodreadsDate(get(idx.dateRead));
                 const dateAdded = convertGoodreadsDate(get(idx.dateAdded));
                 const year = cleanGoodreadsField(get(idx.yearOrig)) || cleanGoodreadsField(get(idx.yearPub)) || '';
                 const review = get(idx.review) || '';
+                const csvGenre = cleanGoodreadsField(get(idx.genre));
+                const csvFormat = cleanGoodreadsField(get(idx.format));
+                const csvLang = cleanGoodreadsField(get(idx.lang));
+                const csvCover = cleanGoodreadsField(get(idx.coverUrl));
+                const isYes = (i) => /^(1|yes|oui|true|x)$/i.test(cleanGoodreadsField(get(i)));
 
                 slot.title = title;
                 slot.author = authorVal;
                 // Sur une mise à jour, on ne remplace pas ce que l'utilisateur a pu compléter à la main
                 // (couverture déjà présente, genre déjà renseigné, résumé déjà écrit).
+                let lookup = null;
                 if (!isUpdate || !slot.cover) {
-                    slot.cover = (fetchCovers && isbn) ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : (slot.cover || '');
+                    if (csvCover) {
+                        slot.cover = csvCover;
+                    } else if (fetchCovers && isbn) {
+                        slot.cover = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+                    } else if (fetchCovers && !slot.cover) {
+                        // Pas d'ISBN : on cherche la couverture par le titre (même moteur que l'import rapide)
+                        for (let attempt = 0; attempt < 2 && !lookup?.cover; attempt++) {
+                            try { lookup = await findBestBookMatch(title, authorVal) || lookup; } catch (err) { /* on réessaie */ }
+                            if (!lookup?.cover) await new Promise(r => setTimeout(r, 600));
+                        }
+                        slot.cover = lookup?.cover || '';
+                        await new Promise(r => setTimeout(r, 150));
+                    } else {
+                        slot.cover = slot.cover || '';
+                    }
                 }
-                if (!isUpdate || !slot.genre) slot.genre = guessedGenre || slot.genre || '';
-                if (!isUpdate) slot.summary = '';
+                if (csvGenre) slot.genre = csvGenre;
+                else if (!isUpdate || !slot.genre) slot.genre = guessedGenre || slot.genre || '';
+                if (!isUpdate) slot.summary = lookup?.summary || '';
                 slot.year = slot.year || year;
-                slot.format = slot.format || '-';
-                slot.lang = slot.lang || '';
+                slot.format = csvFormat || slot.format || '-';
+                slot.lang = csvLang || slot.lang || '';
+                if (idx.bookOfYear >= 0) slot.isFavorite = isYes(idx.bookOfYear);
+                if (idx.allTimeFav >= 0) slot.isAllTimeFavorite = isYes(idx.allTimeFav);
+                if (idx.myFav >= 0) slot.isMyFavorite = isYes(idx.myFav);
+                if (idx.bookClub >= 0) slot.isBookClub = isYes(idx.bookClub);
                 // Le commentaire (ma critique Goodreads) est ré-importé et mis à jour à chaque fois
                 if (review) slot.comment = review;
                 slot.isDNF = isDNF;
