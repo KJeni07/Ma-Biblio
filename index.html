@@ -384,6 +384,26 @@
         }
         .filter-select:focus { border-color: var(--gold-accent); }
 
+        /* Filtres à sélection multiple */
+        .ms-wrap { position: relative; display: inline-block; }
+        .ms-btn { text-align: left; white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+        .ms-btn.ms-active { border-color: var(--gold-accent); }
+        .ms-panel {
+            position: absolute; top: calc(100% + 6px); left: 0; z-index: 60;
+            min-width: 100%; width: max-content; max-width: 280px; max-height: 280px; overflow-y: auto;
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 6px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+        .ms-panel.hidden { display: none; }
+        .ms-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; font-size: 12px; font-weight: 600; color: #475569; cursor: pointer; user-select: none; }
+        .ms-item:hover { background: #f1f5f9; }
+        .ms-item input { accent-color: var(--gold-accent); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+        .ms-clear { display: block; width: 100%; text-align: left; padding: 6px 8px; margin-bottom: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #f87171; border-bottom: 1px solid #f1f5f9; background: none; cursor: pointer; }
+        html.dark .ms-panel { background: #1E1E1E; border-color: #333; box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+        html.dark .ms-item { color: #ddd; }
+        html.dark .ms-item:hover { background: #2a2a2a; }
+        html.dark .ms-clear { border-bottom-color: #2f2f2f; }
+
         .dashboard-year-select {
             appearance: none;
             background-color: white;
@@ -1303,7 +1323,7 @@
 
             <label class="flex items-center gap-2 mt-4 cursor-pointer select-none">
                 <input type="checkbox" id="goodreads-fetch-covers" checked class="w-4 h-4 accent-[color:var(--gold-accent)] cursor-pointer">
-                <span class="text-[10px] font-bold text-gray-500" data-i18n="goodreads.fetchCoversLabel">Récupérer aussi les couvertures automatiquement</span>
+                <span class="text-[10px] font-bold text-gray-500" data-i18n="goodreads.fetchCoversLabel">Récupérer aussi les couvertures et le nombre de pages automatiquement</span>
             </label>
             <p class="text-[10px] text-slate-400 mt-3" data-i18n="goodreads.hint">Les statuts Goodreads sont repris automatiquement : "read" → fiche complète avec note et date, "to-read" → ajouté à ta liste "à lire", "currently-reading" → importé avec une date de début. Le genre et le résumé restent à compléter à la main.</p>
 
@@ -1372,6 +1392,7 @@
                 <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.coverUrl">URL Couverture</label><input id="in-cover" class="modal-input"></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.format">Format</label><select id="in-format" class="modal-input"><option value="-">-</option><option value="Livre" data-i18n="editModal.formatBook">Livre</option><option value="Ebook">Ebook</option><option value="Audiobook">Audiobook</option></select></div>
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.language">Langue</label><input id="in-lang" class="modal-input"></div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.pages">Pages</label><input id="in-pages" type="number" min="0" max="5000" inputmode="numeric" class="modal-input" placeholder="ex : 320"></div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.start">Début (ex: 01/05/2025)</label>
                     <div class="relative">
@@ -1523,7 +1544,7 @@
                         { icon: "👋", title: "Bienvenue sur Nool", body: "4 grandes sections t'attendent en haut de la page. Petit tour rapide pour t'y retrouver.", target: "#nav-tabs", section: "bibliotheque" },
                         { icon: "📚", title: "La Bibliothèque", body: "Range virtuellement tes livres sur cette étagère : fais-les glisser où tu veux, à la souris ou au doigt.", target: "#bookcase-container", section: "bibliotheque" },
                         { icon: "✨", title: "Décorations", body: "Personnalise ton étagère avec de petites décorations (plantes, cadres, bougies...).", target: "#decoration-picker-btn", section: "bibliotheque" },
-                        { icon: "🔍", title: "Filtre de bibliothèque", body: "Clique sur « Filtre » pour n'afficher sur l'étagère que certains livres : par année, auteur, genre, note, ou par statut (livre de l'année, préféré, favoris, Book Club, DNF, à lire).", target: "#shelf-filter-toggle-btn", section: "bibliotheque" },
+                        { icon: "🔍", title: "Filtre de bibliothèque", body: "Clique sur « Filtre » pour n'afficher sur l'étagère que certains livres : par année, auteur, genre, note, ou par statut (livre de l'année, préféré, favoris, Book Club, DNF, à lire). Dans chaque filtre, tu peux cocher plusieurs choix à la fois (par exemple 2022 et 2024, Romance et Thriller).", target: "#shelf-filter-toggle-btn", section: "bibliotheque" },
                         { icon: "📊", title: "Le Tableau de Bord", body: "Retrouve ici tes statistiques de lecture : livres lus, note moyenne, genres préférés, langues lues, rythme par année.", target: "#stats-cards-row", section: "stats" },
                         { icon: "📈", title: "Le graphique", body: "Ce graphique affiche ton rythme de lecture mois par mois (ou année par année), pour visualiser tes habitudes de lecture.", target: "#reading-pace-card", section: "stats" },
                         { icon: "🖼️", title: "Ma Grille", body: "Toutes les couvertures de tes livres, en un coup d'œil, avec des filtres par année, genre, auteur, note...", target: "#grid-content", section: "grille", scrollBlock: "start" },
@@ -1535,7 +1556,7 @@
                         { icon: "🎉", title: "Besoin d'aide plus tard ?", body: "Tu peux revoir ce guide à tout moment en cliquant sur ce bouton « ? ».", target: "#help-toggle-btn", section: "fiches" }
                     ]
                 },
-                editModal: { title: "Modifier la Fiche #", autofill: "Remplissage Automatique", titlePlaceholder: "Commence à taper un titre...", authorPlaceholder: "Auteur...", autofillHint: "Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.", genre: "Genre", releaseYear: "Année de sortie", rating: "Note", dnf: "Abandonné (DNF)", dnfHint: "Cocher si abandonné", toRead: "À lire", toReadHint: "Cocher si pas encore lu", coverUrl: "URL Couverture", format: "Format", formatBook: "Livre", language: "Langue", start: "Début (ex: 01/05/2025)", end: "Fin (ex: 15/05/2025)", summaryPlaceholder: "Résumé...", commentPlaceholder: "Mon avis...", cancel: "Annuler", save: "Enregistrer" },
+                editModal: { pages: "Pages", title: "Modifier la Fiche #", autofill: "Remplissage Automatique", titlePlaceholder: "Commence à taper un titre...", authorPlaceholder: "Auteur...", autofillHint: "Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.", genre: "Genre", releaseYear: "Année de sortie", rating: "Note", dnf: "Abandonné (DNF)", dnfHint: "Cocher si abandonné", toRead: "À lire", toReadHint: "Cocher si pas encore lu", coverUrl: "URL Couverture", format: "Format", formatBook: "Livre", language: "Langue", start: "Début (ex: 01/05/2025)", end: "Fin (ex: 15/05/2025)", summaryPlaceholder: "Résumé...", commentPlaceholder: "Mon avis...", cancel: "Annuler", save: "Enregistrer" },
                 shelf: { genreColor: "Couleur par genre", customizeSpine: "Personnaliser le dos", color: "Couleur", customColor: "Couleur personnalisée", pattern: "Motif", height: "Hauteur", thickness: "Épaisseur", close: "Fermer" },
                 deco: { plant: "Plante", lamp: "Lampe", candle: "Bougie", globe: "Globe", frame: "Cadre photo", statue: "Statuette", clearAll: "Tout retirer de l'étagère", customLabel: "Ou décris l'objet que tu veux", customPlaceholder: "ex: petit vase bleu avec des fleurs", customGenerate: "Générer", customUse: "Utiliser celle-ci", customRetry: "Réessayer", customError: "La génération a échoué, réessaie dans un instant.", customHint: "Généré par une IA d'illustration (Pollinations.AI, gratuite). Le résultat peut varier, n'hésite pas à réessayer ou reformuler." },
                 fiche: { backToGrid: "Retour Grille", backToLibrary: "Retour Bibliothèque", favoriteBook: "Livre préféré", electFavoriteBook: "Élire livre préféré", elect: "Élire", inMyFavorites: "Dans mes favoris", addToMyFavorites: "Ajouter aux favoris" },
@@ -1554,7 +1575,7 @@
                     step2: "Clique sur \"Export Library\" et attends que le fichier se génère (actualise la page si besoin).",
                     step3: "Télécharge le fichier .csv généré, puis sélectionne-le ci-dessous.",
                     openGoodreadsBtn: "↗ Ouvrir la page d'export Goodreads",
-                    fetchCoversLabel: "Récupérer aussi les couvertures automatiquement",
+                    fetchCoversLabel: "Récupérer aussi les couvertures et le nombre de pages automatiquement",
                     hint: "Les statuts Goodreads sont repris automatiquement : \"read\" → fiche complète avec note et date, \"to-read\" → ajouté à ta liste \"à lire\", \"currently-reading\" → importé avec une date de début. Le genre et le résumé restent à compléter à la main.",
                     launch: "Lancer l'import",
                     noFile: "Choisis d'abord un fichier .csv exporté depuis Goodreads.",
@@ -1599,7 +1620,7 @@
                         { icon: "👋", title: "Welcome to Nool", body: "4 main sections await you at the top of the page. Quick tour to help you find your way.", target: "#nav-tabs", section: "bibliotheque" },
                         { icon: "📚", title: "The Library", body: "Arrange your books on this virtual shelf: drag them wherever you like, with your mouse or your finger.", target: "#bookcase-container", section: "bibliotheque" },
                         { icon: "✨", title: "Decorations", body: "Personalize your shelf with small decorations (plants, frames, candles...).", target: "#decoration-picker-btn", section: "bibliotheque" },
-                        { icon: "🔍", title: "Library filter", body: "Click \"Filter\" to show only some of your books on the shelf: by year, author, genre, rating, or by status (book of the year, favorite, favorites, Book Club, DNF, to read).", target: "#shelf-filter-toggle-btn", section: "bibliotheque" },
+                        { icon: "🔍", title: "Library filter", body: "Click \"Filter\" to show only some of your books on the shelf: by year, author, genre, rating, or by status (book of the year, favorite, favorites, Book Club, DNF, to read). In each filter you can tick several choices at once (for example 2022 and 2024, Romance and Thriller).", target: "#shelf-filter-toggle-btn", section: "bibliotheque" },
                         { icon: "📊", title: "The Dashboard", body: "Find your reading stats here: books read, average rating, favorite genres, languages read, pace by year.", target: "#stats-cards-row", section: "stats" },
                         { icon: "📈", title: "The chart", body: "This chart shows your reading pace month by month (or year by year), so you can visualize your reading habits.", target: "#reading-pace-card", section: "stats" },
                         { icon: "🖼️", title: "My Grid", body: "Every book cover at a glance, with filters by year, genre, author, rating...", target: "#grid-content", section: "grille", scrollBlock: "start" },
@@ -1611,7 +1632,7 @@
                         { icon: "🎉", title: "Need help later?", body: "You can replay this guide anytime with this \"?\" button.", target: "#help-toggle-btn", section: "fiches" }
                     ]
                 },
-                editModal: { title: "Edit Entry #", autofill: "Auto-fill", titlePlaceholder: "Start typing a title...", authorPlaceholder: "Author...", autofillHint: "Pick a suggestion to auto-fill the author, genre, year and cover.", genre: "Genre", releaseYear: "Release year", rating: "Rating", dnf: "Did Not Finish (DNF)", dnfHint: "Check if dropped", toRead: "To read", toReadHint: "Check if not read yet", coverUrl: "Cover URL", format: "Format", formatBook: "Book", language: "Language", start: "Start (e.g. 05/01/2025)", end: "End (e.g. 05/15/2025)", summaryPlaceholder: "Summary...", commentPlaceholder: "My review...", cancel: "Cancel", save: "Save" },
+                editModal: { pages: "Pages", title: "Edit Entry #", autofill: "Auto-fill", titlePlaceholder: "Start typing a title...", authorPlaceholder: "Author...", autofillHint: "Pick a suggestion to auto-fill the author, genre, year and cover.", genre: "Genre", releaseYear: "Release year", rating: "Rating", dnf: "Did Not Finish (DNF)", dnfHint: "Check if dropped", toRead: "To read", toReadHint: "Check if not read yet", coverUrl: "Cover URL", format: "Format", formatBook: "Book", language: "Language", start: "Start (e.g. 05/01/2025)", end: "End (e.g. 05/15/2025)", summaryPlaceholder: "Summary...", commentPlaceholder: "My review...", cancel: "Cancel", save: "Save" },
                 shelf: { genreColor: "Color by genre", customizeSpine: "Customize spine", color: "Color", customColor: "Custom color", pattern: "Pattern", height: "Height", thickness: "Thickness", close: "Close" },
                 deco: { plant: "Plant", lamp: "Lamp", candle: "Candle", globe: "Globe", frame: "Photo frame", statue: "Statuette", clearAll: "Remove everything from the shelf", customLabel: "Or describe the object you want", customPlaceholder: "e.g. small blue vase with flowers", customGenerate: "Generate", customUse: "Use this one", customRetry: "Try again", customError: "Generation failed, try again in a moment.", customHint: "Generated by an illustration AI (Pollinations.AI, free). Results may vary, feel free to retry or rephrase." },
                 fiche: { backToGrid: "Back to Grid", backToLibrary: "Back to Library", favoriteBook: "Favorite book", electFavoriteBook: "Elect favorite book", elect: "Elect", inMyFavorites: "In my favorites", addToMyFavorites: "Add to favorites" },
@@ -1630,7 +1651,7 @@
                     step2: "Click \"Export Library\" and wait for the file to be generated (refresh the page if needed).",
                     step3: "Download the generated .csv file, then select it below.",
                     openGoodreadsBtn: "↗ Open the Goodreads export page",
-                    fetchCoversLabel: "Also fetch covers automatically",
+                    fetchCoversLabel: "Also fetch covers and page counts automatically",
                     hint: "Goodreads statuses are picked up automatically: \"read\" → full entry with rating and date, \"to-read\" → added to your \"to read\" list, \"currently-reading\" → imported with a start date. Genre and summary still need to be filled in by hand.",
                     launch: "Start import",
                     noFile: "First choose a .csv file exported from Goodreads.",
@@ -2364,8 +2385,15 @@
         const SPINE_WIDTH_RANGE = [18, 60];
         const SPINE_HEIGHTS = [64, 74, 84, 92];
         function spineWidthFor(b) {
-            if (b.shelfWidth) return b.shelfWidth;
+            if (b.shelfWidth) return b.shelfWidth;           // réglage manuel : toujours prioritaire
             const [min, max] = SPINE_WIDTH_RANGE;
+            const pages = parseInt(b.pages);
+            if (pages > 0) {
+                // 80 pages ou moins = dos le plus fin, 1000 pages ou plus = dos le plus épais
+                const ratio = Math.min(1, Math.max(0, (pages - 80) / 920));
+                return Math.round(min + ratio * (max - min));
+            }
+            // Pas de nombre de pages connu : épaisseur variée mais stable, comme avant
             return min + (Math.abs(b.id * 7) % (max - min));
         }
         function spineHeightFor(b) {
@@ -2610,6 +2638,27 @@
                 if (rowExtent[i] < rowExtent[shortest]) shortest = i;
             }
             return { row: shortest, x: Math.round(rowExtent[shortest] ? rowExtent[shortest] + 6 : 4) };
+        }
+
+        // Change le nombre de pages d'un livre. Si son dos change d'épaisseur, les objets à sa droite
+        // sur la même rangée sont décalés d'autant pour ne pas se chevaucher ni laisser de trou.
+        function setBookPages(book, pages) {
+            pages = parseInt(pages) || 0;
+            const oldW = spineWidthFor(book);
+            book.pages = pages;
+            const newW = spineWidthFor(book);
+            const pos = shelfPositions[book.uid];
+            const delta = newW - oldW;
+            if (!pos || !delta) return delta !== 0;
+            library.forEach(o => {
+                if (o === book || !o.title) return;
+                const q = shelfPositions[o.uid];
+                if (q && q.row === pos.row && q.x > pos.x) q.x += delta;
+            });
+            Object.values(shelfDecorations).forEach(d => {
+                if (d && d.row === pos.row && d.x > pos.x) d.x += delta;
+            });
+            return true;
         }
 
         function initShelfDrag(el, item, kind = 'book') {
@@ -2903,29 +2952,116 @@
         document.addEventListener('pointerup', onShelfPointerUp);
         document.addEventListener('pointercancel', onShelfPointerCancel);
 
+        // ===== Filtres à sélection multiple =====
+        // Chaque <select> de filtre reste dans le DOM (caché) pour fournir la liste des options ;
+        // la sélection est stockée dans el._ms.sel (vide = « tout »). Au sein d'un filtre : OU. Entre filtres : ET.
+        const MULTI_FILTER_IDS = ['filter-year-grid','filter-rating','filter-genre','filter-format','filter-language','filter-author','filter-month','filter-special',
+                                  'filter-year-shelf','filter-author-shelf','filter-genre-shelf','filter-rating-shelf','filter-special-shelf'];
+        function getSel(id) {
+            const el = document.getElementById(id);
+            if (!el) return [];
+            if (el._ms) return [...el._ms.sel];
+            return (el.value && el.value !== 'all') ? [el.value] : [];
+        }
+        function msRealOptions(el) {
+            let opts = Array.from(el.options).filter(o => o.value !== 'all');
+            if (el.id.startsWith('filter-year')) {
+                const years = new Set();
+                library.forEach(b => { const m = b.title && b.end && b.end.match(/(\d{4})\s*$/); if (m) years.add(m[1]); });
+                opts = opts.filter(o => years.has(o.value) || (el._ms && el._ms.sel.has(o.value)));
+            }
+            return opts;
+        }
+        function refreshMS(id) {
+            const el = document.getElementById(id);
+            if (!el || !el._ms) return;
+            const opts = msRealOptions(el);
+            const valid = new Set(opts.map(o => o.value));
+            el._ms.sel.forEach(v => { if (!valid.has(v)) el._ms.sel.delete(v); });
+            const allText = (Array.from(el.options).find(o => o.value === 'all') || {}).textContent || '';
+            const chosen = opts.filter(o => el._ms.sel.has(o.value)).map(o => o.textContent.trim());
+            let label = allText;
+            if (chosen.length === 1) label = chosen[0];
+            else if (chosen.length > 1) label = chosen[0] + ' +' + (chosen.length - 1);
+            el._ms.btn.textContent = label;
+            el._ms.btn.title = chosen.join(', ');
+            el._ms.btn.classList.toggle('ms-active', chosen.length > 0);
+        }
+        function refreshAllMS() { MULTI_FILTER_IDS.forEach(refreshMS); }
+        function clearMS(id) {
+            const el = document.getElementById(id);
+            if (el && el._ms) { el._ms.sel.clear(); refreshMS(id); }
+        }
+        function closeAllMSPanels(except) {
+            document.querySelectorAll('.ms-panel').forEach(p => { if (p !== except) p.classList.add('hidden'); });
+        }
+        function buildMSPanel(el) {
+            const panel = el._ms.panel;
+            const opts = msRealOptions(el);
+            panel.innerHTML = '';
+            const clear = document.createElement('button');
+            clear.type = 'button'; clear.className = 'ms-clear';
+            clear.textContent = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'Clear selection' : 'Tout désélectionner';
+            clear.onclick = (e) => { e.stopPropagation(); el._ms.sel.clear(); buildMSPanel(el); refreshMS(el.id); render(); };
+            panel.appendChild(clear);
+            opts.forEach(o => {
+                const row = document.createElement('label');
+                row.className = 'ms-item';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox'; cb.checked = el._ms.sel.has(o.value);
+                cb.onchange = () => {
+                    if (cb.checked) el._ms.sel.add(o.value); else el._ms.sel.delete(o.value);
+                    refreshMS(el.id); render();
+                };
+                const txt = document.createElement('span');
+                txt.textContent = o.textContent.trim();
+                row.appendChild(cb); row.appendChild(txt);
+                panel.appendChild(row);
+            });
+        }
+        function initMultiSelects() {
+            MULTI_FILTER_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el || el._ms) return;
+                const wrap = document.createElement('div');
+                wrap.className = 'ms-wrap';
+                el.parentNode.insertBefore(wrap, el);
+                wrap.appendChild(el);
+                el.style.display = 'none';
+                el.removeAttribute('onchange');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = el.className + ' ms-btn';
+                const panel = document.createElement('div');
+                panel.className = 'ms-panel hidden';
+                wrap.appendChild(btn); wrap.appendChild(panel);
+                el._ms = { sel: new Set(), btn, panel };
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const willOpen = panel.classList.contains('hidden');
+                    closeAllMSPanels(panel);
+                    if (willOpen) buildMSPanel(el);
+                    panel.classList.toggle('hidden', !willOpen);
+                };
+                panel.onclick = (e) => e.stopPropagation();
+                refreshMS(id);
+            });
+        }
+        document.addEventListener('click', () => closeAllMSPanels());
+        const inSel = (arr, test) => arr.length === 0 || arr.some(test);
+        const specialMatch = (b, v) => (v === 'favorite' && !!b.isFavorite) || (v === 'alltimefavorite' && !!b.isAllTimeFavorite)
+            || (v === 'myfavorite' && !!b.isMyFavorite) || (v === 'bookclub' && !!b.isBookClub)
+            || (v === 'dnf' && !!b.isDNF) || (v === 'toread' && !!b.isToRead);
+
         function getShelfBooks() {
-            const yearSelect = document.getElementById('filter-year-shelf');
-            const authorSelect = document.getElementById('filter-author-shelf');
-            const genreSelect = document.getElementById('filter-genre-shelf');
-            const ratingSelect = document.getElementById('filter-rating-shelf');
-            const specialSelect = document.getElementById('filter-special-shelf');
-            const y = yearSelect ? yearSelect.value : 'all';
-            const a = authorSelect ? authorSelect.value : 'all';
-            const g = genreSelect ? genreSelect.value : 'all';
-            const r = ratingSelect ? ratingSelect.value : 'all';
-            const spec = specialSelect ? specialSelect.value : 'all';
-            let result = library.filter(b => b.title);
-            if (y !== 'all') result = result.filter(b => b.end && b.end.includes(y));
-            if (a !== 'all') result = result.filter(b => b.author === a);
-            if (g !== 'all') result = result.filter(b => b.genre === g);
-            if (r !== 'all') result = result.filter(b => b.rating == r);
-            if (spec === 'favorite') result = result.filter(b => !!b.isFavorite);
-            if (spec === 'alltimefavorite') result = result.filter(b => !!b.isAllTimeFavorite);
-            if (spec === 'myfavorite') result = result.filter(b => !!b.isMyFavorite);
-            if (spec === 'bookclub') result = result.filter(b => !!b.isBookClub);
-            if (spec === 'dnf') result = result.filter(b => !!b.isDNF);
-            if (spec === 'toread') result = result.filter(b => !!b.isToRead);
-            return result;
+            const ys = getSel('filter-year-shelf'), as = getSel('filter-author-shelf'), gs = getSel('filter-genre-shelf'),
+                  rs = getSel('filter-rating-shelf'), sp = getSel('filter-special-shelf');
+            return library.filter(b => b.title
+                && inSel(ys, y => b.end && b.end.includes(y))
+                && inSel(as, a => b.author === a)
+                && inSel(gs, g => b.genre === g)
+                && inSel(rs, r => b.rating == r)
+                && inSel(sp, v => specialMatch(b, v)));
         }
 
         function renderShelf(books) {
@@ -3315,6 +3451,7 @@
             }
         }
         initYearFilters();
+        initMultiSelects();
 
         const gridEl = document.getElementById('grid-content');
         var gridSortable = null;
@@ -3521,6 +3658,34 @@
             if (needsSave) await setDoc(docRef, { books: library });
             updateFilterOptions();
             render();
+            setTimeout(backfillPages, 4000);
+        }
+
+        // Cherche en arrière-plan le nombre de pages des livres qui n'en ont pas (au plus 40 par session,
+        // et un livre introuvable n'est pas réessayé en boucle). L'épaisseur des dos s'ajuste toute seule.
+        let backfillingPages = false;
+        async function backfillPages() {
+            if (backfillingPages || !currentUser) return;
+            const todo = library.filter(b => b.title && !b.pages && !b.pagesTried).slice(0, 40);
+            if (!todo.length) return;
+            backfillingPages = true;
+            let changed = 0, reflowed = false;
+            for (const b of todo) {
+                try {
+                    const m = await findBestBookMatch(b.title, b.author || '');
+                    if (m && m.pages) { if (setBookPages(b, m.pages)) reflowed = true; changed++; } else { b.pagesTried = true; }
+                } catch (err) { /* réessayé à la prochaine session */ }
+                if (changed > 0 && changed % 10 === 0) {
+                    try { await setDoc(doc(db, "users_libs", currentUser.uid), { books: library }); } catch (e) {}
+                    if (reflowed) { await saveShelfPositions(); await saveShelfDecorations(); reflowed = false; }
+                    render();
+                }
+                await new Promise(r => setTimeout(r, 400));
+            }
+            try { await setDoc(doc(db, "users_libs", currentUser.uid), { books: library }); } catch (e) {}
+            if (reflowed) { await saveShelfPositions(); await saveShelfDecorations(); }
+            render();
+            backfillingPages = false;
         }
 
         function updateScrollNavButtons() {
@@ -3543,14 +3708,17 @@
 
         window.render = () => {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const rF = document.getElementById('filter-rating').value;
-            const gF = document.getElementById('filter-genre').value;
-            const fmtF = document.getElementById('filter-format').value;
-            const lF = document.getElementById('filter-language').value;
-            const aF = document.getElementById('filter-author').value;
-            const mF = document.getElementById('filter-month').value;
-            const specF = document.getElementById('filter-special').value;
-            const yGridF = document.getElementById('filter-year-grid').value;
+            refreshAllMS();
+            const rF = getSel('filter-rating'), gF = getSel('filter-genre'), fmtF = getSel('filter-format'), lF = getSel('filter-language'),
+                  aF = getSel('filter-author'), mF = getSel('filter-month'), specF = getSel('filter-special'), yGridF = getSel('filter-year-grid');
+            const passFilters = (b) => inSel(rF, r => b.rating == r)
+                && inSel(yGridF, y => b.end && b.end.includes(y))
+                && inSel(gF, g => b.genre === g)
+                && inSel(fmtF, f => b.format === f)
+                && inSel(lF, l => b.lang === l)
+                && inSel(aF, a => b.author === a)
+                && inSel(mF, m => b.end && b.end.includes('/') && b.end.split('/')[1].trim() === m)
+                && inSel(specF, v => specialMatch(b, v));
             const sortF = document.getElementById('filter-sort').value;
             const yStatsF = document.getElementById('filter-year-stats').value;
             const isAllYears = yStatsF === 'all';
@@ -3567,29 +3735,13 @@
 
             const filteredGrid = library.filter(b => {
                 const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
-                const matchRating = rF === "all" || b.rating == rF;
-                const matchYear = yGridF === "all" || (b.end && b.end.includes(yGridF));
-                const matchGenre = gF === "all" || b.genre === gF;
-                const matchFormat = fmtF === "all" || b.format === fmtF;
-                const matchLang = lF === "all" || b.lang === lF;
-                const matchAuthor = aF === "all" || b.author === aF;
-                const matchMonth = mF === "all" || (b.end && b.end.includes('/') && b.end.split('/')[1].trim() === mF);
-                const matchFavorite = specF === "all" || (specF === "favorite" && !!b.isFavorite) || (specF === "alltimefavorite" && !!b.isAllTimeFavorite) || (specF === "myfavorite" && !!b.isMyFavorite) || (specF === "bookclub" && !!b.isBookClub) || (specF === "dnf" && !!b.isDNF) || (specF === "toread" && !!b.isToRead);
-                return b.title && matchSearch && matchRating && matchYear && matchGenre && matchFormat && matchLang && matchAuthor && matchMonth && matchFavorite; 
+                return b.title && matchSearch && passFilters(b);
             });
 
             const filteredFiches = library.filter(b => {
-                if(!b.title) return false;
+                if (!b.title) return false;
                 const matchSearch = !searchTerm || (b.title + b.author).toLowerCase().includes(searchTerm);
-                const matchRating = rF === "all" || b.rating == rF;
-                const matchYear = yGridF === "all" || (b.end && b.end.includes(yGridF));
-                const matchGenre = gF === "all" || b.genre === gF;
-                const matchFormat = fmtF === "all" || b.format === fmtF;
-                const matchLang = lF === "all" || b.lang === lF;
-                const matchAuthor = aF === "all" || b.author === aF;
-                const matchMonth = mF === "all" || (b.end && b.end.includes('/') && b.end.split('/')[1].trim() === mF);
-                const matchFavorite = specF === "all" || (specF === "favorite" && !!b.isFavorite) || (specF === "alltimefavorite" && !!b.isAllTimeFavorite) || (specF === "myfavorite" && !!b.isMyFavorite) || (specF === "bookclub" && !!b.isBookClub) || (specF === "dnf" && !!b.isDNF) || (specF === "toread" && !!b.isToRead);
-                return matchSearch && matchRating && matchYear && matchGenre && matchFormat && matchLang && matchAuthor && matchMonth && matchFavorite;
+                return matchSearch && passFilters(b);
             });
 
             if (sortF !== 'none') {
@@ -4078,8 +4230,7 @@
 
         window.resetShelfFilters = () => {
             ['filter-year-shelf', 'filter-author-shelf', 'filter-genre-shelf', 'filter-rating-shelf', 'filter-special-shelf'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = 'all';
+                clearMS(id);
             });
             render();
         };
@@ -4122,7 +4273,11 @@
             // On part du livre existant (...library[idx]) pour conserver ses réglages d'étagère
             // (shelfColor, shelfWidth, shelfHeight, shelfPattern) : seuls les champs du formulaire changent.
             library[idx] = { ...library[idx], id, uid: currentUid, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, year: document.getElementById('in-year').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: startDate, end: endDate, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav, isBookClub: currentBookClub, isAllTimeFavorite: currentAllTimeFav, isMyFavorite: currentMyFav, isDNF: document.getElementById('in-dnf').checked, isToRead: document.getElementById('in-toread').checked };
+            const newPages = parseInt(document.getElementById('in-pages').value) || 0;
+            const reflowed = setBookPages(library[idx], newPages);
+            if (newPages) delete library[idx].pagesTried;
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
+            if (reflowed) { await saveShelfPositions(); await saveShelfDecorations(); }
             updateFilterOptions(); render(); closeModal();
         };
 
@@ -4163,7 +4318,7 @@
         window.openEdit = (id) => {
             const b = library.find(x => x.id === id);
             document.getElementById('modal-id').innerText = id;
-            ['title', 'author', 'cover', 'rating', 'genre', 'year', 'format', 'lang', 'start', 'end', 'summary', 'comment'].forEach(f => {
+            ['title', 'author', 'cover', 'rating', 'genre', 'year', 'format', 'lang', 'pages', 'start', 'end', 'summary', 'comment'].forEach(f => {
                 document.getElementById('in-' + f).value = b[f] || (f === 'rating' ? 0 : "");
             });
             document.getElementById('in-dnf').checked = !!b.isDNF;
@@ -4171,7 +4326,7 @@
             document.getElementById('edit-modal').classList.remove('hidden');
         };
         window.closeModal = () => document.getElementById('edit-modal').classList.add('hidden');
-        window.resetFilters = () => { document.getElementById('search-input').value = ""; document.getElementById('filter-rating').value = "all"; document.getElementById('filter-genre').value = "all"; document.getElementById('filter-format').value = "all"; document.getElementById('filter-language').value = "all"; document.getElementById('filter-author').value = "all"; document.getElementById('filter-month').value = "all"; document.getElementById('filter-year-grid').value = "all"; document.getElementById('filter-special').value = "all"; document.getElementById('filter-sort').value = "none"; render(); };
+        window.resetFilters = () => { document.getElementById('search-input').value = ""; ['filter-rating','filter-genre','filter-format','filter-language','filter-author','filter-month','filter-year-grid','filter-special'].forEach(clearMS); document.getElementById('filter-sort').value = "none"; render(); };
 
         window.addNewBookFromLibrary = () => {
             const nextEmptyBook = library.find(b => !b.title);
@@ -4225,9 +4380,15 @@
             }, 400);
         };
 
+        // Un nombre de pages n'est retenu que s'il est plausible (évite les 0, les extraits, les erreurs de base de données)
+        function sanePages(n) {
+            n = parseInt(n);
+            return (n >= 40 && n <= 2500) ? n : 0;
+        }
+
         async function searchOpenLibrary(query) {
             try {
-                const fields = 'key,title,author_name,cover_i,first_publish_year,subject,editions,editions.key,editions.cover_i,editions.language,editions.first_publish_year';
+                const fields = 'key,title,author_name,cover_i,first_publish_year,subject,editions,editions.key,editions.cover_i,editions.language,editions.first_publish_year,number_of_pages_median';
                 const response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&fields=${fields}&editions.language=fre&limit=6`);
                 const data = await response.json();
                 return (data.docs || []).map(doc => {
@@ -4242,6 +4403,7 @@
                         thumb: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-S.jpg` : '',
                         summarySource: 'openlibrary',
                         olKey: doc.key,
+                        pages: sanePages(doc.number_of_pages_median),
                         hasFrenchEdition: !!frenchEdition
                     };
                 }).sort((a, b) => (b.hasFrenchEdition ? 1 : 0) - (a.hasFrenchEdition ? 1 : 0));
@@ -4263,6 +4425,7 @@
                         cover: info.imageLinks?.thumbnail?.replace('http:', 'https:') || '',
                         thumb: info.imageLinks?.smallThumbnail?.replace('http:', 'https:') || '',
                         summary: info.description || '',
+                        pages: sanePages(info.pageCount),
                         summarySource: 'googlebooks'
                     };
                 });
@@ -4351,11 +4514,16 @@
             // Si même le meilleur résultat ne ressemble pas assez au titre cherché,
             // mieux vaut ne pas se tromper de livre que d'ajouter une mauvaise couverture.
             if (best.sim < 0.35) return null;
-            if (!best.c.cover) {
+            const result = { ...best.c };
+            if (!result.cover) {
                 const alt = scored.find(x => x.c.cover && x.sim >= Math.max(0.6, best.sim - 0.15));
-                if (alt) return { ...best.c, cover: alt.c.cover };
+                if (alt) result.cover = alt.c.cover;
             }
-            return best.c;
+            if (!result.pages) {
+                const altP = scored.find(x => x.c.pages && x.sim >= Math.max(0.6, best.sim - 0.15));
+                if (altP) result.pages = altP.c.pages;
+            }
+            return result;
         }
 
         function renderSuggestions(items, query, dropdown) {
@@ -4383,6 +4551,7 @@
             document.getElementById('in-genre').value = b.genre || '';
             document.getElementById('in-year').value = b.year || '';
             document.getElementById('in-cover').value = b.cover || '';
+            document.getElementById('in-pages').value = b.pages || '';
             document.getElementById('in-summary').value = b.summary || '';
             document.getElementById('title-suggestions').classList.add('hidden');
 
@@ -4454,6 +4623,7 @@
                 slot.genre = match?.genre || '';
                 slot.year = match?.year || '';
                 slot.summary = match?.summary || '';
+                slot.pages = match?.pages || 0;
                 slot.format = slot.format || '-';
                 slot.lang = slot.lang || '';
                 slot.start = ''; slot.end = ''; slot.comment = ''; slot.rating = 0;
@@ -4590,6 +4760,7 @@
                 format: col('format'),
                 lang: col('language'),
                 coverUrl: col('cover url'),
+                pages: col('number of pages'),
                 bookOfYear: col('book of the year'),
                 allTimeFav: col('favorite book'),
                 myFav: col('my favorites'),
@@ -4642,6 +4813,7 @@
                 const csvFormat = cleanGoodreadsField(get(idx.format));
                 const csvLang = cleanGoodreadsField(get(idx.lang));
                 const csvCover = cleanGoodreadsField(get(idx.coverUrl));
+                const csvPages = parseInt(cleanGoodreadsField(get(idx.pages))) || 0;
                 const isYes = (i) => /^(1|yes|oui|true|x)$/i.test(cleanGoodreadsField(get(i)));
 
                 slot.title = title;
@@ -4665,6 +4837,16 @@
                     } else {
                         slot.cover = slot.cover || '';
                     }
+                }
+                // Nombre de pages : colonne Goodreads si présente, sinon recherche en ligne (si la case est cochée)
+                if (csvPages) {
+                    slot.pages = csvPages;
+                } else if (!slot.pages) {
+                    if (fetchCovers && !lookup) {
+                        try { lookup = await findBestBookMatch(title, authorVal); } catch (err) { lookup = null; }
+                        await new Promise(r => setTimeout(r, 150));
+                    }
+                    slot.pages = lookup?.pages || 0;
                 }
                 if (csvGenre) slot.genre = csvGenre;
                 else if (!isUpdate || !slot.genre) slot.genre = guessedGenre || slot.genre || '';
