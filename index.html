@@ -3661,19 +3661,20 @@
             setTimeout(backfillPages, 4000);
         }
 
-        // Cherche en arrière-plan le nombre de pages des livres qui n'en ont pas (au plus 40 par session,
+        // Cherche en arrière-plan le nombre de pages des livres qui n'en ont pas (au plus 60 par session,
         // et un livre introuvable n'est pas réessayé en boucle). L'épaisseur des dos s'ajuste toute seule.
         let backfillingPages = false;
         async function backfillPages() {
             if (backfillingPages || !currentUser) return;
-            const todo = library.filter(b => b.title && !b.pages && !b.pagesTried).slice(0, 40);
+            const todo = library.filter(b => b.title && !b.pages && b.pagesLookup !== 2).slice(0, 60);
             if (!todo.length) return;
             backfillingPages = true;
             let changed = 0, reflowed = false;
             for (const b of todo) {
                 try {
-                    const m = await findBestBookMatch(b.title, b.author || '');
-                    if (m && m.pages) { if (setBookPages(b, m.pages)) reflowed = true; changed++; } else { b.pagesTried = true; }
+                    const r = await fetchPageCount(b.title, b.author || '');
+                    if (r.limited) break;                       // quota atteint : on réessaiera à la prochaine session
+                    if (r.pages) { if (setBookPages(b, r.pages)) reflowed = true; changed++; } else { b.pagesLookup = 2; }
                 } catch (err) { /* réessayé à la prochaine session */ }
                 if (changed > 0 && changed % 10 === 0) {
                     try { await setDoc(doc(db, "users_libs", currentUser.uid), { books: library }); } catch (e) {}
@@ -4276,7 +4277,7 @@
             library[idx] = { ...library[idx], id, uid: currentUid, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, year: document.getElementById('in-year').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value, start: startDate, end: endDate, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav, isBookClub: currentBookClub, isAllTimeFavorite: currentAllTimeFav, isMyFavorite: currentMyFav, isDNF: document.getElementById('in-dnf').checked, isToRead: document.getElementById('in-toread').checked };
             const newPages = parseInt(document.getElementById('in-pages').value) || 0;
             const reflowed = setBookPages(library[idx], newPages);
-            if (newPages) delete library[idx].pagesTried;
+            if (newPages) { delete library[idx].pagesTried; delete library[idx].pagesLookup; }
             await setDoc(doc(db, "users_libs", currentUser.uid), { books: library });
             if (reflowed) { await saveShelfPositions(); await saveShelfDecorations(); }
             updateFilterOptions(); render(); closeModal();
@@ -4433,6 +4434,70 @@
             } catch (e) { return []; }
         }
 
+
+        // ===== Recherche dédiée du nombre de pages =====
+        // Plus fiable que la recherche de couverture : interroge Google Books avec titre + auteur (plusieurs éditions,
+        // on garde la valeur médiane), puis Open Library en secours. Renvoie { pages, limited } ;
+        // limited = true si Google a refusé la requête (quota), auquel cas il ne faut pas conclure « introuvable ».
+        function pagesTitleSim(a, b) {
+            const na = normalizeTitle(a), nb = normalizeTitle(b);
+            if (!na || !nb) return 0;
+            if (na.includes(nb) || nb.includes(na)) return 0.9;
+            return titleSimilarity(a, b);
+        }
+        function medianOf(arr) {
+            const a = [...arr].sort((x, y) => x - y);
+            const m = Math.floor(a.length / 2);
+            return a.length % 2 ? a[m] : Math.round((a[m - 1] + a[m]) / 2);
+        }
+        function authorMatches(wanted, got) {
+            if (!wanted) return true;
+            const words = normalizeTitle(wanted).split(' ').filter(w => w.length > 2);
+            const gotN = normalizeTitle((got || []).join(' '));
+            return words.length === 0 || words.some(w => gotN.includes(w));
+        }
+        async function fetchPageCount(rawTitle, author = '') {
+            const out = { pages: 0, limited: false };
+            const cleaned = cleanTitleForSearch(rawTitle);
+            const titles = [...new Set([rawTitle.trim(), cleaned].filter(Boolean))];
+            const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
+            for (const t of titles) {
+                const queries = author ? [`intitle:"${t}" inauthor:"${author}"`, `intitle:"${t}"`] : [`intitle:"${t}"`];
+                for (const q of queries) {
+                    try {
+                        const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=15&printType=books&key=AIzaSyDz7Waj_AluvqFvKemy5QfA3NbYUN875po`);
+                        if (res.status === 429) { out.limited = true; return out; }
+                        const data = await res.json();
+                        const counts = [];
+                        (data.items || []).forEach(item => {
+                            const info = item.volumeInfo || {};
+                            const pc = sanePages(info.pageCount);
+                            if (!pc) return;
+                            const sim = Math.max(pagesTitleSim(rawTitle, info.title), pagesTitleSim(cleaned, info.title));
+                            if (sim >= 0.6 && authorMatches(author, info.authors)) counts.push(pc);
+                        });
+                        if (counts.length) { out.pages = medianOf(counts); return out; }
+                    } catch (e) { /* on tente la suite */ }
+                    await wait(150);
+                }
+            }
+
+            // Secours : Open Library
+            for (const t of titles) {
+                try {
+                    const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent((t + ' ' + author).trim())}&fields=title,author_name,number_of_pages_median&limit=8`);
+                    const data = await res.json();
+                    const hit = (data.docs || []).find(d => sanePages(d.number_of_pages_median)
+                        && Math.max(pagesTitleSim(rawTitle, d.title), pagesTitleSim(cleaned, d.title)) >= 0.6
+                        && authorMatches(author, d.author_name));
+                    if (hit) { out.pages = sanePages(hit.number_of_pages_median); return out; }
+                } catch (e) { /* introuvable */ }
+                await wait(150);
+            }
+            return out;
+        }
+
         // Nettoie un titre collé en vrac (tomes, sous-titres entre parenthèses, ponctuation en trop...)
         // pour donner une meilleure chance de le retrouver dans les bases de données.
         function cleanTitleForSearch(raw) {
@@ -4553,6 +4618,12 @@
             document.getElementById('in-year').value = b.year || '';
             document.getElementById('in-cover').value = b.cover || '';
             document.getElementById('in-pages').value = b.pages || '';
+            if (!b.pages) {
+                fetchPageCount(b.title, b.author).then(r => {
+                    const el = document.getElementById('in-pages');
+                    if (r.pages && el && !el.value) el.value = r.pages;
+                }).catch(() => {});
+            }
             document.getElementById('in-summary').value = b.summary || '';
             document.getElementById('title-suggestions').classList.add('hidden');
 
@@ -4625,6 +4696,7 @@
                 slot.year = match?.year || '';
                 slot.summary = match?.summary || '';
                 slot.pages = match?.pages || 0;
+                if (!slot.pages) { try { slot.pages = (await fetchPageCount(slot.title, slot.author)).pages || 0; } catch (err) { /* introuvable */ } }
                 slot.format = slot.format || '-';
                 slot.lang = slot.lang || '';
                 slot.start = ''; slot.end = ''; slot.comment = ''; slot.rating = 0;
@@ -4843,11 +4915,11 @@
                 if (csvPages) {
                     slot.pages = csvPages;
                 } else if (!slot.pages) {
-                    if (fetchCovers && !lookup) {
-                        try { lookup = await findBestBookMatch(title, authorVal); } catch (err) { lookup = null; }
+                    slot.pages = lookup?.pages || 0;
+                    if (!slot.pages && fetchCovers) {
+                        try { slot.pages = (await fetchPageCount(title, authorVal)).pages || 0; } catch (err) { /* introuvable */ }
                         await new Promise(r => setTimeout(r, 150));
                     }
-                    slot.pages = lookup?.pages || 0;
                 }
                 if (csvGenre) slot.genre = csvGenre;
                 else if (!isUpdate || !slot.genre) slot.genre = guessedGenre || slot.genre || '';
