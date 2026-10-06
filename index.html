@@ -135,7 +135,7 @@
             padding-top: 15px;
             border-top: 1px solid #f9f9f9;
         }
-        @media (min-width: 768px) { .info-grid { grid-template-columns: repeat(6, 1fr); } }
+        @media (min-width: 768px) { .info-grid { grid-template-columns: repeat(7, 1fr); } }
 
         .info-item { border-bottom: 2px solid #f9f9f9; padding-bottom: 8px; }
         .info-value { font-size: 13px; font-weight: 700; color: var(--deep-black); }
@@ -4028,6 +4028,7 @@
                         <div class="info-item"><p class="section-label">Fin :</p><p class="info-value">${book.end || '—'}</p></div>
                         <div class="info-item"><p class="section-label">Genre :</p><p class="info-value">${book.genre || '—'}</p></div>
                         <div class="info-item"><p class="section-label">Année :</p><p class="info-value">${book.year || '—'}</p></div>
+                        <div class="info-item"><p class="section-label">Pages :</p><p class="info-value">${book.pages ? book.pages : '—'}</p></div>
                         <div class="info-item"><p class="section-label">Format :</p><p class="info-value">${book.format || '—'}</p></div>
                         <div class="info-item"><p class="section-label">Langue :</p><p class="info-value">${book.lang || '—'}</p></div>
                     </div>
