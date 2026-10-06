@@ -2608,6 +2608,13 @@
                 }
             });
 
+            // Plusieurs nouveaux livres d'un coup (import) : rangés par auteur, avec une petite séparation entre auteurs
+            const unplaced = visibleBooks.filter(b => !shelfPositions[b.uid]);
+            if (unplaced.length >= 3) {
+                placeBooksByAuthor(unplaced, rowExtent);
+                return;
+            }
+
             visibleBooks.forEach(b => {
                 if (shelfPositions[b.uid]) return;
                 let shortest = 0;
@@ -2616,6 +2623,45 @@
                 }
                 shelfPositions[b.uid] = { row: shortest, x: Math.round(rowExtent[shortest] ? rowExtent[shortest] + 6 : 4) };
                 rowExtent[shortest] += spineWidthFor(b) + 6;
+            });
+        }
+
+        // Range un lot de nouveaux livres : un auteur = un groupe de dos côte à côte (dans l'ordre de la série,
+        // sinon par année de sortie), groupes triés par nom de famille, rangées remplies l'une après l'autre
+        // de façon équilibrée sans couper un auteur en deux quand c'est possible.
+        function placeBooksByAuthor(books, rowExtent) {
+            const BOOK_GAP = 6, AUTHOR_GAP = 20;
+            const lastWord = (a) => { const w = (a || '').trim().split(/\s+/); return w[w.length - 1] || ''; };
+            const groups = new Map();
+            books.forEach(b => {
+                const key = (b.author || '').trim().toLowerCase() || '\uffff';
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key).push(b);
+            });
+            const list = [...groups.entries()].sort((a, b) => {
+                if (a[0] === '\uffff') return 1;
+                if (b[0] === '\uffff') return -1;
+                return lastWord(a[1][0].author).localeCompare(lastWord(b[1][0].author), 'fr', { sensitivity: 'base' })
+                    || a[0].localeCompare(b[0], 'fr');
+            });
+            list.forEach(([, arr]) => arr.sort((x, y) =>
+                ((parseInt(x.year) || 9999) - (parseInt(y.year) || 9999))
+                || (x.title || '').localeCompare(y.title || '', 'fr', { numeric: true })));
+
+            const groupWidth = (arr) => arr.reduce((t, b) => t + spineWidthFor(b) + BOOK_GAP, 0);
+            const total = list.reduce((t, [, arr]) => t + groupWidth(arr) + (AUTHOR_GAP - BOOK_GAP), 0);
+            const target = (rowExtent.reduce((a, b) => a + b, 0) + total) / SHELF_ROW_COUNT;
+
+            let row = 0;
+            list.forEach(([, arr]) => {
+                const gw = groupWidth(arr);
+                while (row < SHELF_ROW_COUNT - 1 && rowExtent[row] > 0 && rowExtent[row] + gw / 2 > target) row++;
+                arr.forEach((b, i) => {
+                    const gap = (i === 0) ? AUTHOR_GAP : BOOK_GAP;
+                    const x = rowExtent[row] ? rowExtent[row] + gap : 4;
+                    shelfPositions[b.uid] = { row, x: Math.round(x) };
+                    rowExtent[row] = x + spineWidthFor(b);
+                });
             });
         }
 
