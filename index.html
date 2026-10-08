@@ -588,6 +588,7 @@
             border-color: rgba(197, 160, 89, 0.25);
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.35);
         }
+        html { scrollbar-gutter: stable; }
         #bookcase-scaler { transform-origin: top left; }
         .bookshelf-row-wrap { margin-bottom: 22px; }
         .bookshelf-row-wrap.bookshelf-row-wrap-last { margin-bottom: 4px; }
@@ -780,6 +781,9 @@
         html.dark #landing-page{--np-bg:#141414;--np-ink:#F2F0EA;--np-mute:#A79F91;--np-card:#242424;--np-line:#333333}
         #landing-page h1,#landing-page h2,#landing-page h3{font-family:'Fraunces',Georgia,serif;margin:0;line-height:1.08;letter-spacing:-.02em}
         #landing-page a{color:inherit;text-decoration:none}
+        #landing-page .np-rv{opacity:0;transform:translateY(30px);transition:opacity .75s ease,transform .85s cubic-bezier(.2,.8,.2,1)}
+        #landing-page .np-rv.np-in{opacity:1;transform:none}
+        @media (prefers-reduced-motion:reduce){#landing-page .np-rv{opacity:1;transform:none;transition:none}}
         #landing-page :focus-visible{outline:3px solid var(--np-gold);outline-offset:3px}
         #landing-page .np-wrap{max-width:1120px;margin:0 auto;padding:0 22px}
         #landing-page .np-btn{display:inline-block;padding:14px 26px;border-radius:999px;font-weight:700;border:2px solid transparent;transition:transform .15s;cursor:pointer}
@@ -787,7 +791,9 @@
         #landing-page .np-gold{background:var(--np-gold);color:#1a1405}
         #landing-page .np-ghost{border-color:rgba(255,255,255,.35);color:#f2f0ea}
         #landing-page .np-hero{background:var(--np-night);color:#f2f0ea;padding-bottom:0;overflow:hidden}
-        #landing-page .np-nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+        #landing-page .np-nav{display:flex;align-items:center;gap:18px;margin-top:18px;padding:10px 12px 10px 22px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.07);backdrop-filter:blur(8px);box-shadow:0 8px 30px rgba(0,0,0,.28)}
+        #landing-page .np-sep{width:1px;height:28px;background:rgba(255,255,255,.25);flex:none}
+        #landing-page .np-opts{margin-left:auto;display:flex;align-items:center;gap:14px}
         #landing-page .np-logo{font-family:'Fraunces',serif;font-weight:800;font-size:28px;letter-spacing:-.03em}
         #landing-page .np-logo i{color:var(--np-gold);font-style:normal}
         #landing-page .np-nav .np-links{display:flex;gap:18px;align-items:center;font-size:15px;color:#D9D3C4}
@@ -806,7 +812,7 @@
         #landing-page .np-plank{height:22px;background:linear-gradient(#5b3d2a,#3d2819);box-shadow:0 -2px 0 #6e4a33 inset}
         @media (prefers-reduced-motion:reduce){#landing-page .np-spine{animation:none}}
         #landing-page section{padding:84px 0}
-        #landing-page .np-sec-h{max-width:620px;margin-bottom:40px}
+        #landing-page .np-sec-h{max-width:920px;margin-bottom:40px}
         #landing-page .np-sec-h h2{font-size:clamp(30px,4.6vw,48px);font-weight:800}
         #landing-page .np-sec-h p{color:var(--np-mute);font-size:18px;margin:14px 0 0}
         #landing-page .np-bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
@@ -815,22 +821,60 @@
         #landing-page .np-tile p{color:var(--np-mute);margin:0 0 18px;font-size:16px}
         #landing-page .np-s2{grid-column:span 2}#landing-page .np-s3{grid-column:span 3}#landing-page .np-s4{grid-column:span 4}
         #landing-page .np-dark-t{background:var(--np-night2);color:#f2f0ea;border-color:transparent}#landing-page .np-dark-t p{color:#C4BDAC}
-        #landing-page .np-rows{display:flex;align-items:flex-end;gap:5px;height:110px}
+        #landing-page .np-rows{display:flex;align-items:flex-end;justify-content:center;gap:6px;height:110px}
         #landing-page .np-rows b{display:flex;align-items:flex-end;justify-content:center;border-radius:3px 3px 0 0;font:600 11px 'DM Sans';color:#fff;padding-bottom:6px;box-shadow:inset -2px 0 3px rgba(0,0,0,.18)}
+        #landing-page .np-mini{position:relative;height:110px;user-select:none;-webkit-user-select:none}
+        #landing-page .np-mini .np-board{position:absolute;left:-6px;right:-6px;bottom:0;height:12px;border-radius:2px;background:linear-gradient(180deg,#9c7040,#664020);box-shadow:0 3px 6px rgba(0,0,0,.35),inset 0 1px 1px rgba(255,255,255,.22)}
+        #landing-page .np-mini .np-it{position:absolute;bottom:11px;cursor:grab;touch-action:none;transition:left .22s cubic-bezier(.2,.8,.2,1),transform .2s;animation:np-rise .6s cubic-bezier(.2,.8,.2,1) backwards;transform-origin:bottom}
+        #landing-page .np-mini .np-it:hover{transform:translateY(-7px)}
+        #landing-page .np-mini .np-it.dragging{transition:none;z-index:5;cursor:grabbing;transform:translateY(-7px)}
+        #landing-page .np-mini .np-bk{display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:3px 3px 1px 1px;box-shadow:inset -3px 0 5px rgba(0,0,0,.2)}
+        #landing-page .np-mini .np-bk span{writing-mode:vertical-rl;font:600 11px 'Fraunces',serif;color:rgba(255,255,255,.88);white-space:nowrap;padding:8px 0;max-height:100%;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+        #landing-page .np-mini .np-dc{display:flex;align-items:flex-end;justify-content:center;line-height:1;filter:drop-shadow(1px 3px 2px rgba(0,0,0,.45))}
+        @media (prefers-reduced-motion:reduce){#landing-page .np-mini .np-it{animation:none;transition:none}}
         #landing-page .np-chips{display:flex;flex-wrap:wrap;gap:8px}
         #landing-page .np-chip{border:1.5px solid var(--np-line);background:transparent;color:var(--np-ink);border-radius:999px;padding:7px 15px;font:600 14px 'DM Sans';cursor:pointer;transition:.15s}
         #landing-page .np-chip[aria-pressed="true"]{background:var(--np-gold);border-color:var(--np-gold);color:#1a1405}
         #landing-page .np-count{margin-top:16px;font-family:'Fraunces',serif;font-size:30px;font-weight:800}
         #landing-page .np-count small{font:500 15px 'DM Sans';color:var(--np-mute)}
         #landing-page .np-stars{display:flex;gap:2px;font-size:38px;line-height:1;cursor:pointer;user-select:none}
-        #landing-page .np-stars span{color:#D8D2C4;transition:color .1s}#landing-page .np-stars span.on{color:var(--np-gold)}
+        #landing-page .np-stars .st{position:relative;display:inline-block}#landing-page .np-stars .st b{color:#D8D2C4;font-weight:400}#landing-page .np-stars .st i{position:absolute;left:0;top:0;width:0;overflow:hidden;color:var(--np-gold);font-style:normal}
         #landing-page .np-saga{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
         #landing-page .np-saga i{font:italic 600 18px 'Fraunces',serif;border-left:3px solid var(--np-gold);padding:2px 12px;background:rgba(201,162,75,.12);border-radius:0 8px 8px 0}
-        #landing-page .np-bars{display:flex;align-items:flex-end;gap:10px;height:120px}
-        #landing-page .np-bars div{flex:1;background:var(--np-gold);opacity:.85;border-radius:4px 4px 0 0;transition:height .8s}
-        #landing-page .np-bars-l{display:flex;gap:10px;font-size:12px;color:var(--np-mute);margin-top:6px}#landing-page .np-bars-l span{flex:1;text-align:center}
+        #landing-page .np-chart-tile{display:flex;flex-direction:column}
+        #landing-page .np-chartbox{position:relative;flex:1;min-height:210px}
+        #landing-page .np-chartbox svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+        #landing-page #np-chart text{fill:var(--np-mute);font:11px 'DM Sans',sans-serif}
+        #landing-page .np-ar{fill:var(--np-gold);fill-opacity:.12}
+        #landing-page .np-ln{fill:none;stroke:var(--np-gold);stroke-width:2.2;stroke-dasharray:1;stroke-dashoffset:1}
+        #landing-page #np-chart.go .np-ln{animation:npdraw 1.6s ease forwards}
+        @keyframes npdraw{to{stroke-dashoffset:0}}
+        #landing-page .np-pt{fill:var(--np-gold);transition:r .15s}#landing-page .np-pt:hover{r:6}
         #landing-page .np-badges{display:flex;gap:18px;flex-wrap:wrap;font-weight:600;font-size:14px;color:#D9D3C4}
         #landing-page .np-badges span{padding-bottom:2px;border-bottom:1px solid rgba(255,255,255,.18)}
+        #landing-page .np-show{position:relative;left:50%;margin-left:-200px;width:400px;height:230px;transform-origin:top center}
+        #landing-page .np-arrows{position:absolute;inset:0;width:400px;height:230px;pointer-events:none;z-index:6}
+        #landing-page .np-arrows path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+        #landing-page .np-arrows .m{stroke:#EFE6CE;stroke-width:1.9;opacity:.95}
+        #landing-page .np-arrows .r{stroke:#EFE6CE;stroke-width:1;opacity:.55}
+        #landing-page .np-cov-one{position:absolute;left:140px;top:29px;width:120px;height:172px;padding:48px 12px 12px 20px;border-radius:3px 7px 7px 3px;background:linear-gradient(160deg,#4d6b8a,#2f4560);display:flex;flex-direction:column;justify-content:center;gap:8px;text-align:center;box-shadow:inset 6px 0 7px rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.5)}
+        #landing-page .np-cov-one b{font:700 18px/1.15 'Fraunces',serif;color:rgba(255,255,255,.95)}
+        #landing-page .np-cov-one small{font:600 8px 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+        #landing-page .np-lg{position:absolute;width:28px;height:28px;border-radius:50%;font-size:14px;font-style:normal;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .2s}
+        #landing-page .np-lg:hover{transform:scale(1.18)}
+        #landing-page .np-lg-boy{top:8px;right:8px;background:rgba(197,160,89,.45);border:1px solid rgba(197,160,89,.7)}
+        #landing-page .np-lg-fav{top:8px;right:48px;background:rgba(244,63,94,.35);border:1px solid rgba(244,63,94,.6)}
+        #landing-page .np-lg-club{bottom:8px;left:8px;background:rgba(59,130,246,.7);border:1px solid rgba(255,255,255,.25)}
+        #landing-page .np-lg-star{bottom:8px;right:8px;background:rgba(252,211,77,.4);border:1px solid rgba(252,211,77,.7)}
+        #landing-page .np-lb{position:absolute;width:98px;font:700 10px/1.25 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#D9D3C4}
+        #landing-page .np-lb-l{left:0;text-align:right}#landing-page .np-lb-r{left:302px;text-align:left}
+        #landing-page .np-boy{display:flex;align-items:center;gap:12px;padding:10px 14px;margin:0 0 14px;border-radius:12px;background:rgba(201,162,75,.13);border:1px solid rgba(201,162,75,.35)}
+        #landing-page .np-boy-thumb{flex:none;width:30px;height:42px;border-radius:2px 4px 4px 2px;display:flex;align-items:center;justify-content:center;box-shadow:inset 3px 0 4px rgba(0,0,0,.25),0 2px 5px rgba(0,0,0,.35)}
+        #landing-page .np-boy-thumb b{font:800 15px 'Fraunces',serif;color:rgba(255,255,255,.9)}
+        #landing-page .np-boy-txt{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+        #landing-page .np-boy-txt small{font:700 9px 'DM Sans',sans-serif;letter-spacing:.18em;color:var(--np-gold)}
+        #landing-page .np-boy-txt strong{font:800 15px 'Fraunces',serif;text-transform:uppercase;letter-spacing:-.01em;margin-top:2px}
+        #landing-page .np-boy-txt em{font:700 10px 'DM Sans',sans-serif;font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:#C4BDAC}
         #landing-page .np-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:s}
         #landing-page .np-steps div{counter-increment:s;border-top:3px solid var(--np-gold);padding-top:18px}
         #landing-page .np-steps div::before{content:counter(s);font:800 44px 'Fraunces',serif;color:var(--np-gold)}
@@ -841,7 +885,9 @@
         @media(max-width:820px){
             #landing-page .np-s2,#landing-page .np-s3,#landing-page .np-s4{grid-column:span 6}
             #landing-page .np-steps{grid-template-columns:1fr}
-            #landing-page .np-nav .np-links a:not(.np-btn){display:none}
+            #landing-page .np-nav .np-links,#landing-page .np-sep.np-hm{display:none}
+            #landing-page .np-nav{gap:12px;padding-left:16px}
+            #landing-page .np-opts{gap:10px}
             #landing-page section{padding:60px 0}
         }
     </style>
@@ -851,13 +897,16 @@
     <div id="landing-page" class="min-h-screen">
         <header class="np-hero">
             <div class="np-wrap">
-                <nav class="np-nav">
+                <nav class="np-nav" aria-label="Navigation principale">
                     <a class="np-logo" href="#">Nool<i>.</i></a>
-                    <div class="np-links">
-                        <a href="#fonctions" data-i18n="landing.navFeatures">Fonctionnalités</a>
+                    <span class="np-sep np-hm"></span>
+                    <div class="np-links"><a href="#fonctions" data-i18n="landing.navFeatures">Fonctionnalités</a></div>
+                    <div class="np-opts">
                         <button onclick="toggleLang()" id="landing-lang-toggle-btn" class="text-[10px] font-black uppercase tracking-widest border border-white/25 rounded-full px-2.5 py-1 hover:border-[var(--np-gold)] hover:text-[var(--np-gold)] transition-colors" title="Change language" style="color:#f2f0ea;">FR</button>
+                        <span class="np-sep"></span>
                         <button onclick="toggleTheme()" id="landing-theme-toggle-btn" class="theme-toggle-btn" title="Changer de thème"></button>
-                        <a class="np-btn np-gold" href="#" onclick="showAuthScreen(); return false;" data-i18n="landing.login2">Se connecter</a>
+                        <span class="np-sep"></span>
+                        <a class="np-btn np-gold" style="padding:10px 20px;font-size:15px" href="#" onclick="showAuthScreen(); return false;" data-i18n="landing.login2">Se connecter</a>
                     </div>
                 </nav>
                 <div class="np-hero-in">
@@ -881,7 +930,7 @@
                         <div class="np-tile np-s4 np-dark-t">
                             <h3 data-i18n="landing.feat1Title">Une vraie étagère, livre par livre</h3>
                             <p data-i18n="landing.feat1Body">Fais glisser tes livres, change les couleurs et ajoute des décorations. Chaque dos est plus épais quand le livre a plus de pages.</p>
-                            <div class="np-rows" id="np-thick"></div>
+                            <div class="np-mini" id="np-thick" role="group" aria-label="Étagère interactive : fais glisser les livres et les décorations"></div>
                         </div>
                         <div class="np-tile np-s2">
                             <h3 data-i18n="landing.feat2Title">Les sagas restent unies</h3>
@@ -890,8 +939,8 @@
                         </div>
                         <div class="np-tile np-s2">
                             <h3 data-i18n="landing.feat3Title">Des fiches qui comptent</h3>
-                            <p data-i18n="landing.feat3Body">Résumé, avis, pages, année. Clique sur les étoiles pour essayer.</p>
-                            <div class="np-stars" id="np-stars" aria-label="Note"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                            <p data-i18n="landing.feat3Body">Résumé, avis, pages, année.</p>
+                            <div class="np-stars" id="np-stars" aria-label="Note"></div>
                             <p id="np-rate" style="margin:10px 0 0">Aucune note</p>
                         </div>
                         <div class="np-tile np-s4">
@@ -900,16 +949,50 @@
                             <div class="np-chips" id="np-chips"></div>
                             <div class="np-count"><span id="np-n">0</span> <small data-i18n="landing.feat4Count">livres correspondent</small></div>
                         </div>
-                        <div class="np-tile np-s3">
+                        <div class="np-tile np-s3 np-chart-tile">
                             <h3 data-i18n="landing.feat5Title">Ton rythme, mois après mois</h3>
                             <p data-i18n="landing.feat5Body">Un tableau de bord qui compte tes lectures et ta note moyenne.</p>
-                            <div class="np-bars" id="np-bars"></div>
-                            <div class="np-bars-l" id="np-barl"></div>
+                            <div class="np-chartbox" id="np-chartbox"><svg id="np-chart" viewBox="0 0 520 230" role="img" aria-label="Livres lus par mois"></svg></div>
                         </div>
                         <div class="np-tile np-s3 np-dark-t">
                             <h3 data-i18n="landing.feat6Title">Tes coups de cœur en vitrine</h3>
                             <p data-i18n="landing.feat6Body">Élis le livre de l'année, ton préféré, tes favoris et ceux de ton Book Club.</p>
-                            <div class="np-badges"><span data-i18n="landing.badge1">👑 Livre de l'année</span><span data-i18n="landing.badge2">❤️ Préféré</span><span data-i18n="landing.badge3">⭐ Favoris</span><span data-i18n="landing.badge4">📖 Book Club</span></div>
+                            <div class="np-boy" aria-label="Livre de l'année">
+                                <div class="np-boy-thumb" style="background:#4d6b8a"><b>P</b></div>
+                                <div class="np-boy-txt"><small data-i18n="landing.boyLabel">👑 LIVRE DE L'ANNÉE 2024</small><strong>Le Petit Prince</strong><em>Antoine de Saint-Exupéry</em></div>
+                            </div>
+                            <div class="np-show" id="np-show">
+                                <div class="np-cov-one" aria-label="Le Petit Prince, avec ses distinctions">
+                                    <b>Le Petit Prince</b><small>A. de Saint-Exupéry</small>
+                                    <i class="np-lg np-lg-fav" title="Préféré">❤️</i><i class="np-lg np-lg-boy" title="Livre de l'année">👑</i>
+                                    <i class="np-lg np-lg-club" title="Book Club">📖</i><i class="np-lg np-lg-star" title="Favoris">⭐</i>
+                                </div>
+                                <svg class="np-arrows" viewBox="0 0 400 230" aria-hidden="true">
+                                    <defs><filter id="np-pencil" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs>
+                                    <g filter="url(#np-pencil)">
+                                        <path class="m" d="M108 47C137 14 165 16 185 37"/>
+                                        <path class="r" d="M109 48.6C138.6 13 164 17.6 185.6 36.2"/>
+                                        <path class="m" d="M182.1 27.4L185 37L175.6 33.7"/>
+                                        <path class="m" d="M107 46l.6 .5"/>
+                                        <path class="m" d="M294 47C278 14 262 16 251 37"/>
+                                        <path class="r" d="M295 45.4C276.4 13 261 14.4 251.6 36.2"/>
+                                        <path class="m" d="M259.2 31.2L251 37L251.1 27"/>
+                                        <path class="m" d="M293 46l.6 .5"/>
+                                        <path class="m" d="M108 183C124 216 140 214 149 193"/>
+                                        <path class="r" d="M109 184.6C125.6 215 139 215.6 149.6 192.2"/>
+                                        <path class="m" d="M141.3 199.4L149 193L149.7 203"/>
+                                        <path class="m" d="M107 182l.6 .5"/>
+                                        <path class="m" d="M294 183C278 216 262 214 251 193"/>
+                                        <path class="r" d="M295 181.4C276.4 215 261 212.4 251.6 192.2"/>
+                                        <path class="m" d="M251.1 203L251 193L259.2 198.8"/>
+                                        <path class="m" d="M293 182l.6 .5"/>
+                                    </g>
+                                </svg>
+                                <span class="np-lb np-lb-l" style="top:41px" data-i18n="landing.lblFav">Livre préféré</span>
+                                <span class="np-lb np-lb-r" style="top:41px" data-i18n="landing.lblBoy">Livre de l'année</span>
+                                <span class="np-lb np-lb-l" style="top:169px" data-i18n="landing.lblClub">Book Club</span>
+                                <span class="np-lb np-lb-r" style="top:169px" data-i18n="landing.lblStar">Mes favoris</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -951,18 +1034,153 @@
                 k++; guard++;
             }
         }
-        var t=document.getElementById('np-thick');
-        if (t) [["96 p.",96,"#8a6a3c"],["186 p.",186,"#6e5440"],["336 p.",336,"#39565a"],["512 p.",512,"#3f3d50"],["688 p.",688,"#3e4c56"],["870 p.",870,"#5c4a42"]].forEach(function(b){var e=document.createElement('b');e.style.cssText='width:'+(w(b[1])*1.6)+'px;height:'+(60+b[1]/14)+'px;background:'+b[2];e.textContent=b[0].replace(' p.','');e.title=b[0];t.appendChild(e)});
-        var st=document.querySelectorAll('#np-stars span'),lab=document.getElementById('np-rate');
-        st.forEach(function(s,i){s.onclick=function(){st.forEach(function(x,j){x.classList.toggle('on',j<=i)});lab.textContent='Note : '+(i+1)+' / 5'}});
+        // Mini-étagère interactive : livres + décorations sur une planche, déplaçables (souris, doigt ou flèches)
+        (function(){
+            var mini=document.getElementById('np-thick');if(!mini)return;
+            var ITEMS=[
+                {t:'b',n:'1984',p:328,c:'#5c4a42',h:250},{t:'b',n:'Dune',p:688,c:'#3e4c56',h:268},
+                {t:'d',e:'🪴',n:['Plante','Plant'],s:34},
+                {t:'b',n:'Circé',p:400,c:'#3f5248',h:236},{t:'b',n:'Piranesi',p:272,c:'#4a4456',h:224},{t:'b',n:'Rebecca',p:449,c:'#6b4f3d',h:244},
+                {t:'d',e:'🕯️',n:['Bougie','Candle'],s:28},
+                {t:'b',n:'Le Petit Prince',p:96,c:'#8a6a3c',h:190},{t:'b',n:'Dracula',p:418,c:'#473539',h:258},{t:'b',n:'Verity',p:336,c:'#39565a',h:232},
+                {t:'d',e:'🦉',n:['Hibou','Owl'],s:30},
+                {t:'b',n:'Jane Eyre',p:532,c:'#5a4350',h:262},{t:'b',n:'Fourth Wing',p:512,c:'#3f3d50',h:270},
+                {t:'d',e:'🖼️',n:['Cadre','Frame'],s:28},
+                {t:'b',n:'Sapiens',p:443,c:'#4e5540',h:246},{t:'b',n:"L'Étranger",p:186,c:'#6e5440',h:208}
+            ];
+            var GAP=5,order=[],W=0,lastW=0,drag=null;
+            function Tx(a){return document.documentElement.lang==='en'?a[1]:a[0]}
+            function pack(skip){
+                var tot=order.reduce(function(s,o){return s+o.w},0)+GAP*Math.max(0,order.length-1),x=Math.max(0,(W-tot)/2);
+                order.forEach(function(o){o.x=x;if(o!==skip)o.el.style.left=x+'px';x+=o.w+GAP})}
+            function build(){
+                W=mini.clientWidth;if(!W)return;lastW=W;mini.innerHTML='<div class="np-board"></div>';order=[];
+                var used=0;
+                for(var i=0;i<ITEMS.length;i++){
+                    var it=ITEMS[i],w=it.t==='b'?Math.round(22+Math.min(1,Math.max(0,(it.p-80)/920))*20):it.s+4;
+                    if(used+w+(order.length?GAP:0)>W-8)break;
+                    used+=w+(order.length?GAP:0);
+                    var el=document.createElement('div');el.className='np-it '+(it.t==='b'?'np-bk':'np-dc');el.tabIndex=0;el.setAttribute('role','button');
+                    var name=it.t==='b'?it.n:Tx(it.n);el.title=name;el.setAttribute('aria-label',name);
+                    el.style.width=w+'px';el.style.animationDelay=(i*45)+'ms';
+                    if(it.t==='b'){el.style.height=Math.round(52+(it.h-190)/80*32)+'px';el.style.background=it.c;el.innerHTML='<span>'+it.n+'</span>'}
+                    else{el.style.height=it.s+'px';el.style.fontSize=it.s+'px';el.textContent=it.e}
+                    var o={el:el,w:w,x:0};order.push(o);mini.appendChild(el);bind(o)}
+                pack()}
+            function bind(o){
+                var el=o.el;
+                el.addEventListener('pointerdown',function(e){
+                    if(e.button>0||drag)return;e.preventDefault();
+                    drag={o:o,off:e.clientX-el.getBoundingClientRect().left,id:e.pointerId};
+                    try{el.setPointerCapture(e.pointerId)}catch(x){}
+                    el.classList.add('dragging')});
+                el.addEventListener('pointermove',function(e){
+                    if(!drag||drag.o!==o||e.pointerId!==drag.id)return;
+                    var r=mini.getBoundingClientRect(),left=Math.max(0,Math.min(W-o.w,e.clientX-r.left-drag.off));
+                    el.style.left=left+'px';
+                    var c=left+o.w/2,others=order.filter(function(q){return q!==o}),idx=0;
+                    others.forEach(function(q){if(q.x+q.w/2<c)idx++});
+                    var next=others.slice();next.splice(idx,0,o);
+                    if(next.some(function(q,i){return q!==order[i]})){order=next;pack(o)}});
+                function end(e){
+                    if(!drag||drag.o!==o||e.pointerId!==drag.id)return;
+                    drag=null;el.classList.remove('dragging');el.style.left=o.x+'px';
+                    try{el.releasePointerCapture(e.pointerId)}catch(x){}}
+                el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+                el.addEventListener('keydown',function(e){
+                    var i=order.indexOf(o),k=e.key==='ArrowLeft'?-1:e.key==='ArrowRight'?1:0;
+                    if(!k||i+k<0||i+k>=order.length)return;
+                    e.preventDefault();order.splice(i,1);order.splice(i+k,0,o);pack()})}
+            build();
+            if('ResizeObserver' in window)new ResizeObserver(function(){if(mini.clientWidth&&Math.abs(mini.clientWidth-lastW)>=40)build()}).observe(mini);
+            else window.addEventListener('resize',function(){if(mini.clientWidth&&Math.abs(mini.clientWidth-lastW)>=40)build()});
+        })();
+        (function(){
+            var sh=document.getElementById('np-show');if(!sh)return;
+            function fit(){var pw=sh.parentNode.clientWidth;if(!pw)return;var k=Math.min(1,pw/400);
+                sh.style.transform=k<1?'scale('+k+')':'';sh.style.marginBottom=k<1?(-230*(1-k))+'px':''}
+            fit();
+            if('ResizeObserver' in window)new ResizeObserver(fit).observe(sh.parentNode);else window.addEventListener('resize',fit);
+        })();
+        function L(){return document.documentElement.lang==='en'?'en':'fr'}
+        function T(fr,en){return L()==='fr'?fr:en}
+        var val=0,box=document.getElementById('np-stars'),lab=document.getElementById('np-rate');
+        function paint(v){
+            if(!box)return;
+            box.querySelectorAll('.st').forEach(function(s){var f=Math.max(0,Math.min(1,v-(s.dataset.i-1)));s.querySelector('i').style.width=(f*100)+'%'});
+            if(lab)lab.textContent=v?T('Note : ','Rating: ')+String(v).replace('.',T(',','.'))+' / 5':T('Aucune note','No rating')}
+        if(box){
+            for(var i=1;i<=5;i++){var st=document.createElement('span');st.className='st';st.dataset.i=i;st.innerHTML='<b>★</b><i>★</i>';box.appendChild(st)}
+            var at=function(s,e){var r=s.getBoundingClientRect(),i=+s.dataset.i;return (e.clientX-r.left)<r.width/2?i-.5:i};
+            box.querySelectorAll('.st').forEach(function(s){
+                s.addEventListener('mousemove',function(e){paint(at(s,e))});
+                s.addEventListener('click',function(e){var v=at(s,e);val=(v===val)?0:v;paint(val)})});
+            box.addEventListener('mouseleave',function(){paint(val)});
+            paint(0)}
         var D=[["Romance",2022],["Romance",2024],["Thriller",2022],["Thriller",2023],["Thriller",2024],["Fantasy",2022],["Fantasy",2024],["Romance",2023],["Classique",2022],["Classique",2024],["Romance",2022],["Thriller",2024],["Fantasy",2023],["Romance",2024]];
         var on={"2022":1,"2024":1,"Romance":1,"Thriller":1},ch=document.getElementById('np-chips'),n=document.getElementById('np-n');
         function upd(){var ys=["2022","2023","2024"].filter(function(k){return on[k]}),gs=["Romance","Thriller","Fantasy","Classique"].filter(function(k){return on[k]});
             if(n) n.textContent=D.filter(function(d){return (!ys.length||on[d[1]])&&(!gs.length||on[d[0]])}).length}
         if (ch) ["2022","2023","2024","Romance","Thriller","Fantasy","Classique"].forEach(function(k){var c=document.createElement('button');c.className='np-chip';c.textContent=k;c.setAttribute('aria-pressed',!!on[k]);c.onclick=function(){on[k]=!on[k];c.setAttribute('aria-pressed',!!on[k]);upd()};ch.appendChild(c)});
         upd();
-        var M=["J","F","M","A","M","J","J","A","S","O","N","D"],V=[3,2,5,4,6,3,7,5,8,4,6,9],bars=document.getElementById('np-bars'),bl=document.getElementById('np-barl');
-        if (bars) V.forEach(function(v,i){var d=document.createElement('div');d.style.height='4px';bars.appendChild(d);setTimeout(function(){d.style.height=(v*12)+'px'},300+i*70);var s=document.createElement('span');s.textContent=M[i];bl.appendChild(s)});
+        var MF=["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"],ME=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],V=[3,2,5,4,6,3,7,5,8,4,6,9];
+        var lastCW=0,lastCH=0;
+        function drawChart(){
+            var c=document.getElementById('np-chart');if(!c)return;
+            var bx=document.getElementById('np-chartbox'),W=(bx&&bx.clientWidth)||520,H=(bx&&bx.clientHeight)||230;lastCW=W;lastCH=H;c.setAttribute('viewBox','0 0 '+W+' '+H);var Lm=30,R=12,Tp=14,B=30,mx=Math.max.apply(null,V),pw=W-Lm-R,ph=H-Tp-B,P=[],g='',M=L()==='fr'?MF:ME;
+            V.forEach(function(v,i){P.push({x:Lm+pw*i/11,y:Tp+ph*(1-v/mx),v:v})});
+            for(var t=0;t<=mx;t++){g+='<text x="'+(Lm-8)+'" y="'+(Tp+ph*(1-t/mx)+4)+'" text-anchor="end">'+t+'</text>'}
+            M.forEach(function(m,i){g+='<text x="'+P[i].x+'" y="'+(H-8)+'" text-anchor="middle">'+m+'</text>'});
+            function ct(a,b,d){var d1=Math.hypot(b.x-a.x,b.y-a.y),d2=Math.hypot(d.x-b.x,d.y-b.y),k=.4,fa=k*d1/(d1+d2),fb=k*d2/(d1+d2);
+                return [{x:b.x-fa*(d.x-a.x),y:b.y-fa*(d.y-a.y)},{x:b.x+fb*(d.x-a.x),y:b.y+fb*(d.y-a.y)}]}
+            function cl(y){return Math.max(Tp,Math.min(Tp+ph,y))}
+            var d='M'+P[0].x+' '+P[0].y;
+            for(var i=0;i<P.length-1;i++){
+                var c1=i===0?P[0]:ct(P[i-1],P[i],P[i+1])[1],c2=i===P.length-2?P[i+1]:ct(P[i],P[i+1],P[i+2])[0];
+                d+=' C'+c1.x+' '+cl(c1.y)+' '+c2.x+' '+cl(c2.y)+' '+P[i+1].x+' '+P[i+1].y}
+            var area=d+' L'+P[P.length-1].x+' '+(Tp+ph)+' L'+P[0].x+' '+(Tp+ph)+' Z';
+            var pts=P.map(function(p,i){return '<circle class="np-pt" cx="'+p.x+'" cy="'+p.y+'" r="3.5"><title>'+M[i]+' : '+p.v+' '+T('livres','books')+'</title></circle>'}).join('');
+            c.innerHTML=g+'<path class="np-ar" d="'+area+'"/><path class="np-ln" pathLength="1" d="'+d+'"/>'+pts;
+            c.setAttribute('aria-label',T('Livres lus par mois','Books read per month'))}
+        drawChart();
+        (function(){var bx=document.getElementById('np-chartbox');if(!bx)return;
+            function chk(){if(bx.clientWidth&&(Math.abs(bx.clientWidth-lastCW)>=4||Math.abs(bx.clientHeight-lastCH)>=4))drawChart()}
+            if('ResizeObserver' in window)new ResizeObserver(chk).observe(bx);else window.addEventListener('resize',chk)})();
+        var ch=document.getElementById('np-chart');
+        if(ch){
+            if('IntersectionObserver' in window){var io=new IntersectionObserver(function(en){en.forEach(function(e){if(e.isIntersecting){ch.classList.add('go');io.disconnect()}})},{threshold:.4});io.observe(ch)}else ch.classList.add('go')}
+        // Appelé par le site à chaque changement de langue
+        window.npRefresh=function(){drawChart();paint(val)};
+
+        // ----- Défilement fluide vers les sections (Fonctionnalités, Découvrir...) -----
+        var lp=document.getElementById('landing-page'),stopGlide=false;
+        ['wheel','touchstart','keydown','mousedown'].forEach(function(ev){window.addEventListener(ev,function(){stopGlide=true},{passive:true})});
+        function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+        function glide(target){
+            var from=window.pageYOffset,to=Math.max(0,target.getBoundingClientRect().top+from-14),dist=to-from;
+            if(!dist)return;
+            if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){window.scrollTo(0,to);return}
+            var dur=Math.min(1500,Math.max(800,Math.abs(dist)*0.85)),t0=null;stopGlide=false;
+            function step(ts){
+                if(stopGlide)return;
+                if(t0===null)t0=ts;
+                var p=Math.min(1,(ts-t0)/dur);
+                window.scrollTo({top:from+dist*ease(p),behavior:'instant'});
+                if(p<1)requestAnimationFrame(step)}
+            requestAnimationFrame(step)}
+        if(lp)lp.addEventListener('click',function(e){
+            var a=e.target.closest&&e.target.closest('a[href^="#"]');
+            if(!a||a.getAttribute('href')==='#')return;
+            var el=document.getElementById(a.getAttribute('href').slice(1));
+            if(!el)return;
+            e.preventDefault();glide(el)});
+        // Les blocs apparaissent en glissant légèrement vers le haut, l'un après l'autre
+        if(lp&&'IntersectionObserver' in window){
+            var rv=lp.querySelectorAll('.np-tile,.np-steps > div,.np-sec-h');
+            var io2=new IntersectionObserver(function(en){en.forEach(function(e){
+                if(e.isIntersecting){var idx=Array.prototype.indexOf.call(e.target.parentNode.children,e.target);
+                    e.target.style.transitionDelay=Math.min(idx,5)*80+'ms';e.target.classList.add('np-in');io2.unobserve(e.target)}})},{threshold:.12});
+            rv.forEach(function(el){el.classList.add('np-rv');io2.observe(el)})}
     })();
     </script>
 
@@ -1671,12 +1889,12 @@
                     fonctionsSubheading: "Une étagère qui ressemble à la tienne, des fiches complètes et des statistiques qui se remplissent toutes seules.",
                     feat1Title: "Une vraie étagère, livre par livre", feat1Body: "Fais glisser tes livres, change les couleurs et ajoute des décorations. Chaque dos est plus épais quand le livre a plus de pages.",
                     feat2Title: "Les sagas restent unies", feat2Body: "Les tomes se rangent côte à côte, dans l'ordre, avec un peu d'air entre deux sagas.",
-                    feat3Title: "Des fiches qui comptent", feat3Body: "Résumé, avis, pages, année. Clique sur les étoiles pour essayer.",
+                    feat3Title: "Des fiches qui comptent", feat3Body: "Résumé, avis, pages, année.",
                     feat4Title: "Des filtres à choix multiples", feat4Body: "Combine plusieurs années et plusieurs genres d'un seul coup.",
                     feat4Count: "livres correspondent",
                     feat5Title: "Ton rythme, mois après mois", feat5Body: "Un tableau de bord qui compte tes lectures et ta note moyenne.",
                     feat6Title: "Tes coups de cœur en vitrine", feat6Body: "Élis le livre de l'année, ton préféré, tes favoris et ceux de ton Book Club.",
-                    badge1: "👑 Livre de l'année", badge2: "❤️ Préféré", badge3: "⭐ Favoris", badge4: "📖 Book Club",
+                    boyLabel: "👑 LIVRE DE L'ANNÉE 2024", lblFav: "Livre préféré", lblBoy: "Livre de l'année", lblClub: "Book Club", lblStar: "Mes favoris", badge1: "👑 Livre de l'année", badge2: "❤️ Préféré", badge3: "⭐ Favoris", badge4: "📖 Book Club",
                     debutHeading: "Prête en trois étapes",
                     step1Title: "Importe", step1Body: "Dépose ton export Goodreads ou colle une liste de titres. Couvertures, pages et sagas sont retrouvées pour toi.",
                     step2Title: "Range", step2Body: "Réorganise l'étagère à ta façon : par auteur, par saga, par couleur.",
@@ -1760,12 +1978,12 @@
                     fonctionsSubheading: "A shelf that looks like yours, complete book pages, and stats that fill in by themselves.",
                     feat1Title: "A real shelf, book by book", feat1Body: "Drag your books around, change colors and add decorations. Each spine gets thicker the more pages a book has.",
                     feat2Title: "Series stay together", feat2Body: "Volumes sit side by side, in order, with a little breathing room between two series.",
-                    feat3Title: "Pages that matter", feat3Body: "Summary, review, pages, year. Click the stars to try it out.",
+                    feat3Title: "Pages that matter", feat3Body: "Summary, review, pages, year.",
                     feat4Title: "Multi-choice filters", feat4Body: "Combine several years and several genres at once.",
                     feat4Count: "books match",
                     feat5Title: "Your pace, month after month", feat5Body: "A dashboard that tracks your reads and your average rating.",
                     feat6Title: "Your favorites on display", feat6Body: "Pick your book of the year, your favorite, your picks and your Book Club reads.",
-                    badge1: "👑 Book of the year", badge2: "❤️ Favorite", badge3: "⭐ Favorites", badge4: "📖 Book Club",
+                    boyLabel: "👑 BOOK OF THE YEAR 2024", lblFav: "Favorite book", lblBoy: "Book of the year", lblClub: "Book Club", lblStar: "My favorites", badge1: "👑 Book of the year", badge2: "❤️ Favorite", badge3: "⭐ Favorites", badge4: "📖 Book Club",
                     debutHeading: "Ready in three steps",
                     step1Title: "Import", step1Body: "Drop your Goodreads export or paste a list of titles. Covers, pages and series are found for you.",
                     step2Title: "Arrange", step2Body: "Reorganize the shelf your way: by author, by series, by color.",
@@ -1862,6 +2080,7 @@
             if (toggleAuthBtn) toggleAuthBtn.innerText = isSignUp ? t('auth.haveAccount') : t('auth.noAccount');
             if (typeof updateFilterOptions === 'function' && currentUser) updateFilterOptions();
             if (typeof render === 'function' && currentUser) render();
+            if (window.npRefresh) window.npRefresh();
         }
 
         window.toggleLang = async () => {
@@ -3323,6 +3542,22 @@
         }
 
         let currentShelfScale = 1;
+        let lastBookcaseClientWidth = 0;
+
+        // La barre de défilement de la page peut apparaître APRÈS le calcul de l'échelle, ce qui rétrécit l'étagère
+        // sans événement « resize » : le dernier livre à droite se retrouvait coupé. On observe la largeur du conteneur.
+        (function watchBookcaseWidth() {
+            const bc = document.getElementById('bookcase-container');
+            if (!bc || typeof ResizeObserver === 'undefined') return;
+            let burst = 0, burstTimer = null;
+            new ResizeObserver(() => {
+                if (bc.clientWidth === lastBookcaseClientWidth || bc.clientWidth < 100) return;
+                if (++burst > 4) return;
+                clearTimeout(burstTimer);
+                burstTimer = setTimeout(() => { burst = 0; }, 600);
+                requestAnimationFrame(() => updateBookcaseWidth());
+            }).observe(bc);
+        })();
 
         let bookcaseResizeTimer = null;
         window.addEventListener('resize', () => {
@@ -3336,6 +3571,7 @@
             const bookcase = document.getElementById('bookcase-container');
             const scaler = document.getElementById('bookcase-scaler');
             if (!bookcase || !scaler) return;
+            if (bookcase.clientWidth < 100) return;   // section masquée : on ne calcule pas une échelle absurde
             let maxRight = 0;
             scaler.querySelectorAll('.shelf-spine, .shelf-decoration').forEach(el => {
                 const left = parseFloat(el.style.left) || 0;
@@ -3345,6 +3581,7 @@
             if (maxRight === 0) { scaler.style.transform = 'none'; scaler.style.height = 'auto'; currentShelfScale = 1; return; }
 
             const availableWidth = bookcase.clientWidth - 32;
+            lastBookcaseClientWidth = bookcase.clientWidth;
             const naturalHeight = scaler.scrollHeight || scaler.offsetHeight;
             if (maxRight > availableWidth) {
                 const scale = availableWidth / maxRight;
@@ -4231,12 +4468,12 @@
                             ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover ${book.isDNF ? 'grayscale opacity-50' : (book.isToRead ? 'saturate-[.35] brightness-95' : '')}">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
                         </div>
                         <div class="flex-1">
-                            <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 mb-[30px]">
-                                <div class="min-w-0">
-                                    <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
-                                    <h3 class="fiche-author !mb-0">${book.author || 'AUTEUR INCONNU'}</h3>
+                            <div class="mb-[30px]">
+                                <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
+                                <div class="flex items-center gap-x-6">
+                                    <h3 class="fiche-author !mb-0 min-w-0">${book.author || 'AUTEUR INCONNU'}</h3>
+                                    ${book.saga ? `<div class="saga-trigger ml-auto max-w-[55%] text-right italic leading-snug mr-2 md:mr-10 lg:mr-16" onclick="openSagaBubble(${book.id}, event)" title="Voir tous les livres de la saga" style="font-family:'Cormorant Garamond','Palatino Linotype',Georgia,serif;font-size:30px;font-weight:500;font-style:italic;color:#8a8a8a;margin-top:-90px;margin-bottom:-90px">${book.saga}${parseFloat(book.sagaNum) ? ` <span style="font-weight:700;color:var(--gold-accent)">#${parseFloat(book.sagaNum)}</span>` : ''}</div>` : ''}
                                 </div>
-                                ${book.saga ? `<div class="saga-trigger ml-auto shrink-0 text-right italic leading-snug mr-2 md:mr-10 lg:mr-16" onclick="openSagaBubble(${book.id}, event)" title="Voir tous les livres de la saga" style="font-family:'Cormorant Garamond','Palatino Linotype',Georgia,serif;font-size:30px;font-weight:500;font-style:italic;color:#8a8a8a">${book.saga}${parseFloat(book.sagaNum) ? ` <span style="font-weight:700;color:var(--gold-accent)">#${parseFloat(book.sagaNum)}</span>` : ''}</div>` : ''}
                             </div>
                             <div class="mb-6">
                                 <p class="section-label">Note :</p>
@@ -4524,6 +4761,7 @@
         window.goToBibliotheque = () => {
             showSection('bibliotheque', true);
         };
+
 
 
         // ===== Bulle « tous les livres de la saga » =====
