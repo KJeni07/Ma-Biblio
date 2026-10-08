@@ -1021,18 +1021,12 @@
 
     <script>
     (function(){
-        var S=[["1984",328,"#5c4a42",250],["Dune",688,"#3e4c56",268],["Circé",400,"#3f5248",236],["Piranesi",272,"#4a4456",224],["Rebecca",449,"#6b4f3d",244],["Le Petit Prince",96,"#8a6a3c",190],["Dracula",418,"#473539",258],["Verity",336,"#39565a",232],["Jane Eyre",532,"#5a4350",262],["Fourth Wing",512,"#3f3d50",270],["Sapiens",443,"#4e5540",246],["L'Étranger",186,"#6e5440",208],["Hamnet",320,"#3c4e59",226],["Americanah",477,"#5a4535",252]];
+        var S=[["1984",328,"#5c4a42",250],["Dune",688,"#3e4c56",268],["Circé",400,"#3f5248",236],["Piranesi",272,"#4a4456",224],["Rebecca",449,"#6b4f3d",244],["Le Petit Prince",96,"#8a6a3c",190],["Dracula",418,"#473539",258],["Verity",336,"#39565a",232],["Jane Eyre",532,"#5a4350",262],["Fourth Wing",512,"#3f3d50",270],["Sapiens",443,"#4e5540",246],["L'Étranger",186,"#6e5440",208],["Hamnet",320,"#3c4e59",226],["Americanah",477,"#5a4535",252],["Orgueil et Préjugés",432,"#4a4456",268],["Les Misérables",1488,"#5a4350",244],["Monte-Cristo",1312,"#5a4535",232],["Frankenstein",280,"#6b4f3d",246],["Anna Karénine",864,"#3f3d50",252],["Madame Bovary",400,"#5c4a42",236],["Le Rouge et le Noir",576,"#8a6a3c",190],["Germinal",592,"#4e5540",262],["La Peste",336,"#3e4c56",208],["Candide",144,"#473539",250],["Fahrenheit 451",208,"#6e5440",224],["Le Meilleur des mondes",288,"#3f5248",258],["Le Hobbit",336,"#39565a",270],["Les Hauts de Hurlevent",416,"#3c4e59",226],["Mrs Dalloway",216,"#4a4456",268],["Beloved",324,"#5a4350",244],["L'Alchimiste",208,"#5a4535",232],["Persuasion",256,"#6b4f3d",246],["Emma",474,"#3f3d50",252],["Le Nom du vent",662,"#5c4a42",236],["Les Piliers de la terre",1056,"#8a6a3c",190],["Shantaram",944,"#4e5540",262],["Educated",352,"#3e4c56",208],["Normal People",288,"#473539",250],["Station Eleven",333,"#6e5440",224],["Klara et le Soleil",303,"#3f5248",258],["Le Joueur d'échecs",96,"#39565a",270],["Le Horla",96,"#3c4e59",226],["Bel-Ami",400,"#4a4456",268],["Thérèse Raquin",288,"#5a4350",244],["La Princesse de Clèves",192,"#5a4535",232],["Notre-Dame de Paris",592,"#6b4f3d",246],["Moby Dick",635,"#3f3d50",252],["Les Trois Mousquetaires",704,"#5c4a42",236],["Gatsby le Magnifique",180,"#8a6a3c",190],["Cent ans de solitude",417,"#4e5540",262],["Le Parfum",263,"#3e4c56",208],["Bonjour tristesse",144,"#473539",250],["Le Grand Meaulnes",256,"#6e5440",224],["L'Écume des jours",288,"#3f5248",258]];
         function w(p){return Math.round(18+Math.min(1,Math.max(0,(p-80)/920))*42)}
         var sh=document.getElementById('np-shelf');
         function addSpine(b,i){var e=document.createElement('div');e.className='np-spine';e.style.cssText='width:'+(w(b[1])*1.25)+'px;height:'+b[3]+'px;background:'+b[2]+';animation-delay:'+(Math.min(i,24)*60)+'ms';e.title=b[0]+' · '+b[1]+' pages';e.innerHTML='<span>'+b[0]+'</span>';sh.appendChild(e)}
         if (sh) {
             S.forEach(function(b,i){addSpine(b,i)});
-            // Complète la rangée pour qu'elle couvre toute la largeur, même sur grand écran
-            var guard=0, k=0;
-            while (sh.scrollWidth < window.innerWidth + 250 && guard < 80) {
-                addSpine(S[k % S.length], S.length + k);
-                k++; guard++;
-            }
         }
         // Mini-étagère interactive : livres + décorations sur une planche, déplaçables (souris, doigt ou flèches)
         (function(){
@@ -1188,9 +1182,7 @@
         <div class="auth-card w-full max-w-md rounded-3xl p-10 text-center">
             <button onclick="showLandingPage()" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-gold-accent mb-4" data-i18n="auth.backToHome">← Retour à l'accueil</button>
             <div class="mb-8">
-                <h1 class="text-3xl font-black italic uppercase tracking-tighter font-serif mb-2">
-                    <span style="color: var(--gold-accent)">Nool</span>
-                </h1>
+                <h1 class="mb-2" style="font-family:'Fraunces',serif;font-weight:800;font-size:28px;letter-spacing:-.03em;line-height:1.08">Nool<i style="color:#C5A059;font-style:normal">.</i></h1>
                 <p id="auth-mode-title" class="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold" data-i18n="auth.memberLogin">Connexion Membre</p>
             </div>
             <form id="auth-form" class="space-y-5 text-left">
