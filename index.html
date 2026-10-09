@@ -863,7 +863,7 @@
         #landing-page .np-lg{position:absolute;width:28px;height:28px;border-radius:50%;font-size:14px;font-style:normal;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .2s}
         #landing-page .np-lg:hover{transform:scale(1.18)}
         #landing-page .np-lg-boy{top:8px;right:8px;background:rgba(197,160,89,.45);border:1px solid rgba(197,160,89,.7)}
-        #landing-page .np-lg-fav{top:8px;right:48px;background:rgba(244,63,94,.35);border:1px solid rgba(244,63,94,.6)}
+        #landing-page .np-lg-fav{top:8px;left:8px;background:rgba(244,63,94,.35);border:1px solid rgba(244,63,94,.6)}
         #landing-page .np-lg-club{bottom:8px;left:8px;background:rgba(59,130,246,.7);border:1px solid rgba(255,255,255,.25)}
         #landing-page .np-lg-star{bottom:8px;right:8px;background:rgba(252,211,77,.4);border:1px solid rgba(252,211,77,.7)}
         #landing-page .np-lb{position:absolute;width:98px;font:700 10px/1.25 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#D9D3C4}
@@ -970,9 +970,9 @@
                                 <svg class="np-arrows" viewBox="0 0 400 230" aria-hidden="true">
                                     <defs><filter id="np-pencil" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs>
                                     <g filter="url(#np-pencil)">
-                                        <path class="m" d="M108 47C137 14 165 16 185 37"/>
-                                        <path class="r" d="M109 48.6C138.6 13 164 17.6 185.6 36.2"/>
-                                        <path class="m" d="M182.1 27.4L185 37L175.6 33.7"/>
+                                        <path class="m" d="M108 47C125 14 146 16 160 37"/>
+                                        <path class="r" d="M109 48.6C126.6 13 145 17.6 160.6 36.2"/>
+                                        <path class="m" d="M157.1 27.4L160 37L150.6 33.7"/>
                                         <path class="m" d="M107 46l.6 .5"/>
                                         <path class="m" d="M294 47C278 14 262 16 251 37"/>
                                         <path class="r" d="M295 45.4C276.4 13 261 14.4 251.6 36.2"/>
@@ -1736,7 +1736,7 @@
                 <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.pages">Pages</label><input id="in-pages" type="number" min="0" max="5000" inputmode="numeric" class="modal-input" placeholder="ex : 320"></div>
                 <div class="md:col-span-2 grid grid-cols-2 gap-x-6">
                     <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Saga</label><input id="in-saga" list="saga-list" class="modal-input" placeholder="ex : Harry Potter"><datalist id="saga-list"></datalist></div>
-                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">N° du tome</label><input id="in-sagaNum" type="number" min="0" step="0.5" inputmode="decimal" class="modal-input" placeholder="ex : 3"></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">N° du tome</label><input id="in-sagaNum" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*" onkeydown="if(['.',',','e','E','+','-'].includes(event.key))event.preventDefault()" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="modal-input" placeholder="ex : 3"></div>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.start">Début (ex: 01/05/2025)</label>
@@ -3131,11 +3131,92 @@
             });
         }
 
+        // --- Placement des livres : pendant le glisser, le livre suit librement le curseur (il passe
+        // par-dessus les autres sans les bouger) ; au relâchement il se pose dans l'emplacement libre
+        // le plus proche, avec une petite animation.
+        const SHELF_DROP_GAP = 6;
+        function shelfSiblings(drag, rIdx) {
+            if (!drag.rowCache) drag.rowCache = {};
+            if (drag.rowCache[rIdx]) return drag.rowCache[rIdx];
+            const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
+            if (!rEl) return null;
+            const movingEls = new Set([drag.el, ...(drag.group ? drag.group.members.map(m => m.el) : [])]);
+            drag.rowCache[rIdx] = Array.from(rEl.children)
+                .filter(c => (c.classList.contains('shelf-spine') || c.classList.contains('shelf-decoration')) && !movingEls.has(c))
+                .map(c => ({ el: c, originalLeft: parseFloat(c.style.left) || 0, width: c.offsetWidth }));
+            return drag.rowCache[rIdx];
+        }
+        function shelfFits(drag, rIdx, left, w) {
+            const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
+            const sibs = shelfSiblings(drag, rIdx);
+            if (!rEl || !sibs) return false;
+            if (left < 0 || left + w > rEl.offsetWidth) return false;
+            return sibs.every(sb => left + w + SHELF_DROP_GAP <= sb.originalLeft || left >= sb.originalLeft + sb.width + SHELF_DROP_GAP);
+        }
+        function shelfGroupItems(drag) {
+            return [{ el: drag.el, row: drag.originalRow, left: drag.originalLeft, width: drag.el.offsetWidth }]
+                .concat(drag.group.members.map(m => ({ el: m.el, row: m.originalRow, left: m.originalX, width: m.el.offsetWidth })));
+        }
+
+
+        // --- Les voisins s'écartent pour faire de la place au livre en cours de déplacement (et reviennent s'il s'éloigne).
+        // On part TOUJOURS des positions d'origine : rien ne dérive, et quand le livre quitte la zone tout revient en place.
+        function updateShelfMakeRoom(drag, rIdx, desiredLeft, w) {
+            const GAP = SHELF_DROP_GAP;
+            const setLeft = (sb, v) => {
+                v = Math.round(v * 10) / 10;
+                if (sb.cur !== v) { sb.cur = v; sb.el.style.left = v + 'px'; }
+            };
+            // Rangées quittées : tout revient à sa place d'origine
+            if (drag.rowCache) {
+                Object.keys(drag.rowCache).forEach(k => {
+                    if (parseInt(k) !== rIdx) drag.rowCache[k].forEach(sb => setLeft(sb, sb.originalLeft));
+                });
+            }
+            drag.plan = null;
+            const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
+            const sibs = shelfSiblings(drag, rIdx);
+            if (!rEl || !sibs) return;
+            const rowW = rEl.offsetWidth;
+            const ord = [...sibs].sort((a, b) => a.originalLeft - b.originalLeft);
+            const reset = () => ord.forEach(sb => setLeft(sb, sb.originalLeft));
+
+            // Où le livre s'insère-t-il ? Selon la position de son centre par rapport au centre des voisins
+            const center = desiredLeft + w / 2;
+            let k = 0;
+            while (k < ord.length && ord[k].originalLeft + ord[k].width / 2 < center) k++;
+            const L = ord.slice(0, k), R = ord.slice(k);
+            const Lend = L.length ? L[L.length - 1].originalLeft + L[L.length - 1].width : -GAP;
+            const Rstart = R.length ? R[0].originalLeft : rowW + GAP;
+            const need = w + 2 * GAP, free = Rstart - Lend;
+
+            // Dispose les voisins autour d'un emplacement donné (décalage en cascade, seulement si nécessaire)
+            const layout = (slot) => {
+                const res = [];
+                let pos = slot + w + GAP;
+                R.forEach(r => { const nl = Math.max(r.originalLeft, pos); res.push([r, nl]); pos = nl + r.width + GAP; });
+                const rightEnd = Math.max(pos - GAP, slot + w);
+                pos = slot - GAP;
+                for (let i = L.length - 1; i >= 0; i--) { const l = L[i]; const nl = Math.min(l.originalLeft, pos - l.width); res.push([l, nl]); pos = nl - GAP; }
+                return { res, leftEdge: Math.min(pos + GAP, slot), rightEnd };
+            };
+
+            let slot;
+            if (free >= need) slot = Math.max(Lend + GAP, Math.min(Rstart - GAP - w, desiredLeft));   // déjà de la place : rien ne bouge
+            else slot = Lend + GAP - Math.floor((need - free) / 2);                                      // sinon on écarte des deux côtés
+            let lay = layout(slot);
+            if (lay.leftEdge < 0) { slot += -lay.leftEdge; lay = layout(slot); }
+            if (lay.rightEnd > rowW) { slot -= (lay.rightEnd - rowW); lay = layout(slot); }
+            if (lay.leftEdge < -0.5 || lay.rightEnd > rowW + 0.5) { reset(); return; }   // rangée trop pleine : pas de place ici
+
+            lay.res.forEach(([sb, nl]) => setLeft(sb, nl));
+            drag.plan = { row: rIdx, left: slot };
+        }
+
         function onShelfPointerMove(e) {
             const drag = activeShelfDrag;
             if (!drag || e.pointerId !== drag.pointerId) return;
             const el = drag.el;
-            const SHELF_GAP_CONST = 6;
 
             if (!drag.moved) {
                 const dx = Math.abs(e.clientX - drag.startX);
@@ -3147,141 +3228,131 @@
                     el.classList.add('group-drag-active');
                     drag.group.members.forEach(m => { m.el.classList.add('dragging', 'group-drag-active'); });
                 }
+                drag.originalRow = parseInt(el.parentElement.dataset.row);
+                drag.originalLeft = drag.lastLeft;
+                drag.lastRowDelta = 0;
+                drag.lastXDelta = 0;
             }
 
-            // Rangée la plus proche du curseur (par distance au centre), plus fiable qu'une zone étendue
-            let targetRowEl = el.parentElement;
+            // Rangée la plus proche du curseur (par distance au centre)
+            let cursorRow = parseInt(el.parentElement.dataset.row);
             let bestDist = Infinity;
             for (let i = 0; i < SHELF_ROW_COUNT; i++) {
                 const rEl = document.getElementById(`bookshelf-row-${i}`);
                 if (!rEl) continue;
                 const rect = rEl.getBoundingClientRect();
                 const dist = Math.abs(e.clientY - (rect.top + rect.height / 2));
-                if (dist < bestDist) { bestDist = dist; targetRowEl = rEl; }
+                if (dist < bestDist) { bestDist = dist; cursorRow = i; }
             }
-            if (targetRowEl !== el.parentElement) targetRowEl.appendChild(el);
-
-            const rowRect = targetRowEl.getBoundingClientRect();
-            const rowWidth = targetRowEl.offsetWidth;
+            const cursorRowEl = document.getElementById(`bookshelf-row-${cursorRow}`);
+            const rowRect = cursorRowEl.getBoundingClientRect();
             const width = el.offsetWidth;
-            let newLeft = (e.clientX - rowRect.left) / currentShelfScale - drag.dragOffsetX;
-            newLeft = Math.max(0, Math.min(rowWidth - width, newLeft));
+            const desiredLeft = (e.clientX - rowRect.left) / currentShelfScale - drag.dragOffsetX;
 
-            // Prépare/retrouve la liste des voisins de la rangée ciblée (hors éléments en cours de
-            // déplacement), en conservant leur position de repos d'origine.
-            const rowIndex = parseInt(targetRowEl.dataset.row);
-            if (!drag.rowCache) drag.rowCache = {};
-            const movingEls = new Set([el, ...(drag.group ? drag.group.members.map(m => m.el) : [])]);
-            const ensureRowCache = (rIdx) => {
-                if (drag.rowCache[rIdx]) return drag.rowCache[rIdx];
-                const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
-                if (!rEl) return null;
-                drag.rowCache[rIdx] = Array.from(rEl.children)
-                    .filter(c => (c.classList.contains('shelf-spine') || c.classList.contains('shelf-decoration')) && !movingEls.has(c))
-                    .map(c => ({ el: c, originalLeft: parseFloat(c.style.left) || 0, width: c.offsetWidth, left: 0 }));
-                return drag.rowCache[rIdx];
-            };
-
-            // Borne physiquement le livre tenu par le curseur : il ne peut pas être poussé plus loin que
-            // ce que les voisins occuperaient s'ils étaient tassés au maximum contre chaque bord. Ainsi,
-            // écarter les voisins pour lui faire de la place ne les fera jamais déborder de l'étagère.
             if (!drag.group) {
-                const rowSiblings = ensureRowCache(rowIndex);
-                if (rowSiblings && rowSiblings.length) {
-                    const ordered = [...rowSiblings].sort((a, b) => a.originalLeft - b.originalLeft);
-                    const center = newLeft + width / 2;
-                    let idx = 0;
-                    while (idx < ordered.length && ordered[idx].originalLeft + ordered[idx].width / 2 < center) idx++;
-                    let leftPack = 0;
-                    for (let i = 0; i < idx; i++) leftPack += ordered[i].width + SHELF_GAP_CONST;
-                    let rightPack = 0;
-                    for (let i = idx; i < ordered.length; i++) rightPack += ordered[i].width + SHELF_GAP_CONST;
-                    const minBound = leftPack;
-                    const maxBound = rowWidth - width - rightPack;
-                    if (minBound <= maxBound) {
-                        newLeft = Math.max(minBound, Math.min(maxBound, newLeft));
-                    }
-                }
+                if (el.parentElement !== cursorRowEl) cursorRowEl.appendChild(el);
+                const left = Math.max(0, Math.min(cursorRowEl.offsetWidth - width, desiredLeft));
+                el.style.left = left + 'px';
+                drag.lastLeft = left;
+                updateShelfMakeRoom(drag, cursorRow, left, width);
+                return;
             }
 
-            el.style.left = newLeft + 'px';
-            drag.lastLeft = newLeft;
+            // Groupe : tous les livres suivent le même décalage, sans sortir de l'étagère
+            const items = shelfGroupItems(drag);
+            let rd = cursorRow - drag.originalRow;
+            if (items.some(it => it.row + rd < 0 || it.row + rd >= SHELF_ROW_COUNT)) rd = drag.lastRowDelta;
+            let xd = desiredLeft - drag.originalLeft;
+            let xMin = -Infinity, xMax = Infinity;
+            items.forEach(it => {
+                const rEl = document.getElementById(`bookshelf-row-${it.row + rd}`);
+                const rw = rEl ? rEl.offsetWidth : 0;
+                xMin = Math.max(xMin, -it.left);
+                xMax = Math.min(xMax, rw - it.width - it.left);
+            });
+            if (xMin <= xMax) xd = Math.max(xMin, Math.min(xMax, xd));
+            drag.lastRowDelta = rd;
+            drag.lastXDelta = xd;
+            items.forEach(it => {
+                const rowEl = document.getElementById(`bookshelf-row-${it.row + rd}`);
+                if (!rowEl) return;
+                if (it.el.parentElement !== rowEl) rowEl.appendChild(it.el);
+                it.el.style.left = (it.left + xd) + 'px';
+            });
+            drag.lastLeft = drag.originalLeft + xd;
+        }
 
-            // Calcule d'abord la position du reste du groupe sélectionné (même décalage)
-            const groupTargets = []; // { rowIndex, left, width, el }
+        // Au relâchement : pose le(s) livre(s) dans l'emplacement libre le plus proche (animé)
+        function snapShelfDrop(drag) {
+            const el = drag.el;
+            void el.offsetWidth; // force le recalcul pour que la transition de "left" s'anime
             if (drag.group) {
-                const rowDelta = rowIndex - drag.group.anchorOriginalRow;
-                const xDelta = newLeft - drag.group.anchorOriginalX;
-                drag.group.members.forEach(m => {
-                    const mRow = Math.max(0, Math.min(SHELF_ROW_COUNT - 1, m.originalRow + rowDelta));
-                    const mRowEl = document.getElementById(`bookshelf-row-${mRow}`);
-                    if (!mRowEl) return;
-                    if (m.el.parentElement !== mRowEl) mRowEl.appendChild(m.el);
-                    const mWidth = m.el.offsetWidth;
-                    const mRowWidth = mRowEl.offsetWidth;
-                    const mLeft = Math.max(0, Math.min(mRowWidth - mWidth, m.originalX + xDelta));
-                    m.el.style.left = mLeft + 'px';
-                    groupTargets.push({ rowIndex: mRow, left: mLeft, width: mWidth, el: m.el });
+                const items = shelfGroupItems(drag);
+                const apply = (rd, xd) => items.forEach(it => {
+                    const rowEl = document.getElementById(`bookshelf-row-${it.row + rd}`);
+                    if (!rowEl) return;
+                    if (it.el.parentElement !== rowEl) rowEl.appendChild(it.el);
+                    it.el.style.left = (it.left + xd) + 'px';
                 });
-            }
-
-            // Écarte les voisins pour éviter tout chevauchement. On trie tous les éléments de la
-            // rangée (livre déplacé compris) par position, puis on balaye deux fois — gauche→droite
-            // puis droite→gauche — pour garantir un espacement minimum partout, y compris en chaîne
-            // et dans les cas limites en bord de rangée.
-            const affectedRows = new Set([rowIndex, ...groupTargets.map(g => g.rowIndex)]);
-            affectedRows.forEach(rIdx => { ensureRowCache(rIdx); });
-            // Remet chaque voisin connu à sa place de repos avant de recalculer les écarts du jour
-            Object.values(drag.rowCache).forEach(items => { items.forEach(it => { it.left = it.originalLeft; }); });
-
-            const SHELF_GAP = SHELF_GAP_CONST;
-            const SHELF_OVERFLOW_MARGIN = 0; // le livre tenu est désormais borné en amont : plus de débordement nécessaire
-            affectedRows.forEach(rIdx => {
-                const siblings = drag.rowCache[rIdx];
-                if (!siblings || !siblings.length) return;
-                const fixedInRow = [];
-                if (rIdx === rowIndex) fixedInRow.push({ left: newLeft, width });
-                groupTargets.filter(g => g.rowIndex === rIdx).forEach(g => fixedInRow.push({ left: g.left, width: g.width }));
-                if (!fixedInRow.length) return;
-
-                const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
-                const rowW = rEl ? rEl.offsetWidth : Infinity;
-
-                const all = [
-                    ...fixedInRow.map(f => ({ left: f.left, width: f.width, fixed: true })),
-                    ...siblings.map(s => ({ ref: s, left: s.left, width: s.width, fixed: false })),
-                ].sort((a, b) => a.left - b.left);
-
-                for (let pass = 0; pass < 4; pass++) {
-                    for (let i = 1; i < all.length; i++) {
-                        const prev = all[i - 1], cur = all[i];
-                        const minLeft = prev.left + prev.width + SHELF_GAP;
-                        if (cur.left < minLeft) {
-                            if (!cur.fixed) cur.left = minLeft;
-                            else if (!prev.fixed) prev.left = cur.left - prev.width - SHELF_GAP;
+                const valid = (rd, xd) => items.every(it => {
+                    const r = it.row + rd;
+                    return r >= 0 && r < SHELF_ROW_COUNT && shelfFits(drag, r, it.left + xd, it.width);
+                });
+                const rowW = (document.getElementById('bookshelf-row-0') || {}).offsetWidth || 1200;
+                for (const rd of [drag.lastRowDelta, 0]) {
+                    for (let d = 0; d <= rowW; d += 2) {
+                        for (const xd of (d === 0 ? [drag.lastXDelta] : [drag.lastXDelta + d, drag.lastXDelta - d])) {
+                            if (valid(rd, xd)) { apply(rd, xd); return; }
                         }
                     }
-                    for (let i = all.length - 2; i >= 0; i--) {
-                        const cur = all[i], next = all[i + 1];
-                        if (cur.fixed) continue;
-                        const maxLeft = next.left - cur.width - SHELF_GAP;
-                        if (cur.left > maxLeft) cur.left = maxLeft;
-                    }
                 }
+                apply(0, 0);
+                return;
+            }
 
-                // Filet de sécurité (surtout pour les déplacements de groupe, non bornés en amont) :
-                // on limite juste un peu le débordement possible hors de la rangée.
-                all.forEach(a => {
-                    if (a.fixed) return;
-                    a.left = Math.max(-SHELF_OVERFLOW_MARGIN, Math.min(rowW + SHELF_OVERFLOW_MARGIN - a.width, a.left));
+            // Le livre prend l'emplacement qui vient d'être ouvert par ses voisins
+            if (drag.plan) {
+                const planRow = document.getElementById(`bookshelf-row-${drag.plan.row}`);
+                if (planRow) {
+                    if (el.parentElement !== planRow) planRow.appendChild(el);
+                    el.style.left = Math.max(0, drag.plan.left) + 'px';
+                    return;
+                }
+            }
+            const width = el.offsetWidth;
+            const cur = parseFloat(el.style.left) || 0;
+            const placeIn = (rIdx) => {
+                const rEl = document.getElementById(`bookshelf-row-${rIdx}`);
+                const sibs = shelfSiblings(drag, rIdx);
+                if (!rEl || !sibs) return null;
+                const ordered = [...sibs].sort((a, b) => a.originalLeft - b.originalLeft);
+                let best = null, start = 0;
+                const consider = (lo, hi) => {
+                    if (hi < lo) return;
+                    const cand = Math.max(lo, Math.min(hi, cur));
+                    if (best === null || Math.abs(cand - cur) < Math.abs(best - cur)) best = cand;
+                };
+                ordered.forEach(sb => {
+                    consider(start, sb.originalLeft - SHELF_DROP_GAP - width);
+                    start = sb.originalLeft + sb.width + SHELF_DROP_GAP;
                 });
-
-                all.forEach(a => { if (!a.fixed) a.ref.left = a.left; });
-            });
-
-            Object.values(drag.rowCache).forEach(items => {
-                items.forEach(it => { it.el.style.left = it.left + 'px'; });
-            });
+                consider(start, rEl.offsetWidth - width);
+                return best;
+            };
+            const curRow = parseInt(el.parentElement.dataset.row);
+            const rowsByDistance = Array.from({ length: SHELF_ROW_COUNT }, (_, i) => i).sort((a, b) => Math.abs(a - curRow) - Math.abs(b - curRow));
+            for (const r of rowsByDistance) {
+                const left = placeIn(r);
+                if (left === null) continue;
+                const rowEl = document.getElementById(`bookshelf-row-${r}`);
+                if (el.parentElement !== rowEl) rowEl.appendChild(el);
+                el.style.left = left + 'px';
+                return;
+            }
+            // Aucune place libre : retour à l'emplacement d'origine
+            const origRowEl = document.getElementById(`bookshelf-row-${drag.originalRow}`);
+            if (origRowEl && el.parentElement !== origRowEl) origRowEl.appendChild(el);
+            el.style.left = drag.originalLeft + 'px';
         }
 
         async function onShelfPointerUp(e) {
@@ -3305,6 +3376,7 @@
                 return;
             }
 
+            snapShelfDrop(drag);
             const rowEl = el.closest('.bookshelf-row');
             if (drag.kind === 'decoration') {
                 if (!shelfDecorations[item.id]) return;
@@ -4409,10 +4481,13 @@
                         ${b.isFavorite ? `<span class="absolute top-2 right-2 backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg" style="background: color-mix(in srgb, var(--gold-accent) 25%, transparent); border: 1px solid color-mix(in srgb, var(--gold-accent) 40%, transparent);">👑</span>` : ''}
 
                         <!-- Badge Livre préféré -->
-                        ${b.isAllTimeFavorite ? `<span class="absolute top-2 ${b.isFavorite ? 'right-12' : 'right-2'} backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg" style="background: rgba(244, 63, 94, 0.25); border: 1px solid rgba(244, 63, 94, 0.4);">❤️</span>` : ''}
+                        ${b.isAllTimeFavorite ? `<span class="absolute top-2 ${gridSelectMode ? 'left-10' : 'left-2'} backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg" style="background: rgba(244, 63, 94, 0.25); border: 1px solid rgba(244, 63, 94, 0.4);">❤️</span>` : ''}
+
+                        <!-- Badge Favori (étoile) -->
+                        ${b.isMyFavorite ? `<span class="absolute bottom-2 right-2 backdrop-blur-md text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg" style="background: rgba(251, 191, 36, 0.3); border: 1px solid rgba(251, 191, 36, 0.5);">⭐</span>` : ''}
                         
                         <!-- Badge Book Club -->
-    ${b.isBookClub ? `<span class="absolute bottom-2 left-2 bg-blue-500/80 backdrop-blur-md text-white text-[10px] w-6 h-6 flex items-center justify-center rounded-full shadow-lg border border-white/20">📖</span>` : ''}
+    ${b.isBookClub ? `<span class="absolute bottom-2 left-2 bg-blue-500/80 backdrop-blur-md text-white text-base w-8 h-8 flex items-center justify-center rounded-full shadow-lg border border-white/20">📖</span>` : ''}
                     </div>
 
                     <div class="flex gap-1">${getRatingOrDnfHtml(b, "text-base")}</div>
@@ -4464,7 +4539,7 @@
                                 <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
                                 <div class="flex items-center gap-x-6">
                                     <h3 class="fiche-author !mb-0 min-w-0">${book.author || 'AUTEUR INCONNU'}</h3>
-                                    ${book.saga ? `<div class="saga-trigger ml-auto max-w-[55%] text-right italic leading-snug mr-2 md:mr-10 lg:mr-16" onclick="openSagaBubble(${book.id}, event)" title="Voir tous les livres de la saga" style="font-family:'Cormorant Garamond','Palatino Linotype',Georgia,serif;font-size:30px;font-weight:500;font-style:italic;color:#8a8a8a;margin-top:-90px;margin-bottom:-90px">${book.saga}${parseFloat(book.sagaNum) ? ` <span style="font-weight:700;color:var(--gold-accent)">#${parseFloat(book.sagaNum)}</span>` : ''}</div>` : ''}
+                                    ${book.saga ? `<div class="saga-trigger ml-auto max-w-[55%] text-right italic leading-snug mr-2 md:mr-10 lg:mr-16" onclick="openSagaBubble(${book.id}, event)" title="Voir tous les livres de la saga" style="font-family:'Cormorant Garamond','Palatino Linotype',Georgia,serif;font-size:30px;font-weight:500;font-style:italic;color:#8a8a8a;margin-top:-90px;margin-bottom:-90px">${book.saga}${parseInt(book.sagaNum, 10) ? ` <span style="font-weight:700;color:var(--gold-accent)">#${parseInt(book.sagaNum, 10)}</span>` : ''}</div>` : ''}
                                 </div>
                             </div>
                             <div class="mb-6">
@@ -4726,7 +4801,7 @@
             // On part du livre existant (...library[idx]) pour conserver ses réglages d'étagère
             // (shelfColor, shelfWidth, shelfHeight, shelfPattern) : seuls les champs du formulaire changent.
             library[idx] = { ...library[idx], id, uid: currentUid, title: document.getElementById('in-title').value, author: document.getElementById('in-author').value, cover: document.getElementById('in-cover').value, rating: parseFloat(document.getElementById('in-rating').value), genre: document.getElementById('in-genre').value, year: document.getElementById('in-year').value, format: document.getElementById('in-format').value, lang: document.getElementById('in-lang').value,
-                saga: (document.getElementById('in-saga').value || '').trim(), sagaNum: parseFloat(document.getElementById('in-sagaNum').value) || 0, start: startDate, end: endDate, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav, isBookClub: currentBookClub, isAllTimeFavorite: currentAllTimeFav, isMyFavorite: currentMyFav, isDNF: document.getElementById('in-dnf').checked, isToRead: document.getElementById('in-toread').checked };
+                saga: (document.getElementById('in-saga').value || '').trim(), sagaNum: parseInt(document.getElementById('in-sagaNum').value, 10) || 0, start: startDate, end: endDate, summary: document.getElementById('in-summary').value, comment: document.getElementById('in-comment').value, isFavorite: currentFav, isBookClub: currentBookClub, isAllTimeFavorite: currentAllTimeFav, isMyFavorite: currentMyFav, isDNF: document.getElementById('in-dnf').checked, isToRead: document.getElementById('in-toread').checked };
             const newPages = parseInt(document.getElementById('in-pages').value) || 0;
             const reflowed = setBookPages(library[idx], newPages);
             if (newPages) { delete library[idx].pagesTried; delete library[idx].pagesLookup; }
@@ -4795,7 +4870,7 @@
                             ${b.cover ? `<img src="${esc(b.cover)}" referrerpolicy="no-referrer" class="w-9 h-14 object-cover rounded shadow-sm shrink-0 ${b.isDNF ? 'grayscale opacity-50' : ''}">` : '<div class="w-9 h-14 rounded bg-slate-200 shrink-0"></div>'}
                             <div class="min-w-0 flex-1">
                                 <p class="text-[13px] font-bold leading-tight truncate">${esc(b.title)}</p>
-                                <p class="text-[11px] text-slate-400 mt-0.5">${parseFloat(b.sagaNum) ? 'Tome ' + parseFloat(b.sagaNum) : esc(b.year || '')}${status(b) ? ' · ' + status(b) : ''}</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">${parseInt(b.sagaNum, 10) ? 'Tome ' + parseInt(b.sagaNum, 10) : esc(b.year || '')}${status(b) ? ' · ' + status(b) : ''}</p>
                             </div>
                         </div>`).join('')}
                 </div>`;
@@ -5098,7 +5173,7 @@
         // ===== Sagas =====
         // book.saga = nom de la saga ('' = livre unique, undefined = pas encore analysé), book.sagaNum = numéro du tome.
         function sagaBookOrder(x, y) {
-            const nx = parseFloat(x.sagaNum) || 0, ny = parseFloat(y.sagaNum) || 0;
+            const nx = parseInt(x.sagaNum, 10) || 0, ny = parseInt(y.sagaNum, 10) || 0;
             if (nx && ny && nx !== ny) return nx - ny;
             return ((parseInt(x.year) || 9999) - (parseInt(y.year) || 9999))
                 || (x.title || '').localeCompare(y.title || '', 'fr', { numeric: true });
@@ -5625,7 +5700,7 @@
                 slot.title = title;
                 slot.author = authorVal;
                 const sagaName = cleanGoodreadsField(get(idx.saga)) || titleSaga;
-                if (sagaName) { slot.saga = sagaName; slot.sagaNum = parseFloat(get(idx.sagaNum)) || titleSagaNum || 0; }
+                if (sagaName) { slot.saga = sagaName; slot.sagaNum = parseInt(get(idx.sagaNum), 10) || Math.floor(titleSagaNum) || 0; }
                 if (!isUpdate) importedBooks.push(slot);
                 // Sur une mise à jour, on ne remplace pas ce que l'utilisateur a pu compléter à la main
                 // (couverture déjà présente, genre déjà renseigné, résumé déjà écrit).
