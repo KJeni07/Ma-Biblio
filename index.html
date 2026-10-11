@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Nool</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -606,6 +606,40 @@
             .bookcase.bookcase-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
             .bookcase .shelf-spine, .bookcase .shelf-decoration { touch-action: pan-x pan-y !important; }
             .shelf-spine.hold, .shelf-decoration.hold { transform: translateY(-8px) scale(1.06); filter: drop-shadow(0 8px 6px rgba(0,0,0,.35)); z-index: 5; }
+        }
+
+        /* ===== Aspect « application » sur téléphone (aucun effet sur ordinateur) ===== */
+        #bottom-nav { display: none; }
+        @keyframes appIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        @media (max-width: 767px) {
+            #bottom-nav {
+                display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+                padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+                background: rgba(250,249,246,.92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+                border-top: 1px solid rgba(0,0,0,.07); box-shadow: 0 -6px 24px rgba(0,0,0,.06);
+            }
+            #bottom-nav button {
+                flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0 6px;
+                border: 0; background: none; color: #9ca3af; border-radius: 14px;
+                font: 700 10px 'Inter', sans-serif; letter-spacing: .02em;
+                transition: color .2s, background .2s, transform .12s; -webkit-tap-highlight-color: transparent;
+            }
+            #bottom-nav button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+            #bottom-nav button.active { color: var(--gold-accent); background: rgba(197,160,89,.13); }
+            #bottom-nav button.active svg { transform: translateY(-1px) scale(1.08); }
+            #bottom-nav button:active { transform: scale(.93); }
+            html.dark #bottom-nav { background: rgba(24,24,24,.92); border-top-color: #2a2a2a; box-shadow: 0 -6px 24px rgba(0,0,0,.4); }
+            /* Barre du haut allégée : les onglets sont maintenant en bas */
+            #nav-tabs { display: none !important; }
+            #app-header-inner { grid-template-areas: "logo actions" !important; }
+            #app-header > div { padding-top: calc(8px + env(safe-area-inset-top)) !important; padding-bottom: 8px !important; }
+            #app-content { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+            #scroll-nav-buttons { bottom: calc(92px + env(safe-area-inset-bottom)) !important; right: 14px !important; }
+            #landing-page .np-nav { margin-top: calc(18px + env(safe-area-inset-top)); }
+            html { overscroll-behavior-y: none; }
+            body { -webkit-tap-highlight-color: transparent; }
+            button, a, [role="button"] { touch-action: manipulation; }
+            .view-section.active { animation: appIn .28s ease backwards; }
         }
         html { scrollbar-gutter: stable; }
         #bookcase-scaler { transform-origin: top left; }
@@ -1246,6 +1280,12 @@
     </div>
 
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
+        <nav id="bottom-nav" aria-label="Navigation principale">
+            <button id="bn-bibliotheque" class="active" onclick="showSection('bibliotheque', true)"><svg viewBox="0 0 24 24"><path d="M5 4v16M9.5 6v14M14 4v16M18.2 5.4l2.8 13.2M3 20.5h18"/></svg><span data-i18n="nav.libraryShort">Biblio</span></button>
+            <button id="bn-stats" onclick="showSection('stats', true)"><svg viewBox="0 0 24 24"><path d="M5 20v-9M12 20V4M19 20v-6"/></svg><span data-i18n="nav.dashboardShort">Stats</span></button>
+            <button id="bn-grille" onclick="showSection('grille', true)"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg><span data-i18n="nav.gridShort">Grille</span></button>
+            <button id="bn-fiches" onclick="showSection('fiches', true)"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg><span data-i18n="nav.fichesShort">Fiches</span></button>
+        </nav>
         
         <div id="app-header" class="sticky top-0 z-50 bg-[#FAF9F6]/95 backdrop-blur-md shadow-sm border-b border-slate-100">
             <div class="max-w-6xl mx-auto px-6 py-4">
@@ -1885,7 +1925,7 @@
         // --- TRADUCTION (FR / EN) ---
         const TRANSLATIONS = {
             fr: {
-                nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", library: "Bibliothèque", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
+                nav: { libraryShort: "Biblio", dashboardShort: "Stats", gridShort: "Grille", fichesShort: "Fiches", dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", library: "Bibliothèque", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
                 filters: { phoneHint: "Fais défiler l'étagère sur le côté · appui long sur un livre pour le déplacer", searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", multiSelectBtn: "Sélection", multiSelectHint: "Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.", multiSelectHintActive: "livre(s) sélectionné(s) — glisse-en un pour les déplacer ensemble.", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allFormats: "Tous les formats", allLanguages: "Toutes les langues", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", favoriteBook: "❤️ Livre préféré", myFavorite: "⭐ Mes Favoris", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 À lire", toReadShort: "À LIRE", reset: "Réinitialiser", sortNone: "Ordre habituel", sortSaga: "Par saga (tomes regroupés)", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)", addBook: "+ Ajouter un livre", gridSelectBtn: "☑️ Sélectionner", gridSelectAll: "Tout sélectionner", gridSelectedCount: "{n} sélectionné(s)", gridDeleteSelected: "🗑 Supprimer", gridCancelSelection: "Annuler", emptyFichesTitle: "Aucune fiche pour l'instant", emptyFichesBody: "Commence par ajouter un livre pour voir apparaître sa fiche ici.", emptyFichesBtn: "+ Ajouter mon premier livre" },
                 months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
                 dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", dnfCount: "Livres Abandonnés (DNF)", ofBooks: "des livres", languagesRead: "Langues Lues", authorsRead: "Livres par Auteur", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE", myFavorites: "⭐ Mes Favoris" },
@@ -1974,7 +2014,7 @@
                 }
             },
             en: {
-                nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", library: "Library", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
+                nav: { libraryShort: "Library", dashboardShort: "Stats", gridShort: "Grid", fichesShort: "Reviews", dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", library: "Library", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
                 filters: { phoneHint: "Scroll the shelf sideways · long-press a book to move it", searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", multiSelectBtn: "Select", multiSelectHint: "Drag a box around several books to select them, then drag one to move them all together.", multiSelectHintActive: "book(s) selected — drag one to move them all together.", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allFormats: "All formats", allLanguages: "All languages", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", favoriteBook: "❤️ Favorite book", myFavorite: "⭐ My Favorites", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 To read", toReadShort: "TO READ", reset: "Reset", sortNone: "Default order", sortSaga: "By series (volumes together)", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)", addBook: "+ Add a book", gridSelectBtn: "☑️ Select", gridSelectAll: "Select all", gridSelectedCount: "{n} selected", gridDeleteSelected: "🗑 Delete", gridCancelSelection: "Cancel", emptyFichesTitle: "No sheets yet", emptyFichesBody: "Start by adding a book to see its sheet appear here.", emptyFichesBtn: "+ Add my first book" },
                 months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
                 dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", dnfCount: "Dropped Books (DNF)", ofBooks: "of books", languagesRead: "Languages Read", authorsRead: "Books per Author", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK", myFavorites: "⭐ My Favorites" },
@@ -4896,6 +4936,7 @@
             if ((id === 'stats' || id === 'bibliotheque') && typeof updateBookcaseWidth === 'function') {
                 setTimeout(updateBookcaseWidth, 0);
             }
+            document.querySelectorAll('#bottom-nav button').forEach(b => b.classList.toggle('active', b.id === 'bn-' + id));
             setTimeout(updateScrollNavButtons, 0);
         };
 
