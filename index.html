@@ -588,6 +588,25 @@
             border-color: rgba(197, 160, 89, 0.25);
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.35);
         }
+
+        /* ===== Adaptation téléphone (écrans de 767 px et moins) : aucune règle ci-dessous ne s'applique sur ordinateur ===== */
+        @media (max-width: 767px) {
+            /* En-tête compact : logo et boutons sur une ligne, les 4 onglets sur la ligne du dessous */
+            #app-header > div { padding: 10px 14px !important; }
+            #app-header-inner { display: grid !important; grid-template-columns: 1fr auto; grid-template-areas: "logo actions" "tabs tabs"; align-items: center; gap: 8px 12px !important; }
+            #app-logo { grid-area: logo; font-size: 24px !important; }
+            #app-header-actions { grid-area: actions; gap: 8px !important; }
+            #nav-tabs { grid-area: tabs; display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 0 !important; width: 100%; }
+            /* Accueil : le bouton « Se connecter » reste sur une ligne */
+            #landing-page .np-nav .np-btn { white-space: nowrap; padding: 9px 14px !important; font-size: 13px !important; }
+            #shelf-selection-hint { display: none !important; }
+            #shelf-phone-hint { display: block !important; }
+            #nav-tabs .tab-btn { font-size: 9.5px; letter-spacing: .04em; line-height: 1.2; padding: 8px 2px; text-align: center; }
+            /* Étagère : taille lisible, on la fait défiler sur le côté ; le doigt sur un livre fait défiler, appui long pour le déplacer */
+            .bookcase.bookcase-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+            .bookcase .shelf-spine, .bookcase .shelf-decoration { touch-action: pan-x pan-y !important; }
+            .shelf-spine.hold, .shelf-decoration.hold { transform: translateY(-8px) scale(1.06); filter: drop-shadow(0 8px 6px rgba(0,0,0,.35)); z-index: 5; }
+        }
         html { scrollbar-gutter: stable; }
         #bookcase-scaler { transform-origin: top left; }
         .bookshelf-row-wrap { margin-bottom: 22px; }
@@ -1228,10 +1247,10 @@
 
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
         
-        <div class="sticky top-0 z-50 bg-[#FAF9F6]/95 backdrop-blur-md shadow-sm border-b border-slate-100">
+        <div id="app-header" class="sticky top-0 z-50 bg-[#FAF9F6]/95 backdrop-blur-md shadow-sm border-b border-slate-100">
             <div class="max-w-6xl mx-auto px-6 py-4">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <h1 style="font-family:'Fraunces',serif;font-weight:800;font-size:28px;letter-spacing:-.03em;line-height:1.08;margin:0;color:var(--deep-black)">Nool<i style="color:var(--gold-accent);font-style:normal">.</i></h1>
+                <div id="app-header-inner" class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <h1 id="app-logo" style="font-family:'Fraunces',serif;font-weight:800;font-size:28px;letter-spacing:-.03em;line-height:1.08;margin:0;color:var(--deep-black)">Nool<i style="color:var(--gold-accent);font-style:normal">.</i></h1>
                     
                     <div class="flex gap-8 items-center" id="nav-tabs">
                         <button onclick="showSection('bibliotheque', true)" id="btn-bibliotheque" class="tab-btn active" data-i18n="nav.library">Bibliothèque</button>
@@ -1240,7 +1259,7 @@
                         <button onclick="showSection('fiches', true)" id="btn-fiches" class="tab-btn" data-i18n="nav.fiches">Mes Fiches</button>
                     </div>
 
-                    <div class="flex items-center gap-3">
+                    <div id="app-header-actions" class="flex items-center gap-3">
                         <button onclick="openTutorial(false)" id="help-toggle-btn" class="theme-toggle-btn" data-i18n-title="tutorial.helpBtn" title="Revoir le didacticiel">?</button>
                         <button onclick="toggleLang()" id="lang-toggle-btn" class="text-[10px] font-black uppercase tracking-widest border border-slate-200 rounded-full px-2.5 py-1 hover:border-gold-accent hover:text-gold-accent transition-colors" title="Change language">FR</button>
                         <button onclick="toggleTheme()" id="theme-toggle-btn" class="theme-toggle-btn" data-i18n-title="nav.themeToggle" title="Changer de thème"></button>
@@ -1477,6 +1496,7 @@
                         </div>
                     </div>
 
+                    <p id="shelf-phone-hint" class="hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 -mt-2" data-i18n="filters.phoneHint">Fais défiler l'étagère sur le côté · appui long sur un livre pour le déplacer</p>
                     <p id="shelf-selection-hint" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 -mt-2" data-i18n="filters.multiSelectHint">Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.</p>
 
                     <div id="shelf-filters-panel" class="hidden flex flex-wrap gap-2 items-center text-xs mb-4 pb-4 border-b border-slate-100">
@@ -1866,7 +1886,7 @@
         const TRANSLATIONS = {
             fr: {
                 nav: { dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", library: "Bibliothèque", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
-                filters: { searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", multiSelectBtn: "Sélection", multiSelectHint: "Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.", multiSelectHintActive: "livre(s) sélectionné(s) — glisse-en un pour les déplacer ensemble.", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allFormats: "Tous les formats", allLanguages: "Toutes les langues", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", favoriteBook: "❤️ Livre préféré", myFavorite: "⭐ Mes Favoris", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 À lire", toReadShort: "À LIRE", reset: "Réinitialiser", sortNone: "Ordre habituel", sortSaga: "Par saga (tomes regroupés)", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)", addBook: "+ Ajouter un livre", gridSelectBtn: "☑️ Sélectionner", gridSelectAll: "Tout sélectionner", gridSelectedCount: "{n} sélectionné(s)", gridDeleteSelected: "🗑 Supprimer", gridCancelSelection: "Annuler", emptyFichesTitle: "Aucune fiche pour l'instant", emptyFichesBody: "Commence par ajouter un livre pour voir apparaître sa fiche ici.", emptyFichesBtn: "+ Ajouter mon premier livre" },
+                filters: { phoneHint: "Fais défiler l'étagère sur le côté · appui long sur un livre pour le déplacer", searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", multiSelectBtn: "Sélection", multiSelectHint: "Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.", multiSelectHintActive: "livre(s) sélectionné(s) — glisse-en un pour les déplacer ensemble.", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allFormats: "Tous les formats", allLanguages: "Toutes les langues", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", favoriteBook: "❤️ Livre préféré", myFavorite: "⭐ Mes Favoris", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 À lire", toReadShort: "À LIRE", reset: "Réinitialiser", sortNone: "Ordre habituel", sortSaga: "Par saga (tomes regroupés)", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)", addBook: "+ Ajouter un livre", gridSelectBtn: "☑️ Sélectionner", gridSelectAll: "Tout sélectionner", gridSelectedCount: "{n} sélectionné(s)", gridDeleteSelected: "🗑 Supprimer", gridCancelSelection: "Annuler", emptyFichesTitle: "Aucune fiche pour l'instant", emptyFichesBody: "Commence par ajouter un livre pour voir apparaître sa fiche ici.", emptyFichesBtn: "+ Ajouter mon premier livre" },
                 months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
                 dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", dnfCount: "Livres Abandonnés (DNF)", ofBooks: "des livres", languagesRead: "Langues Lues", authorsRead: "Livres par Auteur", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE", myFavorites: "⭐ Mes Favoris" },
                 account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", importSectionTitle: "Importer ma bibliothèque", importSectionBody: "Récupère automatiquement tes livres depuis Goodreads (fichier .csv exporté).", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
@@ -1955,7 +1975,7 @@
             },
             en: {
                 nav: { dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", library: "Library", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
-                filters: { searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", multiSelectBtn: "Select", multiSelectHint: "Drag a box around several books to select them, then drag one to move them all together.", multiSelectHintActive: "book(s) selected — drag one to move them all together.", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allFormats: "All formats", allLanguages: "All languages", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", favoriteBook: "❤️ Favorite book", myFavorite: "⭐ My Favorites", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 To read", toReadShort: "TO READ", reset: "Reset", sortNone: "Default order", sortSaga: "By series (volumes together)", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)", addBook: "+ Add a book", gridSelectBtn: "☑️ Select", gridSelectAll: "Select all", gridSelectedCount: "{n} selected", gridDeleteSelected: "🗑 Delete", gridCancelSelection: "Cancel", emptyFichesTitle: "No sheets yet", emptyFichesBody: "Start by adding a book to see its sheet appear here.", emptyFichesBtn: "+ Add my first book" },
+                filters: { phoneHint: "Scroll the shelf sideways · long-press a book to move it", searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", multiSelectBtn: "Select", multiSelectHint: "Drag a box around several books to select them, then drag one to move them all together.", multiSelectHintActive: "book(s) selected — drag one to move them all together.", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allFormats: "All formats", allLanguages: "All languages", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", favoriteBook: "❤️ Favorite book", myFavorite: "⭐ My Favorites", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 To read", toReadShort: "TO READ", reset: "Reset", sortNone: "Default order", sortSaga: "By series (volumes together)", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)", addBook: "+ Add a book", gridSelectBtn: "☑️ Select", gridSelectAll: "Select all", gridSelectedCount: "{n} selected", gridDeleteSelected: "🗑 Delete", gridCancelSelection: "Cancel", emptyFichesTitle: "No sheets yet", emptyFichesBody: "Start by adding a book to see its sheet appear here.", emptyFichesBtn: "+ Add my first book" },
                 months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
                 dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", dnfCount: "Dropped Books (DNF)", ofBooks: "of books", languagesRead: "Languages Read", authorsRead: "Books per Author", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK", myFavorites: "⭐ My Favorites" },
                 account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", importSectionTitle: "Import my library", importSectionBody: "Automatically pull in your books from Goodreads (exported .csv file).", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
@@ -3125,6 +3145,19 @@
                     pointerId: e.pointerId,
                     group,
                 };
+                if (e.pointerType === 'touch' && window.matchMedia('(max-width: 767px)').matches) {
+                    const d = activeShelfDrag;
+                    d.pending = true;
+                    d.px = e.clientX;
+                    d.holdTimer = setTimeout(() => {
+                        if (activeShelfDrag === d && d.pending) {
+                            d.pending = false; d.armed = true;
+                            el.classList.add('hold');
+                            if (navigator.vibrate) navigator.vibrate(15);
+                            shelfAutoScrollLoop(d);
+                        }
+                    }, 280);
+                }
                 try { el.setPointerCapture(e.pointerId); } catch (err) {}
                 cancelHideShelfTooltip();
                 if (shelfTooltipEl) shelfTooltipEl.classList.remove('visible');
@@ -3134,6 +3167,25 @@
         // --- Placement des livres : pendant le glisser, le livre suit librement le curseur (il passe
         // par-dessus les autres sans les bouger) ; au relâchement il se pose dans l'emplacement libre
         // le plus proche, avec une petite animation.
+
+        // Au doigt, quand un livre est « soulevé » près du bord de l'étagère, celle-ci défile pour pouvoir le poser plus loin
+        function shelfAutoScrollLoop(drag) {
+            const step = () => {
+                if (activeShelfDrag !== drag) return;
+                const bc = document.getElementById('bookcase-container');
+                if (bc && bc.classList.contains('bookcase-scroll') && drag.moved) {
+                    const r = bc.getBoundingClientRect(), edge = 48;
+                    if (drag.px < r.left + edge) bc.scrollLeft -= 10;
+                    else if (drag.px > r.right - edge) bc.scrollLeft += 10;
+                }
+                requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+        // Une fois le livre soulevé, le doigt ne doit plus faire défiler la page
+        document.addEventListener('touchmove', (e) => {
+            if (activeShelfDrag && activeShelfDrag.armed) e.preventDefault();
+        }, { passive: false });
         const SHELF_DROP_GAP = 6;
         function shelfSiblings(drag, rIdx) {
             if (!drag.rowCache) drag.rowCache = {};
@@ -3217,6 +3269,16 @@
             const drag = activeShelfDrag;
             if (!drag || e.pointerId !== drag.pointerId) return;
             const el = drag.el;
+            drag.px = e.clientX;
+            if (drag.pending) {
+                // Le doigt a bougé avant la fin de l'appui long : c'est un défilement, pas un déplacement
+                if (Math.abs(e.clientX - drag.startX) > 10 || Math.abs(e.clientY - drag.startY) > 10) {
+                    clearTimeout(drag.holdTimer);
+                    try { el.releasePointerCapture(drag.pointerId); } catch (err) {}
+                    activeShelfDrag = null;
+                }
+                return;
+            }
 
             if (!drag.moved) {
                 const dx = Math.abs(e.clientX - drag.startX);
@@ -3360,7 +3422,7 @@
             if (!drag || e.pointerId !== drag.pointerId) return;
             const el = drag.el, item = drag.item;
             activeShelfDrag = null;
-            el.classList.remove('dragging', 'group-drag-active');
+            el.classList.remove('dragging', 'group-drag-active', 'hold');
             if (drag.group) drag.group.members.forEach(m => m.el.classList.remove('dragging', 'group-drag-active'));
             try { el.releasePointerCapture(e.pointerId); } catch (err) {}
 
@@ -3420,7 +3482,7 @@
             const drag = activeShelfDrag;
             if (!drag || e.pointerId !== drag.pointerId) return;
             activeShelfDrag = null;
-            drag.el.classList.remove('dragging', 'group-drag-active');
+            drag.el.classList.remove('dragging', 'group-drag-active', 'hold');
             if (drag.group) drag.group.members.forEach(m => m.el.classList.remove('dragging', 'group-drag-active'));
             if (drag.rowCache) {
                 Object.values(drag.rowCache).forEach(items => {
@@ -3606,6 +3668,7 @@
         }
 
         let currentShelfScale = 1;
+        const PHONE_MIN_SHELF_SCALE = 0.5;
         let lastBookcaseClientWidth = 0;
 
         // La barre de défilement de la page peut apparaître APRÈS le calcul de l'échelle, ce qui rétrécit l'étagère
@@ -3647,6 +3710,19 @@
             const availableWidth = bookcase.clientWidth - 32;
             lastBookcaseClientWidth = bookcase.clientWidth;
             const naturalHeight = scaler.scrollHeight || scaler.offsetHeight;
+            scaler.style.marginRight = '';
+            bookcase.classList.remove('bookcase-scroll');
+            if (maxRight > availableWidth && window.matchMedia('(max-width: 767px)').matches && availableWidth / maxRight < PHONE_MIN_SHELF_SCALE) {
+                // Téléphone : on ne réduit pas l'étagère jusqu'à l'illisible, elle défile sur le côté
+                const scale = PHONE_MIN_SHELF_SCALE;
+                scaler.style.transform = `scale(${scale})`;
+                scaler.style.width = maxRight + 'px';
+                scaler.style.marginRight = -(maxRight * (1 - scale)) + 'px';
+                bookcase.style.height = (naturalHeight * scale + 38) + 'px';
+                bookcase.classList.add('bookcase-scroll');
+                currentShelfScale = scale;
+                return;
+            }
             if (maxRight > availableWidth) {
                 const scale = availableWidth / maxRight;
                 scaler.style.transform = `scale(${scale})`;
