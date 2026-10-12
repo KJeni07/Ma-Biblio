@@ -667,15 +667,17 @@
             #shelf-phone-hint { text-transform: none !important; letter-spacing: 0 !important; font-size: 12px !important; font-weight: 600 !important; }
             #bookcase-container { margin-left: -24px; margin-right: -24px; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }
 
-            /* ---- Fiches : chaque livre est une « page » plein écran, sans carte ---- */
-            .fiche-container { background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 0 30px !important; margin-bottom: 30px !important; border-bottom: 1px solid rgba(0,0,0,.08) !important; scroll-snap-align: start; scroll-margin-top: 70px; }
-            html.dark .fiche-container { border-bottom-color: #2a2a2a !important; }
+            /* ---- Fiches : une carte propre par livre (bordure, marges intérieures, rien ne dépasse) ---- */
+            .fiche-container { background: #fff !important; border: 1px solid rgba(197,160,89,.3) !important; border-radius: 20px !important; padding: 22px 20px 24px !important; margin: 0 0 22px !important; box-shadow: 0 6px 22px rgba(0,0,0,.06) !important; overflow: hidden; scroll-snap-align: start; scroll-margin-top: 70px; }
+            html.dark .fiche-container { background: #1E1E1E !important; border-color: #333 !important; box-shadow: none !important; }
             html:has(#section-fiches.active) { scroll-snap-type: y proximity; }
-            .fiche-header-actions { width: 100%; flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; margin: 0 -24px; padding: 2px 24px; width: calc(100% + 48px); }
-            .fiche-header-actions::-webkit-scrollbar { display: none; }
-            .fiche-header-actions > * { flex-shrink: 0; white-space: nowrap; }
-            .fiche-container .cover-box { width: 62% !important; max-width: 230px; margin: 4px auto 6px !important; border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,.22); }
+            .fiche-container > .flex:first-child { margin-bottom: 18px !important; gap: 10px !important; }
+            .fiche-header-actions { width: 100%; flex-wrap: wrap !important; gap: 8px !important; margin: 0; padding: 0; overflow: visible; }
+            .fiche-header-actions > button { flex-shrink: 0; white-space: nowrap; padding: 7px 11px !important; font-size: 9px !important; }
+            .fiche-header-actions .fiche-number { margin-left: auto; }
+            .fiche-container .cover-box { width: 58% !important; max-width: 220px; margin: 8px auto 10px !important; border-radius: 14px; box-shadow: 0 14px 30px rgba(0,0,0,.2); }
             .fiche-title, .fiche-author { text-align: center; }
+            .fiche-container .info-grid { margin-top: 24px; }
 
             /* ---- Recherche et filtres : une seule ligne qu'on fait glisser du doigt ---- */
             #search-bar-container .flex-wrap { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; margin: 0 -24px; padding: 2px 24px 4px; -webkit-overflow-scrolling: touch; }
@@ -693,6 +695,28 @@
             #edit-modal > div::before, #bulk-import-modal > div::before, #goodreads-import-modal > div::before, #shelf-settings-modal > div::before, #decoration-picker-modal > div::before {
                 content: ""; display: block; width: 42px; height: 4px; border-radius: 2px; background: #d4d4d8; margin: -12px auto 16px;
             }
+        }
+        #shelf-summary, #shelf-recent { display: none; }
+        @media (max-width: 767px) {
+            #shelf-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 16px; }
+            #shelf-summary .pe-tile { background: #fff; border-radius: 16px; padding: 12px 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+            #shelf-summary .pe-num { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 800; line-height: 1.1; color: var(--deep-black); }
+            #shelf-summary .pe-lab { margin-top: 3px; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; }
+            html.dark #shelf-summary .pe-tile { background: #1E1E1E; box-shadow: none; }
+            html.dark #shelf-summary .pe-num { color: #F2F0EA; }
+            #shelf-recent { display: block; margin-top: 22px; }
+            #shelf-recent .pe-h { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 800; margin: 0 0 12px; color: var(--deep-black); }
+            html.dark #shelf-recent .pe-h { color: #F2F0EA; }
+            #shelf-recent .pe-row { display: flex; gap: 12px; overflow-x: auto; margin: 0 -24px; padding: 2px 24px 14px; scroll-snap-type: x proximity; scroll-padding-left: 24px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+            #shelf-recent .pe-row::-webkit-scrollbar { display: none; }
+            #shelf-recent .pe-card { flex: 0 0 96px; scroll-snap-align: start; background: none; border: 0; padding: 0; text-align: left; -webkit-tap-highlight-color: transparent; }
+            #shelf-recent .pe-cover { width: 96px; height: 144px; border-radius: 6px 12px 12px 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 8px; box-shadow: 0 8px 18px rgba(0,0,0,.2), inset 4px 0 5px rgba(0,0,0,.2); transition: transform .15s; }
+            #shelf-recent .pe-card:active .pe-cover { transform: scale(.96); }
+            #shelf-recent .pe-cover img { width: 100%; height: 100%; object-fit: cover; margin: -8px; }
+            #shelf-recent .pe-cover.has-img span { display: none; }
+            #shelf-recent .pe-cover span { font: 700 12px 'Fraunces', serif; color: rgba(255,255,255,.93); text-align: center; line-height: 1.15; }
+            #shelf-recent .pe-t { margin-top: 8px; font-size: 11px; font-weight: 700; line-height: 1.25; color: var(--deep-black); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+            html.dark #shelf-recent .pe-t { color: #E5E5E5; }
         }
         html { scrollbar-gutter: stable; }
         #bookcase-scaler { transform-origin: top left; }
@@ -1333,7 +1357,7 @@
     </div>
 
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
-        <button id="fab-add" onclick="addNewBookFromLibrary()" aria-label="Ajouter un livre"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button id="fab-add" class="fab-hide" onclick="addNewBookFromLibrary()" aria-label="Ajouter un livre"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
         <nav id="bottom-nav" aria-label="Navigation principale">
             <button id="bn-bibliotheque" class="active" onclick="showSection('bibliotheque', true)"><svg viewBox="0 0 24 24"><path d="M5 4v16M9.5 6v14M14 4v16M18.2 5.4l2.8 13.2M3 20.5h18"/></svg><span data-i18n="nav.libraryShort">Biblio</span></button>
             <button id="bn-stats" onclick="showSection('stats', true)"><svg viewBox="0 0 24 24"><path d="M5 20v-9M12 20V4M19 20v-6"/></svg><span data-i18n="nav.dashboardShort">Stats</span></button>
@@ -1627,8 +1651,10 @@
                         <button onclick="resetShelfFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto" data-i18n="filters.reset">Réinitialiser</button>
                     </div>
 
+                    <div id="shelf-summary"></div>
                     <div id="bookcase-container" class="bookcase"></div>
                     <button onclick="addShelfRow()" class="mt-3 mx-auto flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-gold-accent hover:text-gold-accent transition-colors" data-i18n-title="dash.addRow" title="Ajouter une rangée">+</button>
+                    <div id="shelf-recent"></div>
                 </div>
             </section>
 
@@ -3716,6 +3742,27 @@
                 && inSel(sp, v => specialMatch(b, v)));
         }
 
+
+        // Bibliothèque sur téléphone : tuiles de résumé + bandeau « dernières lectures » (masqués sur ordinateur par le CSS)
+        function renderPhoneLibraryExtras() {
+            const sum = document.getElementById('shelf-summary'), rec = document.getElementById('shelf-recent');
+            if (!sum || !rec || !window.matchMedia('(max-width: 767px)').matches) return;
+            const fr = currentLang !== 'en';
+            const esc = (v) => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+            const parse = (v) => { const m = (v || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? new Date(+m[3], +m[2] - 1, +m[1]).getTime() : 0; };
+            const books = library.filter(b => b.title);
+            const year = new Date().getFullYear();
+            const readNow = books.filter(b => !b.isDNF && parse(b.end) && new Date(parse(b.end)).getFullYear() === year).length;
+            const rated = books.filter(b => parseFloat(b.rating) > 0);
+            const avg = rated.length ? (rated.reduce((t, b) => t + parseFloat(b.rating), 0) / rated.length).toFixed(1).replace('.', fr ? ',' : '.') : '–';
+            const tile = (n, l) => `<div class="pe-tile"><div class="pe-num">${n}</div><div class="pe-lab">${l}</div></div>`;
+            sum.innerHTML = tile(books.length, fr ? 'livres' : 'books') + tile(readNow, fr ? `lus en ${year}` : `read in ${year}`) + tile(avg, fr ? 'note moy.' : 'avg rating');
+            const recent = books.filter(b => parse(b.end)).sort((a, b) => parse(b.end) - parse(a.end)).slice(0, 12);
+            const hue = (t) => { let h = 0; for (const ch of t) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
+            rec.innerHTML = recent.length ? `<p class="pe-h">${fr ? 'Dernières lectures' : 'Recently read'}</p><div class="pe-row">` + recent.map(b =>
+                `<button class="pe-card" onclick="jumpToFiche(${b.id})"><div class="pe-cover ${b.cover ? 'has-img' : ''}" style="background:linear-gradient(135deg,hsl(${hue(b.title)} 38% 40%),hsl(${(hue(b.title) + 30) % 360} 40% 22%))">${b.cover ? `<img src="${esc(b.cover)}" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('has-img');this.remove()">` : ''}<span>${esc(b.title)}</span></div><div class="pe-t">${esc(b.title)}</div></button>`).join('') + '</div>' : '';
+        }
+
         function renderShelf(books) {
             const rowElements = Array.from({ length: SHELF_ROW_COUNT }, (_, i) => document.getElementById(`bookshelf-row-${i}`));
             if (!rowElements[0]) return;
@@ -4637,6 +4684,7 @@
 
             updateChart(statLib, isAllYears);
             renderShelf(getShelfBooks());
+            renderPhoneLibraryExtras();
 
             // HTML GRILLE
             const nextEmptyBook = library.find(b => !b.title);
@@ -4991,7 +5039,7 @@
                 setTimeout(updateBookcaseWidth, 0);
             }
             document.querySelectorAll('#bottom-nav button').forEach(b => b.classList.toggle('active', b.id === 'bn-' + id));
-            document.getElementById('fab-add')?.classList.toggle('fab-hide', id === 'stats' || id === 'compte');
+            document.getElementById('fab-add')?.classList.toggle('fab-hide', id !== 'grille');
             setTimeout(updateScrollNavButtons, 0);
         };
 
