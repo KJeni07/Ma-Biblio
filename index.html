@@ -641,6 +641,59 @@
             button, a, [role="button"] { touch-action: manipulation; }
             .view-section.active { animation: appIn .28s ease backwards; }
         }
+
+        #fab-add { display: none; }
+        @keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+        @media (max-width: 767px) {
+            /* ---- Bouton flottant ---- */
+            #fab-add {
+                display: flex; align-items: center; justify-content: center; position: fixed; z-index: 61;
+                right: 16px; bottom: calc(86px + env(safe-area-inset-bottom)); width: 56px; height: 56px; border-radius: 50%;
+                background: var(--gold-accent); color: #fff; border: 0; box-shadow: 0 8px 22px rgba(0,0,0,.28);
+                transition: transform .15s, opacity .2s; -webkit-tap-highlight-color: transparent;
+            }
+            #fab-add svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; }
+            #fab-add:active { transform: scale(.9); }
+            #fab-add.fab-hide { opacity: 0; pointer-events: none; transform: scale(.6); }
+            #scroll-nav-buttons { bottom: calc(154px + env(safe-area-inset-bottom)) !important; }
+
+            /* ---- Bibliothèque : l'étagère prend toute la largeur, plus de « carte » autour ---- */
+            #bibliotheque-section { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+            #bibliotheque-section .section-label { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 800; letter-spacing: -.02em; text-transform: none; white-space: nowrap; color: var(--deep-black); }
+            html.dark #bibliotheque-section .section-label { color: #F2F0EA; }
+            #bibliotheque-section .flex.items-center.gap-3 > button { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); font-size: 17px; }
+            html.dark #bibliotheque-section .flex.items-center.gap-3 > button { background: #242424; box-shadow: none; }
+            #shelf-filter-toggle-btn span:last-child { display: none; }
+            #shelf-phone-hint { text-transform: none !important; letter-spacing: 0 !important; font-size: 12px !important; font-weight: 600 !important; }
+            #bookcase-container { margin-left: -24px; margin-right: -24px; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }
+
+            /* ---- Fiches : chaque livre est une « page » plein écran, sans carte ---- */
+            .fiche-container { background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 0 30px !important; margin-bottom: 30px !important; border-bottom: 1px solid rgba(0,0,0,.08) !important; scroll-snap-align: start; scroll-margin-top: 70px; }
+            html.dark .fiche-container { border-bottom-color: #2a2a2a !important; }
+            html:has(#section-fiches.active) { scroll-snap-type: y proximity; }
+            .fiche-header-actions { width: 100%; flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; margin: 0 -24px; padding: 2px 24px; width: calc(100% + 48px); }
+            .fiche-header-actions::-webkit-scrollbar { display: none; }
+            .fiche-header-actions > * { flex-shrink: 0; white-space: nowrap; }
+            .fiche-container .cover-box { width: 62% !important; max-width: 230px; margin: 4px auto 6px !important; border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,.22); }
+            .fiche-title, .fiche-author { text-align: center; }
+
+            /* ---- Recherche et filtres : une seule ligne qu'on fait glisser du doigt ---- */
+            #search-bar-container .flex-wrap { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; margin: 0 -24px; padding: 2px 24px 4px; -webkit-overflow-scrolling: touch; }
+            #search-bar-container .flex-wrap::-webkit-scrollbar { display: none; }
+            #search-bar-container .flex-wrap > * { flex-shrink: 0; }
+            #search-bar-container .flex-wrap > span:first-child { display: none; }
+            #search-input { border-radius: 999px; }
+
+            /* ---- Fenêtres : elles montent du bas comme des « feuilles » ---- */
+            #edit-modal, #bulk-import-modal, #goodreads-import-modal, #shelf-settings-modal, #decoration-picker-modal { align-items: flex-end !important; padding: 0 !important; }
+            #edit-modal > div, #bulk-import-modal > div, #goodreads-import-modal > div, #shelf-settings-modal > div, #decoration-picker-modal > div {
+                width: 100% !important; max-width: none !important; max-height: 92vh !important; border-radius: 24px 24px 0 0 !important;
+                padding-bottom: calc(28px + env(safe-area-inset-bottom)) !important; animation: sheetUp .32s cubic-bezier(.2,.8,.2,1);
+            }
+            #edit-modal > div::before, #bulk-import-modal > div::before, #goodreads-import-modal > div::before, #shelf-settings-modal > div::before, #decoration-picker-modal > div::before {
+                content: ""; display: block; width: 42px; height: 4px; border-radius: 2px; background: #d4d4d8; margin: -12px auto 16px;
+            }
+        }
         html { scrollbar-gutter: stable; }
         #bookcase-scaler { transform-origin: top left; }
         .bookshelf-row-wrap { margin-bottom: 22px; }
@@ -1280,6 +1333,7 @@
     </div>
 
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
+        <button id="fab-add" onclick="addNewBookFromLibrary()" aria-label="Ajouter un livre"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
         <nav id="bottom-nav" aria-label="Navigation principale">
             <button id="bn-bibliotheque" class="active" onclick="showSection('bibliotheque', true)"><svg viewBox="0 0 24 24"><path d="M5 4v16M9.5 6v14M14 4v16M18.2 5.4l2.8 13.2M3 20.5h18"/></svg><span data-i18n="nav.libraryShort">Biblio</span></button>
             <button id="bn-stats" onclick="showSection('stats', true)"><svg viewBox="0 0 24 24"><path d="M5 20v-9M12 20V4M19 20v-6"/></svg><span data-i18n="nav.dashboardShort">Stats</span></button>
@@ -4937,8 +4991,11 @@
                 setTimeout(updateBookcaseWidth, 0);
             }
             document.querySelectorAll('#bottom-nav button').forEach(b => b.classList.toggle('active', b.id === 'bn-' + id));
+            document.getElementById('fab-add')?.classList.toggle('fab-hide', id === 'stats' || id === 'compte');
             setTimeout(updateScrollNavButtons, 0);
         };
+
+        ['bottom-nav', 'fab-add'].forEach(id => document.getElementById(id)?.addEventListener('click', () => { if (navigator.vibrate) navigator.vibrate(8); }));
 
         window.goToBibliotheque = () => {
             showSection('bibliotheque', true);
