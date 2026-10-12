@@ -385,6 +385,13 @@
         .filter-select:focus { border-color: var(--gold-accent); }
 
         /* Bulle « livres de la saga » (fiches) */
+
+        .fiche-saga-row { margin-top: 12px; }
+        .saga-chip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(197,160,89,.55); background: rgba(197,160,89,.1); color: #6b6b6b; font-family: 'Cormorant Garamond','Palatino Linotype',Georgia,serif; font-size: 20px; font-style: italic; font-weight: 600; line-height: 1.1; }
+        .saga-chip:hover { text-decoration: none; opacity: 1; background: rgba(197,160,89,.18); }
+        .saga-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .saga-chip-num { flex: none; font-family: 'Inter', sans-serif; font-style: normal; font-size: 11px; font-weight: 800; letter-spacing: .04em; color: #fff; background: var(--gold-accent); border-radius: 999px; padding: 3px 8px; }
+        html.dark .saga-chip { color: #cfcfcf; }
         .saga-trigger { cursor: pointer; transition: opacity .15s; }
         .saga-trigger:hover { opacity: .65; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
         .saga-bubble {
@@ -676,7 +683,7 @@
             .fiche-header-actions > button { flex-shrink: 0; white-space: nowrap; padding: 7px 11px !important; font-size: 9px !important; }
             .fiche-header-actions .fiche-number { margin-left: auto; }
             .fiche-container .cover-box { width: 58% !important; max-width: 220px; margin: 8px auto 10px !important; border-radius: 14px; box-shadow: 0 14px 30px rgba(0,0,0,.2); }
-            .fiche-title, .fiche-author { text-align: center; }
+            .fiche-title, .fiche-author, .fiche-saga-row { text-align: center; }
             .fiche-container .info-grid { margin-top: 24px; }
 
             /* ---- Recherche et filtres : une seule ligne qu'on fait glisser du doigt ---- */
@@ -696,27 +703,43 @@
                 content: ""; display: block; width: 42px; height: 4px; border-radius: 2px; background: #d4d4d8; margin: -12px auto 16px;
             }
         }
-        #shelf-summary, #shelf-recent { display: none; }
+
+        /* ===== Bibliothèque « application » sur téléphone ===== */
+        #shelf-search-wrap { display: none; }
+        #book-sheet { display: none; }
+        @keyframes bsFade { from { opacity: 0; } to { opacity: 1; } }
         @media (max-width: 767px) {
-            #shelf-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 16px; }
-            #shelf-summary .pe-tile { background: #fff; border-radius: 16px; padding: 12px 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
-            #shelf-summary .pe-num { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 800; line-height: 1.1; color: var(--deep-black); }
-            #shelf-summary .pe-lab { margin-top: 3px; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; }
-            html.dark #shelf-summary .pe-tile { background: #1E1E1E; box-shadow: none; }
-            html.dark #shelf-summary .pe-num { color: #F2F0EA; }
-            #shelf-recent { display: block; margin-top: 22px; }
-            #shelf-recent .pe-h { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 800; margin: 0 0 12px; color: var(--deep-black); }
-            html.dark #shelf-recent .pe-h { color: #F2F0EA; }
-            #shelf-recent .pe-row { display: flex; gap: 12px; overflow-x: auto; margin: 0 -24px; padding: 2px 24px 14px; scroll-snap-type: x proximity; scroll-padding-left: 24px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-            #shelf-recent .pe-row::-webkit-scrollbar { display: none; }
-            #shelf-recent .pe-card { flex: 0 0 96px; scroll-snap-align: start; background: none; border: 0; padding: 0; text-align: left; -webkit-tap-highlight-color: transparent; }
-            #shelf-recent .pe-cover { width: 96px; height: 144px; border-radius: 6px 12px 12px 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 8px; box-shadow: 0 8px 18px rgba(0,0,0,.2), inset 4px 0 5px rgba(0,0,0,.2); transition: transform .15s; }
-            #shelf-recent .pe-card:active .pe-cover { transform: scale(.96); }
-            #shelf-recent .pe-cover img { width: 100%; height: 100%; object-fit: cover; margin: -8px; }
-            #shelf-recent .pe-cover.has-img span { display: none; }
-            #shelf-recent .pe-cover span { font: 700 12px 'Fraunces', serif; color: rgba(255,255,255,.93); text-align: center; line-height: 1.15; }
-            #shelf-recent .pe-t { margin-top: 8px; font-size: 11px; font-weight: 700; line-height: 1.25; color: var(--deep-black); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-            html.dark #shelf-recent .pe-t { color: #E5E5E5; }
+            #bibliotheque-section .section-label { font-size: 30px; }
+            #bibliotheque-section .flex.items-center.gap-3 { gap: 10px; }
+            #bibliotheque-section .flex.items-center.gap-3 > button { width: 44px; height: 44px; font-size: 19px; }
+            #shelf-search-wrap { display: block; margin: 2px 0 14px; }
+            #shelf-search { width: 100%; padding: 14px 18px 14px 46px; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.08); font-size: 16px; color: var(--deep-black); outline: none; -webkit-appearance: none; appearance: none;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 16px center; }
+            html.dark #shelf-search { background-color: #1E1E1E; color: #F2F0EA; box-shadow: none; }
+            #shelf-phone-hint { margin-bottom: 14px !important; }
+            .bookshelf-row-wrap { margin-bottom: 30px; }
+            #book-sheet.open { display: block; position: fixed; inset: 0; z-index: 130; }
+            #book-sheet-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.45); animation: bsFade .2s ease; }
+            #book-sheet-panel { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 26px 26px 0 0; padding: 10px 22px calc(24px + env(safe-area-inset-bottom)); box-shadow: 0 -12px 40px rgba(0,0,0,.28); animation: sheetUp .3s cubic-bezier(.2,.8,.2,1); touch-action: none; }
+            html.dark #book-sheet-panel { background: #1E1E1E; }
+            #book-sheet-panel .bs-handle { width: 44px; height: 5px; border-radius: 3px; background: #d4d4d8; margin: 0 auto 18px; }
+            .bs-top { display: flex; gap: 16px; align-items: flex-start; }
+            .bs-cover { flex: none; width: 92px; height: 138px; border-radius: 6px 12px 12px 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 8px; box-shadow: 0 10px 22px rgba(0,0,0,.25), inset 4px 0 5px rgba(0,0,0,.2); }
+            .bs-cover img { width: 100%; height: 100%; object-fit: cover; margin: -8px; }
+            .bs-cover.has-img span { display: none; }
+            .bs-cover span { font: 700 12px 'Fraunces', serif; color: rgba(255,255,255,.93); text-align: center; line-height: 1.15; }
+            .bs-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 800; line-height: 1.12; letter-spacing: -.01em; color: var(--deep-black); }
+            html.dark .bs-title { color: #F2F0EA; }
+            .bs-author { margin-top: 4px; font-size: 13px; font-weight: 700; color: var(--gold-accent); text-transform: uppercase; letter-spacing: .06em; }
+            .bs-stars { margin-top: 10px; display: flex; gap: 2px; }
+            .bs-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 20px; }
+            .bs-meta span { font-size: 11px; font-weight: 700; padding: 6px 11px; border-radius: 999px; background: #f3f4f6; color: #6b7280; }
+            html.dark .bs-meta span { background: #2a2a2a; color: #b5b5b5; }
+            .bs-actions { display: flex; gap: 10px; }
+            .bs-actions button { flex: 1; padding: 15px 10px; border-radius: 16px; border: 0; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+            .bs-actions .bs-primary { flex: 2; background: var(--gold-accent); color: #fff; }
+            .bs-actions .bs-secondary { background: #f3f4f6; color: #4b5563; }
+            html.dark .bs-actions .bs-secondary { background: #2a2a2a; color: #d1d1d1; }
         }
         html { scrollbar-gutter: stable; }
         #bookcase-scaler { transform-origin: top left; }
@@ -1614,7 +1637,8 @@
                         </div>
                     </div>
 
-                    <p id="shelf-phone-hint" class="hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 -mt-2" data-i18n="filters.phoneHint">Fais défiler l'étagère sur le côté · appui long sur un livre pour le déplacer</p>
+                    <p id="shelf-phone-hint" class="hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 -mt-2" data-i18n="filters.phoneHint">Touche un livre pour l'aperçu · appui long pour le déplacer · fais défiler sur le côté</p>
+                    <div id="shelf-search-wrap"><input id="shelf-search" type="search" autocomplete="off" oninput="render()" data-i18n-placeholder="bsheet.searchPlaceholder" placeholder="Rechercher un livre ou un auteur…"></div>
                     <p id="shelf-selection-hint" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 -mt-2" data-i18n="filters.multiSelectHint">Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.</p>
 
                     <div id="shelf-filters-panel" class="hidden flex flex-wrap gap-2 items-center text-xs mb-4 pb-4 border-b border-slate-100">
@@ -1651,10 +1675,8 @@
                         <button onclick="resetShelfFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto" data-i18n="filters.reset">Réinitialiser</button>
                     </div>
 
-                    <div id="shelf-summary"></div>
                     <div id="bookcase-container" class="bookcase"></div>
                     <button onclick="addShelfRow()" class="mt-3 mx-auto flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-gold-accent hover:text-gold-accent transition-colors" data-i18n-title="dash.addRow" title="Ajouter une rangée">+</button>
-                    <div id="shelf-recent"></div>
                 </div>
             </section>
 
@@ -1943,6 +1965,11 @@
         </div>
     </div>
 
+    <div id="book-sheet" aria-hidden="true">
+        <div id="book-sheet-backdrop" onclick="closeBookSheet()"></div>
+        <div id="book-sheet-panel"><div class="bs-handle"></div><div id="book-sheet-body"></div></div>
+    </div>
+
     <div id="decoration-picker-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[120] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -2006,7 +2033,8 @@
         const TRANSLATIONS = {
             fr: {
                 nav: { libraryShort: "Biblio", dashboardShort: "Stats", gridShort: "Grille", fichesShort: "Fiches", dashboard: "Tableau de Bord", grid: "Ma Grille", fiches: "Mes Fiches", library: "Bibliothèque", account: "Compte", logout: "Déconnexion", themeToggle: "Changer de thème" },
-                filters: { phoneHint: "Fais défiler l'étagère sur le côté · appui long sur un livre pour le déplacer", searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", multiSelectBtn: "Sélection", multiSelectHint: "Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.", multiSelectHintActive: "livre(s) sélectionné(s) — glisse-en un pour les déplacer ensemble.", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allFormats: "Tous les formats", allLanguages: "Toutes les langues", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", favoriteBook: "❤️ Livre préféré", myFavorite: "⭐ Mes Favoris", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 À lire", toReadShort: "À LIRE", reset: "Réinitialiser", sortNone: "Ordre habituel", sortSaga: "Par saga (tomes regroupés)", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)", addBook: "+ Ajouter un livre", gridSelectBtn: "☑️ Sélectionner", gridSelectAll: "Tout sélectionner", gridSelectedCount: "{n} sélectionné(s)", gridDeleteSelected: "🗑 Supprimer", gridCancelSelection: "Annuler", emptyFichesTitle: "Aucune fiche pour l'instant", emptyFichesBody: "Commence par ajouter un livre pour voir apparaître sa fiche ici.", emptyFichesBtn: "+ Ajouter mon premier livre" },
+                bsheet: { searchPlaceholder: "Rechercher un livre ou un auteur…", noMatch: "Aucun livre ne correspond à ta recherche.", openFiche: "Ouvrir la fiche", edit: "Modifier", pages: "pages", readOn: "Lu le" },
+                filters: { phoneHint: "Touche un livre pour l'aperçu · appui long pour le déplacer · fais défiler sur le côté", searchPlaceholder: "Recherche rapide (titre, auteur, genre...)", filterBy: "Filtrer par :", toggleBtn: "Filtre", multiSelectBtn: "Sélection", multiSelectHint: "Encadre plusieurs livres à la souris pour les sélectionner, puis glisse-en un pour les déplacer ensemble.", multiSelectHintActive: "livre(s) sélectionné(s) — glisse-en un pour les déplacer ensemble.", allYears: "Toutes les années", allRatings: "Toutes les notes", allGenres: "Tous les genres", allFormats: "Tous les formats", allLanguages: "Toutes les langues", allAuthors: "Tous les auteurs", allMonths: "Tous les mois", allBooks: "Tous les livres", bookOfYear: "👑 Livre de l'année", favoriteBook: "❤️ Livre préféré", myFavorite: "⭐ Mes Favoris", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 À lire", toReadShort: "À LIRE", reset: "Réinitialiser", sortNone: "Ordre habituel", sortSaga: "Par saga (tomes regroupés)", sortDateDesc: "Date de lecture ↓ (récent → ancien)", sortDateAsc: "Date de lecture ↑ (ancien → récent)", sortRatingDesc: "Note ↓ (meilleure → pire)", sortRatingAsc: "Note ↑ (pire → meilleure)", addBook: "+ Ajouter un livre", gridSelectBtn: "☑️ Sélectionner", gridSelectAll: "Tout sélectionner", gridSelectedCount: "{n} sélectionné(s)", gridDeleteSelected: "🗑 Supprimer", gridCancelSelection: "Annuler", emptyFichesTitle: "Aucune fiche pour l'instant", emptyFichesBody: "Commence par ajouter un livre pour voir apparaître sa fiche ici.", emptyFichesBtn: "+ Ajouter mon premier livre" },
                 months: { "01": "Janvier", "02": "Février", "03": "Mars", "04": "Avril", "05": "Mai", "06": "Juin", "07": "Juillet", "08": "Août", "09": "Septembre", "10": "Octobre", "11": "Novembre", "12": "Décembre" },
                 dash: { bookOfYear: "LIVRE DE L'ANNÉE", booksRead: "Livres Lus en", booksReadAll: "Livres Lus", avgRating: "Note Moyenne", min: "min", max: "max", starsOutOf5: "Étoiles sur 5", formatsRead: "Formats Lus", genrePodium: "Podium des Genres", dnfCount: "Livres Abandonnés (DNF)", ofBooks: "des livres", languagesRead: "Langues Lues", authorsRead: "Livres par Auteur", readingPace: "Rythme de lecture (Livres par mois en", readingPaceAll: "Rythme de lecture (Livres par année)", myLibrary: "Ma Bibliothèque", addDecoration: "Ajouter une décoration", shelfSettings: "Réglages de la bibliothèque", addRow: "Ajouter une rangée", allYears: "Toutes les années", noReportAll: "Aucun bilan pour le moment", noReportFor: "Aucun bilan pour", bestBookAll: "MEILLEUR LIVRE", myFavorites: "⭐ Mes Favoris" },
                 account: { backToDashboard: "← Retour au tableau de bord", changePhoto: "Changer la photo", removePhoto: "Retirer la photo", sitePalette: "Palette du site", email: "Email", pseudo: "Pseudo", pseudoPlaceholder: "Choisis un pseudo unique", validatePseudo: "Valider le pseudo", importSectionTitle: "Importer ma bibliothèque", importSectionBody: "Récupère automatiquement tes livres depuis Goodreads (fichier .csv exporté).", changePassword: "Changer le mot de passe", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", validate: "Valider" },
@@ -2095,7 +2123,8 @@
             },
             en: {
                 nav: { libraryShort: "Library", dashboardShort: "Stats", gridShort: "Grid", fichesShort: "Reviews", dashboard: "Dashboard", grid: "My Grid", fiches: "My Reviews", library: "Library", account: "Account", logout: "Log Out", themeToggle: "Switch theme" },
-                filters: { phoneHint: "Scroll the shelf sideways · long-press a book to move it", searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", multiSelectBtn: "Select", multiSelectHint: "Drag a box around several books to select them, then drag one to move them all together.", multiSelectHintActive: "book(s) selected — drag one to move them all together.", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allFormats: "All formats", allLanguages: "All languages", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", favoriteBook: "❤️ Favorite book", myFavorite: "⭐ My Favorites", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 To read", toReadShort: "TO READ", reset: "Reset", sortNone: "Default order", sortSaga: "By series (volumes together)", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)", addBook: "+ Add a book", gridSelectBtn: "☑️ Select", gridSelectAll: "Select all", gridSelectedCount: "{n} selected", gridDeleteSelected: "🗑 Delete", gridCancelSelection: "Cancel", emptyFichesTitle: "No sheets yet", emptyFichesBody: "Start by adding a book to see its sheet appear here.", emptyFichesBtn: "+ Add my first book" },
+                bsheet: { searchPlaceholder: "Search a book or an author…", noMatch: "No book matches your search.", openFiche: "Open sheet", edit: "Edit", pages: "pages", readOn: "Read on" },
+                filters: { phoneHint: "Tap a book for a preview · long-press to move it · scroll sideways", searchPlaceholder: "Quick search (title, author, genre...)", filterBy: "Filter by:", toggleBtn: "Filter", multiSelectBtn: "Select", multiSelectHint: "Drag a box around several books to select them, then drag one to move them all together.", multiSelectHintActive: "book(s) selected — drag one to move them all together.", allYears: "All years", allRatings: "All ratings", allGenres: "All genres", allFormats: "All formats", allLanguages: "All languages", allAuthors: "All authors", allMonths: "All months", allBooks: "All books", bookOfYear: "👑 Book of the year", favoriteBook: "❤️ Favorite book", myFavorite: "⭐ My Favorites", bookClub: "📖 Book Club", dnf: "🚫 DNF", toRead: "📚 To read", toReadShort: "TO READ", reset: "Reset", sortNone: "Default order", sortSaga: "By series (volumes together)", sortDateDesc: "Reading date ↓ (newest → oldest)", sortDateAsc: "Reading date ↑ (oldest → newest)", sortRatingDesc: "Rating ↓ (best → worst)", sortRatingAsc: "Rating ↑ (worst → best)", addBook: "+ Add a book", gridSelectBtn: "☑️ Select", gridSelectAll: "Select all", gridSelectedCount: "{n} selected", gridDeleteSelected: "🗑 Delete", gridCancelSelection: "Cancel", emptyFichesTitle: "No sheets yet", emptyFichesBody: "Start by adding a book to see its sheet appear here.", emptyFichesBtn: "+ Add my first book" },
                 months: { "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June", "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December" },
                 dash: { bookOfYear: "BOOK OF THE YEAR", booksRead: "Books Read in", booksReadAll: "Books Read", avgRating: "Average Rating", min: "min", max: "max", starsOutOf5: "Stars out of 5", formatsRead: "Formats Read", genrePodium: "Genre Podium", dnfCount: "Dropped Books (DNF)", ofBooks: "of books", languagesRead: "Languages Read", authorsRead: "Books per Author", readingPace: "Reading pace (Books per month in", readingPaceAll: "Reading pace (Books per year)", myLibrary: "My Library", addDecoration: "Add a decoration", shelfSettings: "Library settings", addRow: "Add a row", allYears: "All years", noReportAll: "No data yet", noReportFor: "No data for", bestBookAll: "BEST BOOK", myFavorites: "⭐ My Favorites" },
                 account: { backToDashboard: "← Back to dashboard", changePhoto: "Change photo", removePhoto: "Remove photo", sitePalette: "Site palette", email: "Email", pseudo: "Username", pseudoPlaceholder: "Choose a unique username", validatePseudo: "Save username", importSectionTitle: "Import my library", importSectionBody: "Automatically pull in your books from Goodreads (exported .csv file).", changePassword: "Change password", currentPassword: "Current password", newPassword: "New password", validate: "Save" },
@@ -3552,7 +3581,7 @@
                         toggleShelfSelection(item.uid);
                     } else {
                         if (selectedShelfUids.size > 0) { selectedShelfUids.clear(); updateShelfSelectionVisuals(); }
-                        jumpToFiche(item.id);
+                        openBookOrFiche(item.id);
                     }
                 }
                 return;
@@ -3734,7 +3763,9 @@
         function getShelfBooks() {
             const ys = getSel('filter-year-shelf'), as = getSel('filter-author-shelf'), gs = getSel('filter-genre-shelf'),
                   rs = getSel('filter-rating-shelf'), sp = getSel('filter-special-shelf');
+            const sq = (document.getElementById('shelf-search')?.value || '').trim().toLowerCase();
             return library.filter(b => b.title
+                && (!sq || ((b.title || '') + ' ' + (b.author || '')).toLowerCase().includes(sq))
                 && inSel(ys, y => b.end && b.end.includes(y))
                 && inSel(as, a => b.author === a)
                 && inSel(gs, g => b.genre === g)
@@ -3743,32 +3774,14 @@
         }
 
 
-        // Bibliothèque sur téléphone : tuiles de résumé + bandeau « dernières lectures » (masqués sur ordinateur par le CSS)
-        function renderPhoneLibraryExtras() {
-            const sum = document.getElementById('shelf-summary'), rec = document.getElementById('shelf-recent');
-            if (!sum || !rec || !window.matchMedia('(max-width: 767px)').matches) return;
-            const fr = currentLang !== 'en';
-            const esc = (v) => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-            const parse = (v) => { const m = (v || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? new Date(+m[3], +m[2] - 1, +m[1]).getTime() : 0; };
-            const books = library.filter(b => b.title);
-            const year = new Date().getFullYear();
-            const readNow = books.filter(b => !b.isDNF && parse(b.end) && new Date(parse(b.end)).getFullYear() === year).length;
-            const rated = books.filter(b => parseFloat(b.rating) > 0);
-            const avg = rated.length ? (rated.reduce((t, b) => t + parseFloat(b.rating), 0) / rated.length).toFixed(1).replace('.', fr ? ',' : '.') : '–';
-            const tile = (n, l) => `<div class="pe-tile"><div class="pe-num">${n}</div><div class="pe-lab">${l}</div></div>`;
-            sum.innerHTML = tile(books.length, fr ? 'livres' : 'books') + tile(readNow, fr ? `lus en ${year}` : `read in ${year}`) + tile(avg, fr ? 'note moy.' : 'avg rating');
-            const recent = books.filter(b => parse(b.end)).sort((a, b) => parse(b.end) - parse(a.end)).slice(0, 12);
-            const hue = (t) => { let h = 0; for (const ch of t) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
-            rec.innerHTML = recent.length ? `<p class="pe-h">${fr ? 'Dernières lectures' : 'Recently read'}</p><div class="pe-row">` + recent.map(b =>
-                `<button class="pe-card" onclick="jumpToFiche(${b.id})"><div class="pe-cover ${b.cover ? 'has-img' : ''}" style="background:linear-gradient(135deg,hsl(${hue(b.title)} 38% 40%),hsl(${(hue(b.title) + 30) % 360} 40% 22%))">${b.cover ? `<img src="${esc(b.cover)}" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('has-img');this.remove()">` : ''}<span>${esc(b.title)}</span></div><div class="pe-t">${esc(b.title)}</div></button>`).join('') + '</div>' : '';
-        }
-
         function renderShelf(books) {
             const rowElements = Array.from({ length: SHELF_ROW_COUNT }, (_, i) => document.getElementById(`bookshelf-row-${i}`));
             if (!rowElements[0]) return;
 
             if (!books.length) {
-                rowElements[0].innerHTML = '<p class="bookshelf-empty">Ajoute des livres dans Ma Grille pour remplir ton étagère.</p>';
+                rowElements[0].innerHTML = library.some(b => b.title)
+                    ? `<p class="bookshelf-empty">${t('bsheet.noMatch')}</p>`
+                    : '<p class="bookshelf-empty">Ajoute des livres dans Ma Grille pour remplir ton étagère.</p>';
                 rowElements.slice(1).forEach(el => { if (el) el.innerHTML = ''; });
                 renderShelfDecorations();
                 return;
@@ -3809,7 +3822,7 @@
         }
 
         let currentShelfScale = 1;
-        const PHONE_MIN_SHELF_SCALE = 0.5;
+        const PHONE_MIN_SHELF_SCALE = 1.15;   // téléphone : livres plus grands, l'étagère défile sur le côté
         let lastBookcaseClientWidth = 0;
 
         // La barre de défilement de la page peut apparaître APRÈS le calcul de l'échelle, ce qui rétrécit l'étagère
@@ -3853,14 +3866,16 @@
             const naturalHeight = scaler.scrollHeight || scaler.offsetHeight;
             scaler.style.marginRight = '';
             bookcase.classList.remove('bookcase-scroll');
-            if (maxRight > availableWidth && window.matchMedia('(max-width: 767px)').matches && availableWidth / maxRight < PHONE_MIN_SHELF_SCALE) {
-                // Téléphone : on ne réduit pas l'étagère jusqu'à l'illisible, elle défile sur le côté
+            if (window.matchMedia('(max-width: 767px)').matches) {
+                // Téléphone : livres agrandis ; si l'étagère est plus large que l'écran, elle défile sur le côté
                 const scale = PHONE_MIN_SHELF_SCALE;
                 scaler.style.transform = `scale(${scale})`;
                 scaler.style.width = maxRight + 'px';
-                scaler.style.marginRight = -(maxRight * (1 - scale)) + 'px';
                 bookcase.style.height = (naturalHeight * scale + 38) + 'px';
-                bookcase.classList.add('bookcase-scroll');
+                if (maxRight * scale > availableWidth) {
+                    scaler.style.marginRight = (maxRight * (scale - 1)) + 'px';
+                    bookcase.classList.add('bookcase-scroll');
+                }
                 currentShelfScale = scale;
                 return;
             }
@@ -4684,7 +4699,6 @@
 
             updateChart(statLib, isAllYears);
             renderShelf(getShelfBooks());
-            renderPhoneLibraryExtras();
 
             // HTML GRILLE
             const nextEmptyBook = library.find(b => !b.title);
@@ -4753,10 +4767,10 @@
                             ${book.cover ? `<img src="${book.cover}" referrerpolicy="no-referrer" class="w-full h-full object-cover ${book.isDNF ? 'grayscale opacity-50' : (book.isToRead ? 'saturate-[.35] brightness-95' : '')}">` : `<span class="text-slate-100 font-black text-6xl">?</span>`}
                         </div>
                         <div class="flex-1">
-                            <div class="relative mb-[30px]">
+                            <div class="relative mb-6">
                                 <h2 class="fiche-title">${book.title || 'SANS TITRE'}</h2>
                                 <h3 class="fiche-author !mb-0">${book.author || 'AUTEUR INCONNU'}</h3>
-                                ${book.saga ? `<div class="saga-trigger absolute right-2 md:right-10 lg:right-16 max-w-[55%]" onclick="openSagaBubble(${book.id}, event)" title="Voir tous les livres de la saga" style="font-family:'Cormorant Garamond','Palatino Linotype',Georgia,serif;font-size:30px;font-weight:500;font-style:italic;color:#8a8a8a;top:100%;height:30px;line-height:30px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${book.saga}${parseInt(book.sagaNum, 10) ? ` <span style="font-weight:700;color:var(--gold-accent)">#${parseInt(book.sagaNum, 10)}</span>` : ''}</div>` : ''}
+                                ${book.saga ? `<div class="fiche-saga-row"><button type="button" class="saga-trigger saga-chip" onclick="openSagaBubble(${book.id}, event)" title="Voir tous les livres de la saga"><span class="saga-chip-name">${book.saga}</span>${parseInt(book.sagaNum, 10) ? `<span class="saga-chip-num">#${parseInt(book.sagaNum, 10)}</span>` : ''}</button></div>` : ''}
                             </div>
                             <div class="mb-6">
                                 <p class="section-label">Note :</p>
@@ -4972,10 +4986,60 @@
             btn.classList.toggle('text-gold-accent', isHidden);
         };
 
+
+        // Téléphone : toucher un livre de l'étagère ouvre un aperçu (feuille du bas) ; sur ordinateur, la fiche s'ouvre directement
+        window.openBookOrFiche = (id) => {
+            if (window.matchMedia('(max-width: 767px)').matches) openBookSheet(id); else jumpToFiche(id);
+        };
+        window.closeBookSheet = () => {
+            const sh = document.getElementById('book-sheet');
+            sh.classList.remove('open'); sh.setAttribute('aria-hidden', 'true');
+            document.getElementById('book-sheet-panel').style.transform = '';
+        };
+        window.openBookSheet = (id) => {
+            const b = library.find(x => x.id === id);
+            if (!b || !b.title) return;
+            const esc = (v) => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+            const hue = (tx) => { let h = 0; for (const ch of tx) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
+            const sagaNum = parseInt(b.sagaNum, 10);
+            const chips = [];
+            if (b.pages) chips.push(`${b.pages} ${t('bsheet.pages')}`);
+            if (b.year) chips.push(esc(b.year));
+            if (b.format && b.format !== '-') chips.push(esc(b.format));
+            if (b.genre) chips.push(esc(b.genre));
+            if (b.end) chips.push(`${t('bsheet.readOn')} ${esc(b.end)}`);
+            document.getElementById('book-sheet-body').innerHTML = `
+                <div class="bs-top">
+                    <div class="bs-cover ${b.cover ? 'has-img' : ''}" style="background:linear-gradient(135deg,hsl(${hue(b.title)} 38% 40%),hsl(${(hue(b.title) + 30) % 360} 40% 22%))">${b.cover ? `<img src="${esc(b.cover)}" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('has-img');this.remove()">` : ''}<span>${esc(b.title)}</span></div>
+                    <div style="min-width:0">
+                        <div class="bs-title">${esc(b.title)}</div>
+                        <div class="bs-author">${esc(b.author || '')}</div>
+                        <div class="bs-stars">${getRatingOrDnfHtml(b, 'text-xl')}</div>
+                        ${b.saga ? `<span class="saga-chip" style="margin-top:10px;font-size:16px;padding:4px 12px"><span class="saga-chip-name">${esc(b.saga)}</span>${sagaNum ? `<span class="saga-chip-num">#${sagaNum}</span>` : ''}</span>` : ''}
+                    </div>
+                </div>
+                ${chips.length ? `<div class="bs-meta">${chips.map(c => `<span>${c}</span>`).join('')}</div>` : '<div style="height:18px"></div>'}
+                <div class="bs-actions">
+                    <button class="bs-secondary" onclick="closeBookSheet(); openEdit(${b.id})">${t('bsheet.edit')}</button>
+                    <button class="bs-primary" onclick="closeBookSheet(); jumpToFiche(${b.id})">${t('bsheet.openFiche')}</button>
+                </div>`;
+            const sh = document.getElementById('book-sheet');
+            sh.classList.add('open'); sh.setAttribute('aria-hidden', 'false');
+        };
+        (function () {   // glisser la feuille vers le bas pour la fermer
+            const panel = document.getElementById('book-sheet-panel');
+            if (!panel) return;
+            let y0 = null;
+            panel.addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; }, { passive: true });
+            panel.addEventListener('touchmove', (e) => { if (y0 === null) return; const dy = e.touches[0].clientY - y0; if (dy > 0) panel.style.transform = `translateY(${dy}px)`; }, { passive: true });
+            panel.addEventListener('touchend', (e) => { if (y0 === null) return; const dy = e.changedTouches[0].clientY - y0; y0 = null; if (dy > 90) closeBookSheet(); else panel.style.transform = ''; });
+        })();
+
         window.resetShelfFilters = () => {
             ['filter-year-shelf', 'filter-author-shelf', 'filter-genre-shelf', 'filter-rating-shelf', 'filter-special-shelf'].forEach(id => {
                 clearMS(id);
             });
+            const sq = document.getElementById('shelf-search'); if (sq) sq.value = '';
             render();
         };
 
