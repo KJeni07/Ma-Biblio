@@ -1200,12 +1200,36 @@
   #edit-modal .nool-fiche-actions { max-width: 100%; }
 }
 
+/* Alignement du calendrier au centre exact du champ, sur mobile et ordinateur. */
+.nool-date-field { position:relative; }
+.nool-date-field .nool-calendar-button {
+  position:absolute; top:50%; right:10px; transform:translateY(-50%);
+  display:flex; align-items:center; justify-content:center;
+  width:36px; height:36px; padding:0; margin:0; line-height:1;
+  font-size:19px; border:0; background:transparent; z-index:1;
+}
+.nool-date-field .nool-native-date-picker { right:10px; top:50%; transform:translateY(-50%); width:36px; height:36px; }
+.nool-date-field > .modal-input { padding-right:54px !important; }
+@media(max-width:767px) {
+ .nool-date-field .nool-calendar-button {right:8px; width:44px; height:44px;}
+ .nool-date-field .nool-native-date-picker {right:8px; width:44px; height:44px;}
+}
 /* Calendrier iOS/Android : le vrai champ date doit recevoir le toucher. */
 .nool-native-date-picker { position:absolute; right:8px; top:50%; transform:translateY(-50%); width:38px; height:38px; opacity:0; z-index:2; cursor:pointer; }
 @media (max-width:767px) {
-  .nool-native-date-picker { width:48px; height:48px; right:0; opacity:0.015; pointer-events:auto; }
+  .nool-native-date-picker { width:44px; height:44px; right:8px; opacity:0.015; pointer-events:auto; }
   .nool-native-date-picker::-webkit-calendar-picker-indicator { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
   .nool-native-date-picker + * { pointer-events:none; }
+}
+
+/* Didacticiel : accès tactile et positionnement stable */
+#mobile-tutorial-help { display:none; }
+@media (max-width:767px) {
+  #mobile-tutorial-help { display:flex; align-items:center; justify-content:center; position:fixed; right:14px; bottom:calc(82px + env(safe-area-inset-bottom)); width:42px; height:42px; border-radius:50%; background:var(--deep-black,#181818); color:#fff; border:1px solid var(--gold-accent,#c5a059); font-size:20px; font-weight:700; z-index:70; box-shadow:0 4px 16px #0003; }
+  #mobile-tutorial-help.tutorial-running { display:none; }
+  #tutorial-tooltip { width:calc(100vw - 32px); max-width:340px!important; box-sizing:border-box; }
+  #tutorial-tooltip > div { padding:16px!important; }
+  #tutorial-prev-btn, #tutorial-next-btn { min-height:42px; }
 }
 </style>
 </head>
@@ -1551,6 +1575,7 @@
             <button id="bn-grille" onclick="showSection('grille', true)"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg><span data-i18n="nav.gridShort">Grille</span></button>
             <button id="bn-fiches" onclick="showSection('fiches', true)"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg><span data-i18n="nav.fichesShort">Fiches</span></button>
         </nav>
+        <button id="mobile-tutorial-help" type="button" onclick="openTutorial(false)" aria-label="Revoir le didacticiel" title="Revoir le didacticiel">?</button>
         
         <div id="app-header" class="sticky top-0 z-50 bg-[#FAF9F6]/95 backdrop-blur-md shadow-sm border-b border-slate-100">
             <div class="max-w-6xl mx-auto px-6 py-4">
@@ -2066,17 +2091,17 @@
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.start">Début (ex: 01/05/2025)</label>
-                    <div class="relative">
+                    <div class="relative nool-date-field">
                         <input id="in-start" class="modal-input pr-10" placeholder="JJ/MM/AAAA">
-                        <button type="button" onclick="openDatePicker('in-start')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gold-accent" title="Choisir une date">📅</button>
+                        <button type="button" onclick="openDatePicker('in-start')" class="nool-calendar-button text-gray-400 hover:text-gold-accent" title="Choisir une date">📅</button>
                         <input type="date" id="in-start-picker" aria-label="Choisir une date" class="nool-native-date-picker" onchange="applyPickedDate('in-start', this.value)">
                     </div>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block" data-i18n="editModal.end">Fin (ex: 15/05/2025)</label>
-                    <div class="relative">
+                    <div class="relative nool-date-field">
                         <input id="in-end" class="modal-input pr-10" placeholder="JJ/MM/AAAA">
-                        <button type="button" onclick="openDatePicker('in-end')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gold-accent" title="Choisir une date">📅</button>
+                        <button type="button" onclick="openDatePicker('in-end')" class="nool-calendar-button text-gray-400 hover:text-gold-accent" title="Choisir une date">📅</button>
                         <input type="date" id="in-end-picker" aria-label="Choisir une date" class="nool-native-date-picker" onchange="applyPickedDate('in-end', this.value)">
                     </div>
                 </div>
@@ -4346,66 +4371,64 @@
         function positionTutorial() {
             const slides = t('tutorial.slides');
             const slide = slides[tutorialStep];
-            const targetEl = document.querySelector(slide.target);
             const spotlight = document.getElementById('tutorial-spotlight');
             const tooltip = document.getElementById('tutorial-tooltip');
-
-            if (!targetEl) { spotlight.classList.add('hidden'); return; }
-
-            const pad = 8;
-            const rect = targetEl.getBoundingClientRect();
-            if (rect.width === 0 || rect.height === 0) { spotlight.classList.add('hidden'); return; }
-            spotlight.style.top = (rect.top - pad) + 'px';
-            spotlight.style.left = (rect.left - pad) + 'px';
-            spotlight.style.width = (rect.width + pad * 2) + 'px';
-            spotlight.style.height = (rect.height + pad * 2) + 'px';
-            spotlight.classList.remove('hidden');
-
-            const tooltipRect = tooltip.getBoundingClientRect();
-            const margin = 16;
-            const header = document.querySelector('.sticky.top-0');
-            const topFloor = Math.max(margin, header ? header.getBoundingClientRect().bottom + 8 : margin);
-            let top = rect.bottom + pad + margin;
-            if (top + tooltipRect.height > window.innerHeight - margin) {
-                top = rect.top - pad - margin - tooltipRect.height;
+            const vw = document.documentElement.clientWidth;
+            const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const margin = 12;
+            const targetEl = document.querySelector(slide.target);
+            const rect = targetEl && targetEl.getBoundingClientRect();
+            const valid = rect && rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < vh;
+            if (valid) {
+                const pad = 5;
+                const x = Math.max(4, rect.left - pad), y = Math.max(4, rect.top - pad);
+                spotlight.style.left = x + 'px';
+                spotlight.style.top = y + 'px';
+                spotlight.style.width = Math.min(vw - x - 4, rect.width + pad * 2) + 'px';
+                spotlight.style.height = Math.min(vh - y - 4, rect.height + pad * 2) + 'px';
+                spotlight.classList.remove('hidden');
+            } else {
+                spotlight.classList.add('hidden');
             }
-            if (top < topFloor) top = topFloor;
-
-            let left = rect.left + rect.width / 2 - tooltipRect.width / 2;
-            left = Math.max(margin, Math.min(window.innerWidth - tooltipRect.width - margin, left));
-
-            tooltip.style.top = top + 'px';
+            const tw = tooltip.offsetWidth || Math.min(300, vw - 24);
+            const th = tooltip.offsetHeight || 200;
+            let left = valid ? rect.left + rect.width / 2 - tw / 2 : (vw - tw) / 2;
+            left = Math.max(margin, Math.min(vw - tw - margin, left));
+            let top = valid ? rect.bottom + 14 : (vh - th) / 2;
+            if (top + th > vh - margin) top = valid ? rect.top - th - 14 : (vh - th) / 2;
+            top = Math.max(margin, Math.min(vh - th - margin, top));
             tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
         }
 
         async function renderTutorialStep() {
             const slides = t('tutorial.slides');
             const step = Math.max(0, Math.min(slides.length - 1, tutorialStep));
             const slide = slides[step];
-
             if (slide.section) showSection(slide.section);
-
             document.getElementById('tutorial-icon').innerText = slide.icon;
             document.getElementById('tutorial-title').innerText = slide.title;
             document.getElementById('tutorial-body').innerText = slide.body;
             document.getElementById('tutorial-step-count').innerText = t('tutorial.stepCount').replace('{n}', step + 1).replace('{total}', slides.length);
-
             document.getElementById('tutorial-prev-btn').classList.toggle('invisible', step === 0);
             const isLast = step === slides.length - 1;
             document.getElementById('tutorial-next-btn').innerText = isLast ? t('tutorial.finish') : t('tutorial.next');
             document.getElementById('tutorial-skip-btn').classList.toggle('hidden', isLast);
-
-            // Laisse le temps à la section de s'afficher et au ciblage de se stabiliser avant de mesurer
-            await new Promise(r => setTimeout(r, 60));
-            const targetEl = document.querySelector(slide.target);
-            if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: slide.scrollBlock || 'center' });
-            await new Promise(r => setTimeout(r, 220));
+            // Attendre le rendu réel de la section avant de mesurer la cible.
+            await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+            let targetEl = document.querySelector(slide.target);
+            if (targetEl && targetEl.getBoundingClientRect().width && targetEl.getBoundingClientRect().height) {
+                targetEl.scrollIntoView({ behavior:'instant', block:slide.scrollBlock || 'center', inline:'nearest' });
+            }
+            await new Promise(r => setTimeout(r, 110));
             positionTutorial();
+            setTimeout(positionTutorial, 320);
         }
 
         window.openTutorial = (isOnboarding) => {
             tutorialIsOnboarding = !!isOnboarding;
             tutorialStep = 0;
+            document.getElementById('mobile-tutorial-help')?.classList.add('tutorial-running');
             document.getElementById('tutorial-blocker').classList.remove('hidden');
             document.getElementById('tutorial-tooltip').classList.remove('hidden');
             renderTutorialStep();
@@ -4429,6 +4452,7 @@
         };
 
         window.closeTutorial = async () => {
+            document.getElementById('mobile-tutorial-help')?.classList.remove('tutorial-running');
             document.getElementById('tutorial-blocker').classList.add('hidden');
             document.getElementById('tutorial-spotlight').classList.add('hidden');
             document.getElementById('tutorial-tooltip').classList.add('hidden');
