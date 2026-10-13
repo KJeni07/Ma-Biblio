@@ -1066,6 +1066,13 @@
             .bookshelf-row-wrap { margin-bottom: 16px !important; }
         }
 
+        /* Le rectangle de sélection de l'étagère est fixe : sur iPhone il peut
+           laisser un segment doré à l'écran après un défilement tactile. */
+        @media (max-width: 767px) {
+            #shelf-marquee { display: none !important; }
+            body:not(:has(#section-bibliotheque.active)) .shelf-tooltip { display: none !important; }
+        }
+
         /* Correctifs téléphone : défilement libre des fiches et suppression du trait parasite */
         @media (max-width: 767px) {
             html:has(#section-fiches.active) { scroll-snap-type: none !important; }
@@ -5123,6 +5130,12 @@
         };
 
         window.showSection = (id, forceScrollTop = false) => {
+            // Nettoyage des éléments temporaires de l'étagère avant de changer de vue.
+            if (window.innerWidth <= 767px) {
+                document.getElementById('shelf-marquee')?.remove();
+                document.querySelectorAll('.shelf-tooltip').forEach(el => el.remove());
+            }
+
             if(forceScrollTop || (window.innerWidth <= 767 && id === 'fiches')) window.scrollTo({top: 0, behavior: 'instant'});
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
