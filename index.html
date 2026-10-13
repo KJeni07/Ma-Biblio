@@ -1065,6 +1065,15 @@
             #shelf-search-wrap { margin: 0 0 10px !important; }
             .bookshelf-row-wrap { margin-bottom: 16px !important; }
         }
+
+        /* Correctifs téléphone : défilement libre des fiches et suppression du trait parasite */
+        @media (max-width: 767px) {
+            html:has(#section-fiches.active) { scroll-snap-type: none !important; }
+            #section-fiches .fiche-container { scroll-snap-align: none !important; }
+            #section-fiches #fiches-content { padding-bottom: calc(115px + env(safe-area-inset-bottom)); }
+            #stats-cards-row .stat-card { position: relative; }
+            #stats-cards-row .stat-card::before, #stats-cards-row .stat-card::after { content: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -1398,7 +1407,7 @@
 
     <div id="scroll-nav-buttons" class="hidden">
         <button id="scroll-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="scroll-nav-btn" title="Haut de page">↑</button>
-        <button id="scroll-bottom-btn" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="scroll-nav-btn" title="Bas de page">↓</button>
+        <button id="scroll-bottom-btn" onclick="window.scrollTo({top: document.documentElement.scrollHeight, behavior: 'smooth'})" class="scroll-nav-btn" title="Bas de page">↓</button>
     </div>
 
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-700">
@@ -4465,11 +4474,12 @@
             const bottomBtn = document.getElementById('scroll-bottom-btn');
             if (!appEl || !nav || !topBtn || !bottomBtn) return;
             const appVisible = !appEl.classList.contains('hidden');
-            const scrollable = document.body.scrollHeight > window.innerHeight + 250;
+            const pageHeight = document.documentElement.scrollHeight;
+            const scrollable = pageHeight > window.innerHeight + 250;
             nav.classList.toggle('hidden', !appVisible || !scrollable);
             if (!scrollable) return;
             const nearTop = window.scrollY < 150;
-            const nearBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 150;
+            const nearBottom = (window.innerHeight + window.scrollY) >= pageHeight - 150;
             topBtn.classList.toggle('disabled', nearTop);
             bottomBtn.classList.toggle('disabled', nearBottom);
         }
@@ -5113,7 +5123,7 @@
         };
 
         window.showSection = (id, forceScrollTop = false) => {
-            if(forceScrollTop) window.scrollTo({top: 0});
+            if(forceScrollTop || (window.innerWidth <= 767 && id === 'fiches')) window.scrollTo({top: 0, behavior: 'instant'});
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
