@@ -1199,6 +1199,14 @@
   #edit-modal .nool-fiche-header { width: auto !important; }
   #edit-modal .nool-fiche-actions { max-width: 100%; }
 }
+
+/* Calendrier iOS/Android : le vrai champ date doit recevoir le toucher. */
+.nool-native-date-picker { position:absolute; right:8px; top:50%; transform:translateY(-50%); width:38px; height:38px; opacity:0; z-index:2; cursor:pointer; }
+@media (max-width:767px) {
+  .nool-native-date-picker { width:48px; height:48px; right:0; opacity:0.015; pointer-events:auto; }
+  .nool-native-date-picker::-webkit-calendar-picker-indicator { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+  .nool-native-date-picker + * { pointer-events:none; }
+}
 </style>
 </head>
 <body>
@@ -2061,7 +2069,7 @@
                     <div class="relative">
                         <input id="in-start" class="modal-input pr-10" placeholder="JJ/MM/AAAA">
                         <button type="button" onclick="openDatePicker('in-start')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gold-accent" title="Choisir une date">📅</button>
-                        <input type="date" id="in-start-picker" class="absolute opacity-0 w-0 h-0 pointer-events-none" onchange="applyPickedDate('in-start', this.value)">
+                        <input type="date" id="in-start-picker" aria-label="Choisir une date" class="nool-native-date-picker" onchange="applyPickedDate('in-start', this.value)">
                     </div>
                 </div>
                 <div>
@@ -2069,7 +2077,7 @@
                     <div class="relative">
                         <input id="in-end" class="modal-input pr-10" placeholder="JJ/MM/AAAA">
                         <button type="button" onclick="openDatePicker('in-end')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gold-accent" title="Choisir une date">📅</button>
-                        <input type="date" id="in-end-picker" class="absolute opacity-0 w-0 h-0 pointer-events-none" onchange="applyPickedDate('in-end', this.value)">
+                        <input type="date" id="in-end-picker" aria-label="Choisir une date" class="nool-native-date-picker" onchange="applyPickedDate('in-end', this.value)">
                     </div>
                 </div>
             </div>
@@ -5433,7 +5441,7 @@
             const picker = document.getElementById(fieldId + '-picker');
             const m = normalizeDateInput(textVal || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
             if (m) picker.value = `${m[3]}-${m[2]}-${m[1]}`;
-            if (picker.showPicker) picker.showPicker(); else picker.click();
+            try { if (typeof picker.showPicker === 'function') picker.showPicker(); else { picker.focus(); picker.click(); } } catch (e) { picker.focus(); picker.click(); }
         };
 
         window.applyPickedDate = (fieldId, isoValue) => {
