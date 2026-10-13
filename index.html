@@ -1095,6 +1095,59 @@
         @media (max-width: 767px) {
             #shelf-marquee { display: none !important; }
         }
+    
+        /* Nool : commandes de décorations adaptées aux écrans tactiles.
+           Desktop inchangé. */
+        @media (max-width: 767px) {
+            .shelf-decoration .decoration-resize {
+                width: 32px; height: 32px; top: -16px; left: -16px;
+                font-size: 17px; opacity: 1; z-index: 12;
+                box-shadow: 0 2px 9px rgba(0,0,0,.3);
+                touch-action: manipulation !important;
+            }
+            /* Sur téléphone, afficher la commande uniquement après sélection de l'objet. */
+            .shelf-decoration .decoration-resize,
+            .shelf-decoration:hover .decoration-resize,
+            .shelf-decoration:focus-within .decoration-resize {
+                opacity: 0 !important;
+                visibility: hidden;
+                pointer-events: none;
+            }
+            .shelf-decoration.deco-size-selected .decoration-resize,
+            .shelf-decoration.deco-size-selected:focus-within .decoration-resize {
+                opacity: 1 !important;
+                visibility: visible;
+                pointer-events: auto;
+            }
+            .shelf-decoration .decoration-remove,
+            .shelf-decoration .decoration-edit-photo {
+                min-width: 30px; min-height: 30px;
+                touch-action: manipulation !important;
+            }
+            #deco-size-panel {
+                position: fixed; left: 0; right: 0; bottom: 0; top: auto;
+                transform: none; width: 100%; max-width: none;
+                box-sizing: border-box; border-radius: 22px 22px 0 0;
+                border-left: 0; border-right: 0; border-bottom: 0;
+                padding: 18px 20px calc(24px + env(safe-area-inset-bottom));
+                z-index: 200; box-shadow: 0 -12px 42px rgba(0,0,0,.42);
+            }
+            #deco-size-panel input[type="range"] {
+                display: block; width: 100%; height: 38px; margin: 10px 0;
+                touch-action: pan-x; cursor: pointer;
+            }
+            #deco-size-panel button {
+                min-height: 44px; min-width: 44px;
+                touch-action: manipulation;
+            }
+            #deco-size-panel > div:last-child { gap: 12px; }
+            #deco-size-panel > div:last-child button { flex: 1; }
+            body:has(#deco-size-panel:not([hidden])) #fab-add,
+            body:has(#deco-size-panel:not([hidden])) #scroll-nav-buttons {
+                pointer-events: none; opacity: 0;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -3102,9 +3155,24 @@
                     el.addEventListener('dragstart', e => e.preventDefault());
                     el.querySelectorAll('img').forEach(img => { img.draggable = false; img.addEventListener('dragstart', e => e.preventDefault()); if (img.classList.contains('decoration-ai-img')) fitGeneratedDecoration(img); });
                     initShelfDrag(el, { id, kind: 'decoration' }, 'decoration');
+                    // Un appui simple sélectionne l'objet sur mobile ; le glissement reste géré par initShelfDrag.
+                    el.addEventListener('click', event => {
+                        if (!window.matchMedia('(max-width: 767px)').matches) return;
+                        if (event.target.closest('button')) return;
+                        const alreadySelected = el.classList.contains('deco-size-selected');
+                        document.querySelectorAll('.shelf-decoration.deco-size-selected').forEach(node => node.classList.remove('deco-size-selected'));
+                        if (!alreadySelected) el.classList.add('deco-size-selected');
+                    });
                 }
             });
         }
+
+        // Toucher ailleurs referme la commande de redimensionnement sur mobile.
+        document.addEventListener('click', event => {
+            if (!window.matchMedia('(max-width: 767px)').matches) return;
+            if (event.target.closest('.shelf-decoration, #deco-size-panel')) return;
+            document.querySelectorAll('.shelf-decoration.deco-size-selected').forEach(node => node.classList.remove('deco-size-selected'));
+        });
 
         function hashColor(str) {
             let hash = 0;
