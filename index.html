@@ -1185,6 +1185,20 @@
   html.dark #edit-modal .nool-fiche-actions { background: #1e1e1e; border-color: #383838; }
   html.dark #edit-modal .nool-fiche-autofill { background: #272727 !important; border-color: #444 !important; }
 }
+
+/* Correctif mobile : aucune dérive horizontale dans la fiche. */
+@media (max-width: 767px) {
+  #edit-modal { width: 100% !important; max-width: 100% !important; overflow-x: clip !important; }
+  #edit-modal > div { width: 100% !important; min-width: 0 !important; max-width: 100% !important; overflow-x: hidden !important; overscroll-behavior-x: none; }
+  #edit-modal > div *, #edit-modal > div *::before, #edit-modal > div *::after { box-sizing: border-box; }
+  #edit-modal > div .grid, #edit-modal > div .flex { min-width: 0; max-width: 100%; }
+  #edit-modal > div .grid > *, #edit-modal > div .flex > * { min-width: 0; }
+  #edit-modal input:not([type="checkbox"]):not([type="radio"]),
+  #edit-modal textarea, #edit-modal select, #edit-modal .modal-input { max-width: 100% !important; min-width: 0 !important; }
+  #edit-modal img, #edit-modal video, #edit-modal canvas { max-width: 100%; }
+  #edit-modal .nool-fiche-header { width: auto !important; }
+  #edit-modal .nool-fiche-actions { max-width: 100%; }
+}
 </style>
 </head>
 <body>
