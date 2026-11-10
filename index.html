@@ -1267,7 +1267,61 @@
   #tutorial-tooltip > div { padding:16px!important; }
   #tutorial-prev-btn, #tutorial-next-btn { min-height:42px; }
 }
-</style>
+
+        /* Nool — bibliothèque tactile : présentation type application, téléphone uniquement. */
+        @media (max-width: 767px) {
+          #section-bibliotheque { padding-top: 4px; }
+          #bibliotheque-section { padding: 0 !important; }
+          #bibliotheque-section > .flex:first-child { align-items: center; margin-bottom: 15px !important; gap: 10px; }
+          #bibliotheque-section .section-label { font-family: 'Fraunces', Georgia, serif; font-size: clamp(23px, 6vw, 29px) !important; letter-spacing: -.045em; line-height: 1.1; }
+          #bibliotheque-section .flex.items-center.gap-3 { gap: 8px !important; flex-shrink: 0; }
+          #bibliotheque-section .flex.items-center.gap-3 > button {
+            width: 42px !important; height: 42px !important; flex: 0 0 42px;
+            border-radius: 14px !important; border: 1px solid rgba(197,160,89,.24) !important;
+            background: #fff !important; color: #806331 !important; font-size: 18px !important;
+            box-shadow: 0 3px 12px rgba(36,27,10,.045) !important;
+            transition: background .15s, transform .15s;
+          }
+          #bibliotheque-section .flex.items-center.gap-3 > button:active { transform: scale(.94); background: #f5ead4 !important; }
+          #shelf-filter-toggle-btn span:first-child { font-size: 19px; }
+          #shelf-search-wrap { position: relative; margin: 0 0 12px !important; }
+          #shelf-search { min-height: 48px; border: 1px solid rgba(197,160,89,.18) !important;
+            border-radius: 16px !important; box-shadow: 0 4px 16px rgba(35,29,19,.045) !important;
+            font-size: 14px !important; padding-top: 12px !important; padding-bottom: 12px !important;
+          }
+          #shelf-phone-hint { margin: 0 0 14px !important; padding: 9px 12px;
+            border-radius: 12px; background: rgba(197,160,89,.09);
+            color: #856f4b !important; font-size: 10px !important; font-weight: 650 !important;
+            line-height: 1.55 !important; text-transform: none !important; letter-spacing: 0 !important;
+          }
+          #shelf-filters-panel:not(.hidden) { display: flex; flex-wrap: nowrap; overflow-x: auto;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 8px; padding: 3px 1px 12px;
+            margin-bottom: 13px; border-bottom: 0; align-items: center;
+          }
+          #shelf-filters-panel::-webkit-scrollbar { display: none; }
+          #shelf-filters-panel > * { flex: 0 0 auto; }
+          #shelf-filters-panel select { max-width: 190px; border-radius: 13px !important;
+            min-height: 40px; font-size: 12px !important; background-color: #fff; }
+          #shelf-filters-panel > button { margin-left: 4px !important; min-height: 40px;
+            padding: 0 9px; white-space: nowrap; }
+          #bookcase-container { margin: 0 !important; width: 100%; padding: 15px 10px 9px !important;
+            border-radius: 20px !important; border: 1px solid rgba(92,59,25,.22) !important;
+            box-shadow: 0 10px 28px rgba(52,33,15,.12), inset 0 2px 9px rgba(0,0,0,.1) !important;
+          }
+          #bibliotheque-section > button[onclick="addShelfRow()"] { margin-top: 14px !important;
+            width: auto !important; min-width: 146px; height: 40px !important; padding: 0 16px;
+            border: 1px solid rgba(197,160,89,.4) !important; border-radius: 999px !important;
+            background: rgba(197,160,89,.10); color: #9b793c !important;
+            font-size: 21px; font-weight: 700;
+          }
+          html.dark #bibliotheque-section .flex.items-center.gap-3 > button { background: #252525 !important; color: #d6b574 !important; border-color: #423722 !important; }
+          html.dark #shelf-search { background-color: #202020 !important; border-color: #373024 !important; box-shadow: none !important; }
+          html.dark #shelf-phone-hint { background: rgba(197,160,89,.12); color: #c9af7d !important; }
+          html.dark #shelf-filters-panel select { background-color: #222 !important; }
+          html.dark #bibliotheque-section > button[onclick="addShelfRow()"] { background: rgba(197,160,89,.13); color: #d6b574 !important; }
+        }
+
+    </style>
 </head>
 <body>
 
