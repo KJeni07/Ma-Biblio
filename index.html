@@ -429,33 +429,41 @@
         html.dark .ms-item:hover { background: #2a2a2a; }
         html.dark .ms-clear { border-bottom-color: #2f2f2f; }
 
-        /* Filtres multisélection : sur téléphone, liste lisible en feuille au-dessus de la navigation. */
+        /* Sur téléphone : menu contextuel ancré au filtre, comme le menu de tri iOS. */
         @media (max-width: 767px) {
             .ms-panel.ms-mobile-open {
                 position: fixed !important;
-                top: auto !important;
-                left: 12px !important;
-                right: 12px !important;
-                bottom: calc(12px + env(safe-area-inset-bottom)) !important;
-                width: auto !important;
-                min-width: 0 !important;
-                max-width: none !important;
+                right: auto !important;
+                bottom: auto !important;
+                width: max-content !important;
+                min-width: 230px !important;
+                max-width: calc(100vw - 24px) !important;
                 max-height: min(65dvh, 480px) !important;
                 overflow-y: auto !important;
                 overscroll-behavior: contain;
                 z-index: 220 !important;
-                padding: 12px !important;
-                border-radius: 20px !important;
-                box-shadow: 0 0 0 100vmax rgba(0,0,0,.38), 0 12px 40px rgba(0,0,0,.25) !important;
+                padding: 6px !important;
+                border-radius: 15px !important;
+                background: rgba(248,248,250,.97) !important;
+                border: 1px solid rgba(120,120,130,.24) !important;
+                box-shadow: 0 14px 35px rgba(0,0,0,.28) !important;
+                -webkit-backdrop-filter: blur(18px);
+                backdrop-filter: blur(18px);
                 -webkit-overflow-scrolling: touch;
             }
+            html.dark .ms-panel.ms-mobile-open {
+                background: rgba(43,43,46,.97) !important;
+                border-color: rgba(255,255,255,.1) !important;
+            }
             .ms-panel.ms-mobile-open .ms-item {
-                min-height: 46px;
-                padding: 11px 12px;
-                font-size: 14px;
+                min-height: 45px;
+                padding: 10px 12px;
+                font-size: 15px;
                 white-space: normal;
                 overflow-wrap: anywhere;
+                border-bottom: 1px solid rgba(130,130,130,.16);
             }
+            .ms-panel.ms-mobile-open .ms-item:last-child { border-bottom: 0; }
             .ms-panel.ms-mobile-open .ms-item input { width: 19px; height: 19px; }
             .ms-panel.ms-mobile-open .ms-clear { padding: 12px; font-size: 12px; }
         }
@@ -1254,10 +1262,7 @@
 }
 
 /* Didacticiel : accès tactile et positionnement stable */
-#mobile-tutorial-help { display:none; }
 @media (max-width:767px) {
-  #mobile-tutorial-help { display:flex; align-items:center; justify-content:center; position:fixed; right:14px; bottom:calc(82px + env(safe-area-inset-bottom)); width:42px; height:42px; border-radius:50%; background:var(--deep-black,#181818); color:#fff; border:1px solid var(--gold-accent,#c5a059); font-size:20px; font-weight:700; z-index:70; box-shadow:0 4px 16px #0003; }
-  #mobile-tutorial-help.tutorial-running { display:none; }
   #tutorial-tooltip { width:calc(100vw - 32px); max-width:340px!important; box-sizing:border-box; }
   #tutorial-tooltip > div { padding:16px!important; }
   #tutorial-prev-btn, #tutorial-next-btn { min-height:42px; }
@@ -1606,7 +1611,6 @@
             <button id="bn-grille" onclick="showSection('grille', true)"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg><span data-i18n="nav.gridShort">Grille</span></button>
             <button id="bn-fiches" onclick="showSection('fiches', true)"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg><span data-i18n="nav.fichesShort">Fiches</span></button>
         </nav>
-        <button id="mobile-tutorial-help" type="button" onclick="openTutorial(false)" aria-label="Revoir le didacticiel" title="Revoir le didacticiel">?</button>
         
         <div id="app-header" class="sticky top-0 z-50 bg-[#FAF9F6]/95 backdrop-blur-md shadow-sm border-b border-slate-100">
             <div class="max-w-6xl mx-auto px-6 py-4">
@@ -4199,6 +4203,23 @@
                     if (window.matchMedia('(max-width: 767px)').matches && willOpen) {
                         document.body.appendChild(panel);
                         panel.classList.add('ms-mobile-open');
+                        // Le menu s'ouvre près du bouton, sans feuille plein écran.
+                        // Ajustement horizontal et vertical pour ne jamais sortir de l'écran.
+                        const rect = btn.getBoundingClientRect();
+                        const margin = 12;
+                        const vw = document.documentElement.clientWidth;
+                        const vh = window.visualViewport?.height || window.innerHeight;
+                        const visibleTop = window.visualViewport?.offsetTop || 0;
+                        const pw = panel.offsetWidth;
+                        const ph = panel.offsetHeight;
+                        const left = Math.max(margin, Math.min(rect.left, vw - pw - margin));
+                        const below = rect.bottom + 6;
+                        const above = rect.top - ph - 6;
+                        const top = below + ph <= visibleTop + vh - margin
+                            ? below
+                            : (above >= visibleTop + margin ? above : Math.max(visibleTop + margin, visibleTop + (vh - ph) / 2));
+                        panel.style.left = left + 'px';
+                        panel.style.top = top + 'px';
                     } else if (!willOpen && panel.parentNode !== wrap) {
                         panel.classList.remove('ms-mobile-open');
                         wrap.appendChild(panel);
@@ -4474,7 +4495,6 @@
         window.openTutorial = (isOnboarding) => {
             tutorialIsOnboarding = !!isOnboarding;
             tutorialStep = 0;
-            document.getElementById('mobile-tutorial-help')?.classList.add('tutorial-running');
             document.getElementById('tutorial-blocker').classList.remove('hidden');
             document.getElementById('tutorial-tooltip').classList.remove('hidden');
             renderTutorialStep();
@@ -4498,7 +4518,6 @@
         };
 
         window.closeTutorial = async () => {
-            document.getElementById('mobile-tutorial-help')?.classList.remove('tutorial-running');
             document.getElementById('tutorial-blocker').classList.add('hidden');
             document.getElementById('tutorial-spotlight').classList.add('hidden');
             document.getElementById('tutorial-tooltip').classList.add('hidden');
