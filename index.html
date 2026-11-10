@@ -754,7 +754,7 @@
             html.dark #bibliotheque-section .section-label { color: #F2F0EA; }
             #bibliotheque-section .flex.items-center.gap-3 > button { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); font-size: 17px; }
             html.dark #bibliotheque-section .flex.items-center.gap-3 > button { background: #242424; box-shadow: none; }
-            #shelf-filter-toggle-btn span:last-child { display: none; }
+            #shelf-filter-toggle-btn span:not(:first-child) { display: none; }
             #shelf-phone-hint { text-transform: none !important; letter-spacing: 0 !important; font-size: 12px !important; font-weight: 600 !important; }
             #bookcase-container { margin-left: -24px; margin-right: -24px; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }
 
@@ -1328,7 +1328,7 @@
             transition: background .15s, transform .15s;
           }
           #bibliotheque-section .flex.items-center.gap-3 > button:active { transform: scale(.94); background: #f5ead4 !important; }
-          #shelf-filter-toggle-btn span:first-child { font-size: 19px; }
+          #shelf-filter-toggle-btn svg { display: block !important; width: 21px; height: 21px; flex-shrink: 0; }
           #shelf-search-wrap { position: relative; margin: 0 0 12px !important; }
           #shelf-search { min-height: 48px; border: 1px solid rgba(197,160,89,.18) !important;
             border-radius: 16px !important; box-shadow: 0 4px 16px rgba(35,29,19,.045) !important;
@@ -1953,7 +1953,7 @@
                         <p class="section-label mb-0" data-i18n="dash.myLibrary">Ma Bibliothèque</p>
                         <div class="flex items-center gap-3">
                             <button onclick="toggleShelfFilters()" id="shelf-filter-toggle-btn" class="flex items-center gap-1.5 text-slate-400 hover:text-gold-accent text-xs font-bold uppercase tracking-widest" data-i18n-title="filters.toggleBtn" title="Rechercher et filtrer" aria-label="Rechercher et filtrer">
-                                <span aria-hidden="true">🔍</span>
+                                <svg aria-hidden="true" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
                             </button>
                             <button type="button" onclick="toggleShelfLayoutsMenu()" id="shelf-layout-toggle-btn" class="text-slate-400 hover:text-gold-accent text-base" title="Mes dispositions" aria-label="Mes dispositions" aria-controls="shelf-layout-toolbar" aria-expanded="false">▤</button>
                             <button onclick="openDecorationPicker()" id="decoration-picker-btn" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.addDecoration" title="Ajouter une décoration">✨</button>
