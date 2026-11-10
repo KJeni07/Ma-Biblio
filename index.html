@@ -409,6 +409,51 @@
         html.dark .saga-row:hover { background: #2a2a2a; }
         html.dark .saga-row.current { background: #2b2619; }
 
+
+        /* Dispositions enregistrées de la bibliothèque */
+        .shelf-layout-toolbar { margin: 12px 0 16px; padding: 14px; background: #fff; border: 1px solid rgba(197,160,89,.25); border-radius: 16px; }
+        .shelf-layout-heading { display:flex; justify-content:space-between; gap:8px; align-items:center; font-size:12px; font-weight:850; color:var(--deep-black); margin-bottom:10px; }
+        #shelf-layout-status { font-size:10px; font-weight:600; color:#8a8a8a; }
+        .shelf-layout-controls { display:flex; gap:7px; align-items:center; min-width:0; }
+        .shelf-layout-controls select { min-width:0; flex:1; height:40px; border:1px solid #e2e8f0; border-radius:10px; padding:0 9px; background:#faf9f6; color:#333; font-size:12px; font-weight:700; }
+        .shelf-layout-controls button { flex:none; height:40px; padding:0 11px; border:1px solid rgba(197,160,89,.3); border-radius:10px; background:rgba(197,160,89,.09); color:#80602d; font-size:13px; font-weight:800; }
+        .shelf-layout-tip { margin-top:9px; font-size:10px; line-height:1.5; color:#888; }
+        html.dark .shelf-layout-toolbar { background:#1e1e1e; border-color:#403727; }
+        html.dark .shelf-layout-heading { color:#f2f0ea; }
+        html.dark .shelf-layout-controls select { background:#262626; color:#eee; border-color:#444; }
+        html.dark .shelf-layout-controls button { background:#30291e; color:#d8b878; }
+        @media(max-width:767px) { .shelf-layout-toolbar { margin:10px 0 14px; padding:12px; } .shelf-layout-controls { flex-wrap:wrap; } .shelf-layout-controls select { flex-basis:100%; width:100%; height:46px; font-size:14px; } .shelf-layout-controls button { flex:1; height:42px; } .shelf-layout-controls button:first-of-type { flex:2; } }
+
+        /* Barre de dispositions volontairement discrète */
+        .shelf-layout-toolbar { margin: 8px 0 12px; padding: 9px 10px; border-color: rgba(197,160,89,.14); border-radius: 12px; box-shadow: none; }
+        .shelf-layout-heading { margin-bottom: 6px; font-size: 10px; font-weight: 700; color: #888; }
+        .shelf-layout-controls { gap: 5px; flex-wrap: nowrap; }
+        .shelf-layout-controls select { height: 34px; font-size: 11px; font-weight: 600; background: transparent; }
+        .shelf-layout-controls button { height: 34px; padding: 0 9px; font-size: 12px; background: transparent; }
+        #shelf-layout-save { color: #80602d; background: rgba(197,160,89,.09); }
+        .shelf-layout-tip { display: none; }
+        @media (max-width: 767px) {
+          .shelf-layout-toolbar { padding: 8px; margin: 6px 0 10px; }
+          .shelf-layout-controls { flex-wrap: nowrap; }
+          .shelf-layout-controls select { flex: 1 1 auto; width: auto; min-width: 0; height: 36px; font-size: 11px; }
+          .shelf-layout-controls button, .shelf-layout-controls button:first-of-type { flex: none; height: 36px; padding: 0 8px; }
+        }
+
+        /* Menu discret des dispositions, ouvert depuis le bouton de l'en-tête */
+        #shelf-layout-toolbar.shelf-layout-toolbar { position:fixed; z-index:120; width:min(360px, calc(100vw - 24px)); max-height:calc(100dvh - 24px); overflow-y:auto; margin:0; padding:14px; border:1px solid rgba(197,160,89,.25); border-radius:16px; background:#fff; box-shadow:0 16px 45px rgba(0,0,0,.18); }
+        #shelf-layout-toolbar.hidden { display:none !important; }
+        #shelf-layout-toolbar .shelf-layout-heading { font-size:13px; margin-bottom:12px; }
+        #shelf-layout-toolbar .shelf-layout-controls { flex-wrap:wrap; gap:7px; }
+        #shelf-layout-toolbar .shelf-layout-controls select { flex:1 0 100%; width:100%; height:42px; font-size:13px; }
+        #shelf-layout-toolbar .shelf-layout-controls button { flex:1; min-height:39px; }
+        #shelf-layout-toolbar .shelf-layout-tip { display:block; margin-top:10px; }
+        #shelf-layout-toggle-btn[aria-expanded="true"] { color:var(--gold-accent); }
+        html.dark #shelf-layout-toolbar { background:#1e1e1e; border-color:#403727; box-shadow:0 16px 45px rgba(0,0,0,.5); }
+        @media(max-width:767px) {
+          #shelf-layout-toolbar.shelf-layout-toolbar { width:min(340px, calc(100vw - 20px)); padding:14px; }
+          #shelf-layout-toolbar .shelf-layout-controls button { flex:1; height:42px; }
+        }
+
         /* Filtres à sélection multiple */
         .ms-wrap { position: relative; display: inline-block; }
         .ms-btn { text-align: left; white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
@@ -1907,9 +1952,10 @@
                     <div class="flex items-center justify-between mb-4">
                         <p class="section-label mb-0" data-i18n="dash.myLibrary">Ma Bibliothèque</p>
                         <div class="flex items-center gap-3">
-                            <button onclick="toggleShelfFilters()" id="shelf-filter-toggle-btn" class="flex items-center gap-1.5 text-slate-400 hover:text-gold-accent text-xs font-bold uppercase tracking-widest" data-i18n-title="filters.toggleBtn" title="Filtre">
-                                <span>🔍</span> <span data-i18n="filters.toggleBtn">Filtre</span>
+                            <button onclick="toggleShelfFilters()" id="shelf-filter-toggle-btn" class="flex items-center gap-1.5 text-slate-400 hover:text-gold-accent text-xs font-bold uppercase tracking-widest" data-i18n-title="filters.toggleBtn" title="Rechercher et filtrer" aria-label="Rechercher et filtrer">
+                                <span aria-hidden="true">🔍</span>
                             </button>
+                            <button type="button" onclick="toggleShelfLayoutsMenu()" id="shelf-layout-toggle-btn" class="text-slate-400 hover:text-gold-accent text-base" title="Mes dispositions" aria-label="Mes dispositions" aria-controls="shelf-layout-toolbar" aria-expanded="false">▤</button>
                             <button onclick="openDecorationPicker()" id="decoration-picker-btn" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.addDecoration" title="Ajouter une décoration">✨</button>
                             <button onclick="openShelfSettings()" class="text-slate-400 hover:text-gold-accent text-base" data-i18n-title="dash.shelfSettings" title="Réglages de la bibliothèque">⚙️</button>
                         </div>
@@ -1953,6 +1999,17 @@
                         <button onclick="resetShelfFilters()" class="text-[9px] font-bold text-red-400 uppercase tracking-widest hover:underline ml-auto" data-i18n="filters.reset">Réinitialiser</button>
                     </div>
 
+                    <div id="shelf-layout-toolbar" class="shelf-layout-toolbar hidden" role="dialog" aria-label="Mes dispositions">
+                        <div class="shelf-layout-heading"><span>Dispositions</span><span id="shelf-layout-status" aria-live="polite"></span></div>
+                        <div class="shelf-layout-controls">
+                            <select id="shelf-layout-select" aria-label="Choisir une disposition" onchange="switchShelfLayout(this.value)"></select>
+                            <button type="button" onclick="saveCurrentShelfLayout()" id="shelf-layout-save" title="Enregistrer cette disposition">Enregistrer</button>
+                            <button type="button" onclick="createShelfLayout()" title="Enregistrer une nouvelle disposition">＋</button>
+                            <button type="button" onclick="renameShelfLayout()" title="Renommer cette disposition">✎</button>
+                            <button type="button" onclick="deleteShelfLayout()" title="Supprimer cette disposition">🗑</button>
+                        </div>
+                        <p class="shelf-layout-tip">Modifie les livres, puis appuie sur Enregistrer pour conserver cette disposition. ＋ crée une copie sous un autre nom.</p>
+                    </div>
                     <div id="bookcase-container" class="bookcase"></div>
                     <button onclick="addShelfRow()" class="mt-3 mx-auto flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-gold-accent hover:text-gold-accent transition-colors" data-i18n-title="dash.addRow" title="Ajouter une rangée">+</button>
                 </div>
@@ -2207,7 +2264,7 @@
                 <h2 class="text-base font-black uppercase tracking-tight font-serif" data-i18n="dash.shelfSettings">Réglages de la bibliothèque</h2>
                 <button onclick="closeShelfSettings()" class="text-slate-300 hover:text-black text-2xl leading-none">&times;</button>
             </div>
-            <p class="section-label mb-2" data-i18n="shelf.genreColor">Couleur par genre</p>
+            <p class="section-label mb-2" data-i18n="shelf.genreColor">Une couleur par thème de livre</p>
             <div id="shelf-settings-genres" class="max-h-72 overflow-y-auto mb-2"></div>
         </div>
     </div>
@@ -2366,7 +2423,7 @@
                     ]
                 },
                 editModal: { pages: "Pages", title: "Modifier la Fiche #", autofill: "Remplissage Automatique", titlePlaceholder: "Commence à taper un titre...", authorPlaceholder: "Auteur...", autofillHint: "Sélectionne une suggestion pour remplir automatiquement l'auteur, le genre, l'année et la couverture.", genre: "Genre", releaseYear: "Année de sortie", rating: "Note", dnf: "Abandonné (DNF)", dnfHint: "Cocher si abandonné", toRead: "À lire", toReadHint: "Cocher si pas encore lu", coverUrl: "URL Couverture", format: "Format", formatBook: "Livre", language: "Langue", start: "Début (ex: 01/05/2025)", end: "Fin (ex: 15/05/2025)", summaryPlaceholder: "Résumé...", commentPlaceholder: "Mon avis...", cancel: "Annuler", save: "Enregistrer" },
-                shelf: { genreColor: "Couleur par genre", customizeSpine: "Personnaliser le dos", color: "Couleur", customColor: "Couleur personnalisée", pattern: "Motif", height: "Hauteur", thickness: "Épaisseur", close: "Fermer" },
+                shelf: { genreColor: "Couleur par thème", customizeSpine: "Personnaliser le dos", color: "Couleur", customColor: "Couleur personnalisée", pattern: "Motif", height: "Hauteur", thickness: "Épaisseur", close: "Fermer" },
                 deco: { plant: "Plante", lamp: "Lampe", candle: "Bougie", globe: "Globe", frame: "Cadre photo", statue: "Statuette", clearAll: "Tout retirer de l'étagère", customLabel: "Ou décris l'objet que tu veux", customPlaceholder: "ex: petit vase bleu avec des fleurs", customGenerate: "Générer", customUse: "Utiliser celle-ci", customRetry: "Réessayer", customError: "La génération a échoué, réessaie dans un instant.", customHint: "Objets générés par un service externe. En cas d’échec, importe un PNG transparent." },
                 fiche: { backToGrid: "Retour Grille", backToLibrary: "Retour Bibliothèque", favoriteBook: "Livre préféré", electFavoriteBook: "Élire livre préféré", elect: "Élire", inMyFavorites: "Dans mes favoris", addToMyFavorites: "Ajouter aux favoris" },
                 bulkImport: {
@@ -2456,7 +2513,7 @@
                     ]
                 },
                 editModal: { pages: "Pages", title: "Edit Entry #", autofill: "Auto-fill", titlePlaceholder: "Start typing a title...", authorPlaceholder: "Author...", autofillHint: "Pick a suggestion to auto-fill the author, genre, year and cover.", genre: "Genre", releaseYear: "Release year", rating: "Rating", dnf: "Did Not Finish (DNF)", dnfHint: "Check if dropped", toRead: "To read", toReadHint: "Check if not read yet", coverUrl: "Cover URL", format: "Format", formatBook: "Book", language: "Language", start: "Start (e.g. 05/01/2025)", end: "End (e.g. 05/15/2025)", summaryPlaceholder: "Summary...", commentPlaceholder: "My review...", cancel: "Cancel", save: "Save" },
-                shelf: { genreColor: "Color by genre", customizeSpine: "Customize spine", color: "Color", customColor: "Custom color", pattern: "Pattern", height: "Height", thickness: "Thickness", close: "Close" },
+                shelf: { genreColor: "Color by theme", customizeSpine: "Customize spine", color: "Color", customColor: "Custom color", pattern: "Pattern", height: "Height", thickness: "Thickness", close: "Close" },
                 deco: { plant: "Plant", lamp: "Lamp", candle: "Candle", globe: "Globe", frame: "Photo frame", statue: "Statuette", clearAll: "Remove everything from the shelf", customLabel: "Or describe the object you want", customPlaceholder: "e.g. small blue vase with flowers", customGenerate: "Generate", customUse: "Use this one", customRetry: "Try again", customError: "Generation failed, try again in a moment.", customHint: "Generated by an illustration AI (Pollinations.AI, free). Results may vary, feel free to retry or rephrase." },
                 fiche: { backToGrid: "Back to Grid", backToLibrary: "Back to Library", favoriteBook: "Favorite book", electFavoriteBook: "Elect favorite book", elect: "Elect", inMyFavorites: "In my favorites", addToMyFavorites: "Add to favorites" },
                 bulkImport: {
@@ -2634,10 +2691,11 @@
 
         async function saveShelfSettings() {
             if (!currentUser) return;
+            markShelfLayoutDirty();
             try {
                 // mergeFields pour genreColorOverrides : évite qu'une couleur de genre réinitialisée
                 // localement ne soit jamais retirée côté serveur (merge:true fusionnerait en profondeur).
-                await setDoc(doc(db, "user_profiles", currentUser.uid), { genreColorOverrides, shelfRowCount: SHELF_ROW_COUNT }, { mergeFields: ["genreColorOverrides", "shelfRowCount"] });
+                await setDoc(doc(db, "user_profiles", currentUser.uid), { genreColorOverrides }, { mergeFields: ["genreColorOverrides"] });
             } catch (err) { /* pas grave */ }
         }
 
@@ -2698,7 +2756,7 @@
             const genres = [...new Set(library.map(b => b.genre).filter(g => g))].sort();
             const container = document.getElementById('shelf-settings-genres');
             if (genres.length === 0) {
-                container.innerHTML = '<p class="text-[11px] text-slate-400 italic">Ajoute un genre à tes livres pour pouvoir lui choisir une couleur.</p>';
+                container.innerHTML = '<p class="text-[11px] text-slate-400 italic">Ajoute un thème (genre) à tes livres pour pouvoir lui choisir une couleur.</p>';
             } else {
                 container.innerHTML = genres.map(g => `
                     <div class="flex items-center justify-between gap-3 py-2 border-b border-slate-100 last:border-0">
@@ -2715,6 +2773,156 @@
             genreColorOverrides[genre] = color;
             saveShelfSettings();
             renderShelf(getShelfBooks());
+        };
+
+        // Les modifications de l'étagère sont temporaires jusqu'à l'action Enregistrer.
+        let shelfLayouts = {};
+        let activeShelfLayoutId = 'default';
+        let shelfLayoutSaving = Promise.resolve();
+        let shelfLayoutDirty = false;
+        const cloneShelfData = value => JSON.parse(JSON.stringify(value || {}));
+        function captureShelfLayout() {
+            return { name: shelfLayouts[activeShelfLayoutId]?.name || 'Disposition principale',
+                positions: cloneShelfData(shelfPositions), decorations: cloneShelfData(shelfDecorations), rows: SHELF_ROW_COUNT };
+        }
+        function markShelfLayoutDirty() {
+            if (!currentUser || !shelfLayouts[activeShelfLayoutId]) return;
+            shelfLayoutDirty = true;
+            updateShelfLayoutStatus();
+        }
+        function updateShelfLayoutStatus(message) {
+            const status = document.getElementById('shelf-layout-status');
+            if (status) status.textContent = message !== undefined ? message : (shelfLayoutDirty ? 'Non enregistré' : '');
+        }
+        function persistShelfLayouts() {
+            if (!currentUser) return Promise.resolve();
+            const snapshot = cloneShelfData(shelfLayouts);
+            const activeId = activeShelfLayoutId;
+            const uid = currentUser.uid;
+            updateShelfLayoutStatus('Enregistrement…');
+            shelfLayoutSaving = shelfLayoutSaving.catch(() => {}).then(async () => {
+                await setDoc(doc(db, 'user_profiles', uid),
+                    { shelfLayouts: snapshot, activeShelfLayoutId: activeId },
+                    { mergeFields: ['shelfLayouts', 'activeShelfLayoutId'] });
+                updateShelfLayoutStatus();
+            }).catch(err => {
+                updateShelfLayoutStatus('Erreur de sauvegarde');
+                console.error('Sauvegarde des dispositions :', err);
+            });
+            return shelfLayoutSaving;
+        }
+        function refreshShelfLayoutPicker() {
+            const picker = document.getElementById('shelf-layout-select');
+            if (!picker) return;
+            picker.replaceChildren();
+            Object.entries(shelfLayouts).forEach(([id, layout]) => {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = layout.name || 'Disposition';
+                picker.appendChild(option);
+            });
+            picker.value = activeShelfLayoutId;
+            updateShelfLayoutStatus();
+        }
+        function loadShelfLayout(id) {
+            const layout = shelfLayouts[id];
+            if (!layout) return;
+            activeShelfLayoutId = id;
+            shelfPositions = cloneShelfData(layout.positions);
+            shelfDecorations = cloneShelfData(layout.decorations);
+            SHELF_ROW_COUNT = Math.max(1, Math.min(8, Number(layout.rows) || 3));
+            shelfLayoutDirty = false;
+            selectedShelfUids.clear();
+            renderBookcaseRows();
+            renderShelf(getShelfBooks());
+            refreshShelfLayoutPicker();
+        }
+        function positionShelfLayoutsMenu() {
+            const button = document.getElementById('shelf-layout-toggle-btn');
+            const panel = document.getElementById('shelf-layout-toolbar');
+            if (!button || !panel || panel.classList.contains('hidden')) return;
+            const rect = button.getBoundingClientRect();
+            const width = panel.offsetWidth;
+            const height = panel.offsetHeight;
+            const margin = 10;
+            const left = Math.max(margin, Math.min(rect.right - width, window.innerWidth - width - margin));
+            const below = rect.bottom + 9;
+            const top = below + height <= window.innerHeight - margin
+                ? below : Math.max(margin, rect.top - height - 9);
+            panel.style.left = `${left}px`;
+            panel.style.top = `${top}px`;
+        }
+        window.toggleShelfLayoutsMenu = (force) => {
+            const panel = document.getElementById('shelf-layout-toolbar');
+            const button = document.getElementById('shelf-layout-toggle-btn');
+            if (!panel || !button) return;
+            const open = typeof force === 'boolean' ? force : panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', !open);
+            button.setAttribute('aria-expanded', String(open));
+            if (open) { refreshShelfLayoutPicker(); positionShelfLayoutsMenu(); }
+        };
+        document.addEventListener('pointerdown', (event) => {
+            const panel = document.getElementById('shelf-layout-toolbar');
+            const button = document.getElementById('shelf-layout-toggle-btn');
+            if (panel && button && !panel.classList.contains('hidden') &&
+                !panel.contains(event.target) && !button.contains(event.target)) toggleShelfLayoutsMenu(false);
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') toggleShelfLayoutsMenu(false);
+        });
+        window.addEventListener('resize', positionShelfLayoutsMenu);
+        window.addEventListener('scroll', positionShelfLayoutsMenu, { passive:true });
+
+        window.saveCurrentShelfLayout = async () => {
+            if (!currentUser || !shelfLayouts[activeShelfLayoutId]) return;
+            shelfLayouts[activeShelfLayoutId] = captureShelfLayout();
+            shelfLayoutDirty = false;
+            updateShelfLayoutStatus();
+            await persistShelfLayouts();
+            // Champs historiques mis à jour uniquement après validation explicite.
+            try {
+                await setDoc(doc(db, 'user_profiles', currentUser.uid),
+                    { shelfPositions: cloneShelfData(shelfPositions), shelfDecorations: cloneShelfData(shelfDecorations), shelfRowCount: SHELF_ROW_COUNT },
+                    { mergeFields: ['shelfPositions', 'shelfDecorations', 'shelfRowCount'] });
+            } catch (err) { console.error('Enregistrement étagère :', err); updateShelfLayoutStatus('Erreur de sauvegarde'); }
+        };
+        window.switchShelfLayout = async id => {
+            if (!shelfLayouts[id] || id === activeShelfLayoutId) return;
+            if (shelfLayoutDirty && !confirm('Les modifications non enregistrées seront perdues. Changer de disposition ?')) {
+                refreshShelfLayoutPicker();
+                return;
+            }
+            loadShelfLayout(id);
+            await persistShelfLayouts();
+        };
+        window.createShelfLayout = async () => {
+            const name = prompt('Nom de la nouvelle disposition :', `Disposition ${Object.keys(shelfLayouts).length + 1}`);
+            if (name === null || !name.trim()) return;
+            const id = 'layout_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            // Sauvegarde la disposition actuellement visible comme une nouvelle copie,
+            // sans modifier la disposition d'origine, même si elle avait été retouchée.
+            shelfLayouts[id] = { ...captureShelfLayout(), name: name.trim().slice(0, 70) };
+            activeShelfLayoutId = id;
+            shelfLayoutDirty = false;
+            refreshShelfLayoutPicker();
+            await persistShelfLayouts();
+        };
+        window.renameShelfLayout = async () => {
+            const layout = shelfLayouts[activeShelfLayoutId];
+            if (!layout) return;
+            const name = prompt('Nouveau nom de cette disposition :', layout.name);
+            if (name === null || !name.trim()) return;
+            layout.name = name.trim().slice(0, 70);
+            refreshShelfLayoutPicker();
+            await persistShelfLayouts();
+        };
+        window.deleteShelfLayout = async () => {
+            if (Object.keys(shelfLayouts).length <= 1) { alert('Conserve au moins une disposition.'); return; }
+            if (activeShelfLayoutId === 'default') { alert('La disposition principale ne peut pas être supprimée.'); return; }
+            if (!confirm('Supprimer cette disposition ? Les autres seront conservées.')) return;
+            delete shelfLayouts[activeShelfLayoutId];
+            loadShelfLayout('default' in shelfLayouts ? 'default' : Object.keys(shelfLayouts)[0]);
+            await persistShelfLayouts();
         };
 
         let shelfPositions = {}; // { [bookUid]: { row, x } }
@@ -2808,12 +3016,13 @@
 
         async function saveShelfDecorations() {
             if (!currentUser) return;
+            markShelfLayoutDirty();
             try {
                 // mergeFields (et non merge:true) : merge:true fusionnerait en profondeur l'objet
                 // shelfDecorations avec l'ancien, donc une décoration supprimée localement ne serait
                 // jamais retirée côté serveur (elle réapparaîtrait après actualisation). mergeFields
                 // remplace ce champ dans son intégralité, sans toucher aux autres champs du document.
-                await setDoc(doc(db, "user_profiles", currentUser.uid), { shelfDecorations }, { mergeFields: ["shelfDecorations"] });
+                // Les décorations sont conservées localement jusqu'à Enregistrer.
             } catch (err) { /* pas grave */ }
         }
 
@@ -3354,11 +3563,31 @@
             return `hsl(${hue}, 38%, 40%)`;
         }
 
+        // Palette par thème littéraire : mêmes thèmes = mêmes couleurs, sans dépendre de la couverture.
         const GENRE_PALETTE = ['#7B3F3F', '#3E5C50', '#35506B', '#B5651D', '#5B4B8A', '#4A4A4A', '#7A6A2E', '#2E6B6B', '#8A4A6B', '#4E6B2E'];
+        const GENRE_THEME_COLORS = [
+            [/romance|amour|sentimental|new adult|romantasy/i, '#C56A87'],
+            [/fantasy|fantastique|magie|sorcier|merveilleux/i, '#7654A3'],
+            [/science.fiction|sci.fi|dystopi|anticipation|spatial/i, '#347B98'],
+            [/thriller|polar|policier|crime|enqu[eê]te|suspense/i, '#39495C'],
+            [/horreur|[eé]pouvante|gothique/i, '#693747'],
+            [/historique|histoire|[eé]poque/i, '#A57543'],
+            [/jeunesse|enfant|young adult/i, '#D5A53C'],
+            [/aventure|voyage|exploration/i, '#3E8C79'],
+            [/contemporain|litt[eé]rature g[eé]n[eé]rale|fiction/i, '#62829A'],
+            [/classique|patrimoine/i, '#856E57'],
+            [/po[eé]sie|po[eè]me/i, '#A27AAE'],
+            [/biograph|autobiograph|m[eé]moire|t[eé]moignage/i, '#63816C'],
+            [/d[eé]veloppement personnel|bien.[eê]tre|psycholog/i, '#6C9C83'],
+            [/manga|bande dessin[eé]e|comics|graphic novel/i, '#C2764E'],
+            [/humour|com[eé]die/i, '#D19A46']
+        ];
         let genreColorOverrides = {};
         function genreColor(genre) {
             if (!genre) return null;
             if (genreColorOverrides[genre]) return genreColorOverrides[genre];
+            const match = GENRE_THEME_COLORS.find(([regex]) => regex.test(genre));
+            if (match) return match[1];
             let hash = 0;
             for (let i = 0; i < genre.length; i++) hash = genre.charCodeAt(i) + ((hash << 5) - hash);
             return GENRE_PALETTE[Math.abs(hash) % GENRE_PALETTE.length];
@@ -3411,12 +3640,13 @@
 
         async function saveShelfPositions() {
             if (!currentUser) return;
+            markShelfLayoutDirty();
             try {
                 // mergeFields (et non merge:true) : merge:true fusionnerait en profondeur l'objet
                 // shelfPositions avec l'ancien, donc une position supprimée localement ne serait
                 // jamais retirée côté serveur. mergeFields remplace ce champ dans son intégralité,
                 // sans toucher aux autres champs du document.
-                await setDoc(doc(db, "user_profiles", currentUser.uid), { shelfPositions }, { mergeFields: ["shelfPositions"] });
+                // Les positions sont conservées localement jusqu'à Enregistrer.
             } catch (err) { /* pas grave */ }
         }
 
@@ -3485,8 +3715,8 @@
             const height = spineHeightFor(b);
             const coverColor = b.cover ? shelfColorStatus[b.cover] : null;
             const hasResolvedColor = coverColor && coverColor !== 'pending' && coverColor !== 'failed';
-            const solidColor = b.shelfColor || (hasResolvedColor ? coverColor.solid : (genreColor(b.genre) || hashColor(b.title || String(b.id))));
-            const backgroundValue = (!b.shelfColor && hasResolvedColor) ? coverColor.gradient : solidColor;
+            const solidColor = b.shelfColor || genreColor(b.genre) || (hasResolvedColor ? coverColor.solid : hashColor(b.title || String(b.id)));
+            const backgroundValue = (!b.shelfColor && !b.genre && hasResolvedColor) ? coverColor.gradient : solidColor;
             const safeTitle = (b.title || '').replace(/"/g, '&quot;');
             const seedStr = b.uid || b.title || String(b.id);
             let seedHash = 0;
@@ -4823,11 +5053,14 @@
                 currentPseudo = null;
                 shelfPositions = {};
                 shelfDecorations = {};
+                shelfLayouts = {};
+                activeShelfLayoutId = "default";
                 genreColorOverrides = {};
                 SHELF_ROW_COUNT = 3;
                 let hasSeenTutorial = false;
+                let profileSnap = null;
                 try {
-                    const profileSnap = await getDoc(doc(db, "user_profiles", user.uid));
+                    profileSnap = await getDoc(doc(db, "user_profiles", user.uid));
                     if (profileSnap.exists()) {
                         hasSeenTutorial = !!profileSnap.data().hasSeenTutorial;
                         const p = profileSnap.data().photo;
@@ -4869,6 +5102,21 @@
                         }
                     }
                 } catch (err) { /* pas grave si ça échoue, on retombe sur photoURL ou l'initiale */ }
+                // Migration transparente de l'ancienne disposition, sans perdre les livres.
+                if (profileSnap?.exists() && profileSnap.data().shelfLayouts && Object.keys(profileSnap.data().shelfLayouts).length) {
+                    shelfLayouts = cloneShelfData(profileSnap.data().shelfLayouts);
+                    activeShelfLayoutId = shelfLayouts[profileSnap.data().activeShelfLayoutId]
+                        ? profileSnap.data().activeShelfLayoutId : Object.keys(shelfLayouts)[0];
+                    const selected = shelfLayouts[activeShelfLayoutId];
+                    shelfPositions = cloneShelfData(selected.positions);
+                    shelfDecorations = cloneShelfData(selected.decorations);
+                    SHELF_ROW_COUNT = Math.max(1, Math.min(8, Number(selected.rows) || 3));
+                } else {
+                    shelfLayouts = { default: { name: 'Disposition principale',
+                        positions: cloneShelfData(shelfPositions),
+                        decorations: cloneShelfData(shelfDecorations), rows: SHELF_ROW_COUNT } };
+                }
+                refreshShelfLayoutPicker();
                 renderBookcaseRows();
                 const initial = (user.displayName || user.email || '?')[0].toUpperCase();
                 paintAvatars(photoRemoved ? null : (customPhotoUrl || user.photoURL), initial);
