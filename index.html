@@ -429,6 +429,37 @@
         html.dark .ms-item:hover { background: #2a2a2a; }
         html.dark .ms-clear { border-bottom-color: #2f2f2f; }
 
+        /* Filtres multisélection : sur téléphone, liste lisible en feuille au-dessus de la navigation. */
+        @media (max-width: 767px) {
+            .ms-panel.ms-mobile-open {
+                position: fixed !important;
+                top: auto !important;
+                left: 12px !important;
+                right: 12px !important;
+                bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+                width: auto !important;
+                min-width: 0 !important;
+                max-width: none !important;
+                max-height: min(65dvh, 480px) !important;
+                overflow-y: auto !important;
+                overscroll-behavior: contain;
+                z-index: 220 !important;
+                padding: 12px !important;
+                border-radius: 20px !important;
+                box-shadow: 0 0 0 100vmax rgba(0,0,0,.38), 0 12px 40px rgba(0,0,0,.25) !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            .ms-panel.ms-mobile-open .ms-item {
+                min-height: 46px;
+                padding: 11px 12px;
+                font-size: 14px;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+            .ms-panel.ms-mobile-open .ms-item input { width: 19px; height: 19px; }
+            .ms-panel.ms-mobile-open .ms-clear { padding: 12px; font-size: 12px; }
+        }
+
         .dashboard-year-select {
             appearance: none;
             background-color: white;
@@ -4108,7 +4139,12 @@
             if (el && el._ms) { el._ms.sel.clear(); refreshMS(id); }
         }
         function closeAllMSPanels(except) {
-            document.querySelectorAll('.ms-panel').forEach(p => { if (p !== except) p.classList.add('hidden'); });
+            document.querySelectorAll('.ms-panel').forEach(p => {
+                if (p === except) return;
+                p.classList.add('hidden');
+                p.classList.remove('ms-mobile-open');
+                if (p._msWrap && p.parentNode !== p._msWrap) p._msWrap.appendChild(p);
+            });
         }
         function buildMSPanel(el) {
             const panel = el._ms.panel;
@@ -4149,6 +4185,7 @@
                 btn.className = el.className + ' ms-btn';
                 const panel = document.createElement('div');
                 panel.className = 'ms-panel hidden';
+                panel._msWrap = wrap;
                 wrap.appendChild(btn); wrap.appendChild(panel);
                 el._ms = { sel: new Set(), btn, panel };
                 btn.onclick = (e) => {
@@ -4157,6 +4194,15 @@
                     closeAllMSPanels(panel);
                     if (willOpen) buildMSPanel(el);
                     panel.classList.toggle('hidden', !willOpen);
+                    // Le bandeau des filtres défile horizontalement sur mobile :
+                    // placer la liste dans body évite qu'elle soit coupée par overflow-x:auto.
+                    if (window.matchMedia('(max-width: 767px)').matches && willOpen) {
+                        document.body.appendChild(panel);
+                        panel.classList.add('ms-mobile-open');
+                    } else if (!willOpen && panel.parentNode !== wrap) {
+                        panel.classList.remove('ms-mobile-open');
+                        wrap.appendChild(panel);
+                    }
                 };
                 panel.onclick = (e) => e.stopPropagation();
                 refreshMS(id);
