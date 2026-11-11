@@ -1438,7 +1438,54 @@
         .nool-reading-tooltip-placeholder { display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; padding:3px; font-size:6px; line-height:1.15; overflow-wrap:anywhere; color:#f3e6cb; }
         .nool-reading-tooltip-more { font-size:10px; color:#d9bf86; align-self:center; }
         @media(max-width:767px) { .nool-reading-tooltip { padding:9px 10px; } .nool-reading-tooltip-cover { width:27px; height:40px; flex-basis:27px; } }
-    </style>
+    
+/* Nool : statistiques secondaires lisibles sur téléphone */
+@media (max-width: 767px) {
+  #stats-secondary-row > .stat-card { height: 192px !important; min-height: 192px !important; }
+  #stats-secondary-row #lang-podium {
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: flex-start !important;
+    gap: 7px !important; height: 155px !important;
+  }
+  #stats-secondary-row #lang-podium svg {
+    width: 98px !important; height: 98px !important;
+    flex: 0 0 98px !important; overflow: visible;
+  }
+  #stats-secondary-row #lang-podium > div {
+    width: 100% !important; max-width: 100% !important;
+    max-height: 43px !important; overflow-y: auto !important;
+    display: flex !important; flex-wrap: wrap !important;
+    justify-content: center !important; align-content: flex-start !important;
+    gap: 3px 9px !important;
+  }
+  #stats-secondary-row #lang-podium .donut-legend-row {
+    font-size: 8px !important; display: inline-flex !important;
+    align-items: center !important; width: auto !important;
+    max-width: 100%; white-space: nowrap; gap: 3px !important;
+  }
+  #stats-secondary-row #lang-podium .donut-legend-row .truncate { max-width: 64px; }
+  #stats-secondary-row #lang-podium .donut-legend-row .ml-auto { margin-left: 2px !important; padding-left: 0 !important; }
+  #stats-secondary-row #author-podium { max-height: 154px !important; overflow: hidden !important; }
+  #stats-secondary-row #author-podium .olympic-podium {
+    height: 146px !important; gap: 4px !important;
+    align-items: flex-end !important;
+  }
+  #stats-secondary-row #author-podium .olympic-step { width: 33.33% !important; min-width: 0 !important; }
+  #stats-secondary-row #author-podium .olympic-step-name {
+    display: -webkit-box !important; -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3; line-clamp: 3;
+    white-space: normal !important; overflow: hidden !important;
+    overflow-wrap: anywhere; text-overflow: clip !important;
+    line-height: 1.18 !important; font-size: 9px !important;
+    min-height: 32px; max-height: 34px;
+  }
+  #stats-secondary-row #author-podium .olympic-step-count {
+    font-size: 9px !important; white-space: nowrap;
+  }
+  #stats-secondary-row #author-podium .olympic-step-bar { width: 100%; }
+}
+
+</style>
 </head>
 <body>
 
@@ -5839,13 +5886,13 @@
                     borderRadius: 5, borderSkipped: false,
                     maxBarThickness: byYear ? 30 : 20,
                     barPercentage: 0.82, categoryPercentage: 0.9
-                } : { label: 'Livres', data: counts, borderColor: chartColor, backgroundColor: hexToRgba(chartColor, 0.1), fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6, pointHitRadius: 20 }] },
+                } : { label: 'Livres', data: counts, borderColor: chartColor, backgroundColor: hexToRgba(chartColor, 0.1), fill: true, tension: 0.4 }] },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
                     plugins: {
                         legend: { display: false },
-                        tooltip: { enabled: false, external: externalReadingTooltip, intersect: true, mode: 'nearest' }
+                        tooltip: { enabled: false, external: externalReadingTooltip, intersect: false, mode: 'index' }
                     },
                     layout: mobilePace ? { padding: { top: 12, left: 0, right: 2, bottom: 0 } } : {},
                     scales: { 
