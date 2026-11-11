@@ -1724,6 +1724,106 @@
   }
 }
 
+
+/* Correctif final iPhone : grille compacte et stable, sans hauteur de ligne fantôme. */
+@media screen and (max-width: 767px) {
+  #stats-secondary-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: 210px !important;
+    align-items: stretch !important;
+    align-content: start !important;
+    row-gap: 12px !important;
+    column-gap: 12px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin-bottom: 16px !important;
+  }
+  #stats-secondary-row > .stat-card {
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 210px !important;
+    min-height: 210px !important;
+    max-height: 210px !important;
+    padding: 40px 8px 9px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    align-self: stretch !important;
+  }
+  #stats-secondary-row > .stat-card > .section-label { top: 15px !important; }
+  #stats-secondary-row > .stat-card:has(> span.text-xl.mb-1) > .section-label { top: 36px !important; }
+  #stats-secondary-row > .stat-card:has(> #stat-dnf) > :is(#stat-dnf,#stat-dnf-pct),
+  #stats-secondary-row > .stat-card:has(> #stat-pages) > :not(.section-label):not(span) {
+    translate: 0 0 !important;
+  }
+  #stats-secondary-row > .stat-card:has(> #lang-podium),
+  #stats-secondary-row > .stat-card:has(> #author-podium) {
+    justify-content: flex-end !important;
+    padding: 39px 7px 10px !important;
+  }
+  #stats-secondary-row #lang-podium {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    gap: 7px !important;
+    width: 100% !important;
+    height: 155px !important;
+    max-height: 155px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+  }
+  #stats-secondary-row #lang-podium svg {
+    width: 82px !important;
+    height: 82px !important;
+    flex: 0 0 82px !important;
+  }
+  #stats-secondary-row #lang-podium > div {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 3px !important;
+    width: 100% !important;
+    height: 55px !important;
+    max-height: 55px !important;
+    min-height: 0 !important;
+    flex: 0 0 55px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  #stats-secondary-row #lang-podium .donut-legend-row {
+    display: flex !important;
+    width: auto !important;
+    flex: 0 0 auto !important;
+    font-size: 9px !important;
+    line-height: 1.5 !important;
+    white-space: nowrap !important;
+  }
+  #stats-secondary-row #author-podium {
+    flex: 0 0 155px !important;
+    height: 155px !important;
+    max-height: 155px !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+  }
+  #stats-secondary-row #author-podium .olympic-podium {
+    height: 147px !important;
+    max-height: 147px !important;
+    gap: 4px !important;
+  }
+}
+
 </style>
 </head>
 <body>
