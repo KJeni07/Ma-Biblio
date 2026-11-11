@@ -1731,6 +1731,98 @@
     height: 157px !important;
   }
 }
+
+/* Correction structurelle mobile : 2 rangées compactes, sans espace fantôme. */
+@media (max-width: 767px) {
+  #stats-secondary-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, 210px) !important;
+    grid-auto-rows: 210px !important;
+    gap: 12px !important;
+    align-content: start !important;
+    align-items: stretch !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  #stats-secondary-row > .stat-card {
+    width: 100% !important;
+    height: 210px !important;
+    min-height: 210px !important;
+    max-height: 210px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  #stats-secondary-row > .stat-card:has(> #lang-podium),
+  #stats-secondary-row > .stat-card:has(> #author-podium) {
+    padding: 37px 7px 8px !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+  }
+  #stats-secondary-row #lang-podium {
+    width: 100% !important;
+    height: 161px !important;
+    min-height: 0 !important;
+    max-height: 161px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 7px !important;
+    overflow: hidden !important;
+  }
+  #stats-secondary-row #lang-podium svg {
+    width: 76px !important;
+    height: 76px !important;
+    flex: 0 0 76px !important;
+    overflow: visible !important;
+  }
+  #stats-secondary-row #lang-podium > div {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 72px !important;
+    min-height: 0 !important;
+    flex: 0 1 auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    gap: 3px !important;
+    margin: 0 !important;
+  }
+  #stats-secondary-row #lang-podium .donut-legend-row {
+    display: flex !important;
+    width: auto !important;
+    max-width: 100% !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    font-size: 9px !important;
+    line-height: 1.4 !important;
+    white-space: nowrap !important;
+  }
+  #stats-secondary-row #lang-podium .donut-legend-row .truncate {
+    max-width: 85px !important;
+  }
+  #stats-secondary-row #author-podium {
+    width: 100% !important;
+    height: 156px !important;
+    max-height: 156px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+  }
+  #stats-secondary-row #author-podium .olympic-podium {
+    height: 145px !important;
+    max-height: 145px !important;
+  }
+}
+
 </style>
 </head>
 <body>
