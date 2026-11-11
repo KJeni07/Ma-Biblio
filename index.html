@@ -1485,6 +1485,136 @@
   #stats-secondary-row #author-podium .olympic-step-bar { width: 100%; }
 }
 
+
+/* Nool — titres uniformes des huit cartes du tableau de bord */
+#stats-cards-row .stat-card,
+#stats-secondary-row > .stat-card { position: relative; }
+#stats-cards-row .stat-card > .section-label,
+#stats-secondary-row > .stat-card > .section-label {
+    position: absolute !important;
+    top: 19px !important;
+    left: 9px !important;
+    right: 9px !important;
+    width: auto !important;
+    margin: 0 !important;
+    text-align: center !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    line-height: 1.35 !important;
+    letter-spacing: .055em !important;
+    text-transform: uppercase !important;
+    color: #929292 !important;
+    z-index: 2;
+}
+@media (max-width: 767px) {
+  #stats-cards-row .stat-card > .section-label,
+  #stats-secondary-row > .stat-card > .section-label {
+    top: 15px !important;
+    left: 7px !important;
+    right: 7px !important;
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+    letter-spacing: .025em !important;
+  }
+  #stats-secondary-row > .stat-card { padding-top: 40px !important; }
+  #stats-secondary-row > .stat-card:has(> #lang-podium),
+  #stats-secondary-row > .stat-card:has(> #author-podium) { padding-top: 40px !important; }
+  #stats-secondary-row #lang-podium { height: 143px !important; }
+  #stats-secondary-row #lang-podium svg { width: 90px !important; height: 90px !important; flex-basis: 90px !important; }
+}
+
+
+/* Correctif : réserver une zone pour les titres des podiums, sans chevauchement. */
+#stats-cards-row .stat-card:has(> #genre-podium),
+#stats-secondary-row > .stat-card:has(> #author-podium) {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  padding-top: 48px !important;
+}
+#stats-cards-row #genre-podium,
+#stats-secondary-row #author-podium {
+  margin-top: 0 !important;
+  width: 100%;
+  min-height: 0;
+}
+#stats-secondary-row #author-podium .olympic-podium { height: 118px; }
+@media (max-width: 767px) {
+  #stats-cards-row .stat-card:has(> #genre-podium),
+  #stats-secondary-row > .stat-card:has(> #author-podium) {
+    padding-top: 40px !important;
+  }
+  #stats-secondary-row #author-podium .olympic-podium { height: 115px !important; }
+}
+
+
+/* Ajustement ciblé mobile : descendre uniquement les contenus de Formats Lus et Langues Lues. */
+@media (max-width: 767px) {
+  #stats-cards-row #stat-format {
+    transform: translateY(16px) !important;
+  }
+  #stats-secondary-row #lang-podium {
+    transform: translateY(8px) !important;
+  }
+}
+
+/* Centrage vertical des informations sur ordinateur, titres inchangés. */
+@media (min-width: 768px) {
+  #stats-cards-row #stat-format {
+    transform: translateY(16px) !important;
+  }
+  #stats-secondary-row #lang-podium {
+    transform: translateY(16px) !important;
+  }
+}
+
+/* Icônes au-dessus des titres pour les cartes qui en possèdent une. */
+#stats-cards-row .stat-card > span.text-xl.mb-1,
+#stats-secondary-row > .stat-card > span.text-xl.mb-1 {
+  position: absolute !important;
+  top: 9px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+  z-index: 3;
+}
+#stats-cards-row .stat-card:has(> span.text-xl.mb-1) > .section-label,
+#stats-secondary-row > .stat-card:has(> span.text-xl.mb-1) > .section-label {
+  top: 43px !important;
+}
+@media (max-width: 767px) {
+  #stats-cards-row .stat-card > span.text-xl.mb-1,
+  #stats-secondary-row > .stat-card > span.text-xl.mb-1 { top: 7px !important; }
+  #stats-cards-row .stat-card:has(> span.text-xl.mb-1) > .section-label,
+  #stats-secondary-row > .stat-card:has(> span.text-xl.mb-1) > .section-label { top: 36px !important; }
+}
+/* Descendre uniquement les données des quatre cartes avec pictogramme,
+   sans déplacer les icônes ni les titres. */
+#stats-cards-row #stat-count,
+#stats-cards-row #stat-count-compare,
+#stats-cards-row #stat-avg,
+#stats-cards-row #stat-avg + div,
+#stats-secondary-row #stat-dnf,
+#stats-secondary-row #stat-dnf-pct,
+#stats-secondary-row #stat-pages {
+  /* Le groupe entier est déplacé ci-dessous pour conserver son alignement. */
+}
+#stats-cards-row .stat-card:has(> #stat-count) > :is(#stat-count, #stat-count-compare),
+#stats-cards-row .stat-card:has(> div > #stat-avg) > :not(.section-label):not(span),
+#stats-secondary-row .stat-card:has(> #stat-dnf) > :is(#stat-dnf, #stat-dnf-pct),
+#stats-secondary-row .stat-card:has(> #stat-pages) > :not(.section-label):not(span) {
+  translate: 0 25px;
+}
+@media (max-width: 767px) {
+  #stats-cards-row .stat-card:has(> #stat-count) > :is(#stat-count, #stat-count-compare),
+  #stats-cards-row .stat-card:has(> div > #stat-avg) > :not(.section-label):not(span),
+  #stats-secondary-row .stat-card:has(> #stat-dnf) > :is(#stat-dnf, #stat-dnf-pct),
+  #stats-secondary-row .stat-card:has(> #stat-pages) > :not(.section-label):not(span) {
+    translate: 0 18px;
+  }
+}
 </style>
 </head>
 <body>
