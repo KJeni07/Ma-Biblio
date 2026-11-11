@@ -1678,6 +1678,59 @@
   #stats-secondary-row #author-podium { max-height: 145px !important; }
   #stats-secondary-row #author-podium .olympic-podium { height: 140px !important; }
 }
+
+/* Correctif final mobile : quatre cartes secondaires de hauteur identique,
+   anneau ET toutes les langues visibles sans rognage. */
+@media (max-width: 767px) {
+  #stats-secondary-row { align-items: stretch !important; grid-auto-rows: 228px !important; }
+  #stats-secondary-row > .stat-card {
+    box-sizing: border-box !important;
+    height: 228px !important; min-height: 228px !important; max-height: 228px !important;
+    overflow: hidden !important;
+  }
+  #stats-secondary-row > .stat-card:has(> #lang-podium),
+  #stats-secondary-row > .stat-card:has(> #author-podium) {
+    padding: 42px 9px 10px !important;
+    display: flex !important; flex-direction: column !important;
+    justify-content: flex-start !important; align-items: center !important;
+  }
+  #stats-secondary-row #lang-podium {
+    transform: none !important;
+    height: 174px !important; min-height: 174px !important;
+    width: 100% !important; overflow: visible !important;
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: center !important;
+    gap: 9px !important;
+  }
+  #stats-secondary-row #lang-podium svg {
+    width: 90px !important; height: 90px !important;
+    flex: 0 0 90px !important;
+  }
+  #stats-secondary-row #lang-podium > div {
+    box-sizing: border-box !important;
+    flex: 0 0 auto !important;
+    width: 100% !important; max-width: 100% !important;
+    height: auto !important; max-height: 68px !important;
+    overflow-y: auto !important; overflow-x: hidden !important;
+    display: flex !important; flex-wrap: wrap !important;
+    align-content: center !important; justify-content: center !important;
+    gap: 5px 9px !important;
+    margin: 0 !important;
+  }
+  #stats-secondary-row #lang-podium .donut-legend-row {
+    display: inline-flex !important; flex: 0 0 auto !important;
+    width: auto !important; max-width: 100% !important;
+    font-size: 8px !important; gap: 4px !important;
+    white-space: nowrap !important;
+  }
+  #stats-secondary-row #author-podium {
+    width: 100% !important; max-height: 170px !important;
+    overflow: hidden !important;
+  }
+  #stats-secondary-row #author-podium .olympic-podium {
+    height: 157px !important;
+  }
+}
 </style>
 </head>
 <body>
