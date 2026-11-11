@@ -1615,6 +1615,23 @@
     translate: 0 18px;
   }
 }
+
+/* Mobile : cartes Livres lus, Note moyenne et Formats lus plus compactes. */
+@media (max-width: 767px) {
+  #stats-cards-row > .grid > .stat-card:nth-child(-n+3) {
+    height: 148px !important;
+    min-height: 148px !important;
+    padding: 12px 16px !important;
+  }
+  /* Les icônes et les titres restent en haut ; les chiffres occupent le centre. */
+  #stats-cards-row > .grid > .stat-card:nth-child(1) > :is(#stat-count, #stat-count-compare),
+  #stats-cards-row > .grid > .stat-card:nth-child(2) > :not(.section-label):not(span) {
+    translate: 0 9px !important;
+  }
+  #stats-cards-row > .grid > .stat-card:nth-child(3) #stat-format {
+    transform: translateY(7px) !important;
+  }
+}
 </style>
 </head>
 <body>
