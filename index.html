@@ -1615,6 +1615,39 @@
     translate: 0 18px;
   }
 }
+
+/* Nool — uniquement les trois premières cartes des statistiques sur mobile.
+   Les titres/icônes restent en haut ; les valeurs sont centrées dans la zone restante. */
+@media (max-width: 767px) {
+  #stats-cards-row > .grid:first-child > .stat-card:nth-child(-n+3) {
+    height: 148px !important;
+    min-height: 148px !important;
+    max-height: 148px !important;
+    padding: 48px 14px 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+  /* Neutraliser les anciens décalages réservés aux grandes cartes. */
+  #stats-cards-row > .grid:first-child > .stat-card:nth-child(1) > #stat-count,
+  #stats-cards-row > .grid:first-child > .stat-card:nth-child(1) > #stat-count-compare,
+  #stats-cards-row > .grid:first-child > .stat-card:nth-child(2) > div:has(#stat-avg),
+  #stats-cards-row > .grid:first-child > .stat-card:nth-child(2) > p:last-child {
+    translate: 0 0 !important;
+    transform: none !important;
+  }
+  #stats-cards-row > .grid:first-child > .stat-card:nth-child(3) > #stat-format {
+    transform: none !important;
+    translate: 0 0 !important;
+    align-items: center !important;
+    margin-top: 3px !important;
+  }
+  #stats-cards-row > .grid:first-child > .stat-card:nth-child(2) > div:has(#stat-avg) {
+    gap: clamp(12px, 7vw, 40px) !important;
+  }
+}
 </style>
 </head>
 <body>
