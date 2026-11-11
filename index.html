@@ -1632,6 +1632,52 @@
     transform: translateY(7px) !important;
   }
 }
+
+/* Correction mobile : cartes secondaires alignées, anneau et légende visibles. */
+@media (max-width: 767px) {
+  #stats-secondary-row { align-items: stretch !important; }
+  #stats-secondary-row > .stat-card {
+    box-sizing: border-box !important;
+    height: 192px !important;
+    min-height: 192px !important;
+    max-height: 192px !important;
+    overflow: hidden !important;
+  }
+  #stats-secondary-row > .stat-card:has(> #lang-podium) {
+    padding: 38px 8px 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+  }
+  #stats-secondary-row #lang-podium {
+    transform: none !important;
+    height: 145px !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 5px !important;
+  }
+  #stats-secondary-row #lang-podium svg {
+    width: 82px !important;
+    height: 82px !important;
+    flex: 0 0 82px !important;
+  }
+  #stats-secondary-row #lang-podium > div {
+    flex: 0 0 auto !important;
+    max-height: 45px !important;
+    overflow: visible !important;
+    gap: 3px 7px !important;
+  }
+  #stats-secondary-row > .stat-card:has(> #author-podium) {
+    padding: 38px 8px 8px !important;
+  }
+  #stats-secondary-row #author-podium { max-height: 145px !important; }
+  #stats-secondary-row #author-podium .olympic-podium { height: 140px !important; }
+}
 </style>
 </head>
 <body>
