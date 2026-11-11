@@ -1421,6 +1421,23 @@
             #stats-secondary-row #author-podium { max-height: 130px; overflow-y: auto; }
         }
 
+
+/* Nool : graphique de lecture compact et tactile sur téléphone uniquement */
+@media (max-width: 767px) {
+  #reading-pace-card { padding: 18px 13px 15px !important; border-radius: 20px !important; overflow: hidden; }
+  #reading-pace-label { font-size: 11px !important; line-height: 1.5; letter-spacing: .055em; margin: 0 4px 12px !important; }
+  #reading-pace-card .reading-chart-wrap { height: 218px !important; min-height: 218px; }
+  #reading-pace-card canvas { touch-action: pan-y; }
+}
+
+        /* Infobulle des lectures : mini-couvertures adaptées au tactile */
+        .nool-reading-tooltip { position:fixed; z-index:9999; pointer-events:none; max-width:min(280px,calc(100vw - 24px)); min-width:135px; padding:11px 12px; border-radius:13px; background:rgba(24,24,25,.97); color:#f8f5ee; border:1px solid rgba(197,160,89,.36); box-shadow:0 12px 35px rgba(0,0,0,.38); font-family:Inter,sans-serif; }
+        .nool-reading-tooltip-title { font-size:12px; font-weight:800; margin-bottom:8px; }
+        .nool-reading-tooltip-covers { display:flex; flex-wrap:wrap; gap:6px; max-height:146px; overflow:hidden; }
+        .nool-reading-tooltip-cover { width:31px; height:46px; flex:0 0 31px; border-radius:3px; object-fit:cover; background:#45403a; border:1px solid rgba(255,255,255,.15); }
+        .nool-reading-tooltip-placeholder { display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; padding:3px; font-size:6px; line-height:1.15; overflow-wrap:anywhere; color:#f3e6cb; }
+        .nool-reading-tooltip-more { font-size:10px; color:#d9bf86; align-self:center; }
+        @media(max-width:767px) { .nool-reading-tooltip { padding:9px 10px; } .nool-reading-tooltip-cover { width:27px; height:40px; flex-basis:27px; } }
     </style>
 </head>
 <body>
@@ -1988,7 +2005,7 @@
                 
                 <div id="reading-pace-card" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                     <p class="section-label mb-3" id="reading-pace-label"><span data-i18n="dash.readingPace">Rythme de lecture (Livres par mois en</span> <span class="display-year">...</span>)</p>
-                    <div class="h-64 w-full">
+                    <div class="h-64 w-full reading-chart-wrap">
                         <canvas id="readingChart"></canvas>
                     </div>
                 </div>
@@ -5741,23 +5758,113 @@
                 });
             }
 
+            // Les couvertures suivent exactement le même regroupement que les valeurs du graphique.
+            const booksByPoint = labels.map((label, index) => books.filter(b => {
+                if (!b.end || !b.end.includes('/')) return false;
+                const parts = b.end.split('/');
+                return byYear ? (parts[2] || '').trim() === label : parseInt(parts[1], 10) === index + 1;
+            }));
+            const oldTooltip = document.getElementById('nool-reading-tooltip');
+            if (oldTooltip) oldTooltip.remove();
+            const coverTooltip = document.createElement('div');
+            coverTooltip.id = 'nool-reading-tooltip';
+            coverTooltip.className = 'nool-reading-tooltip';
+            coverTooltip.style.display = 'none';
+            coverTooltip.setAttribute('role', 'status');
+            document.body.appendChild(coverTooltip);
+            const externalReadingTooltip = ({chart, tooltip}) => {
+                if (!tooltip || tooltip.opacity === 0 || !tooltip.dataPoints?.length) {
+                    coverTooltip.style.display = 'none';
+                    return;
+                }
+                const index = tooltip.dataPoints[0].dataIndex;
+                const matched = booksByPoint[index] || [];
+                coverTooltip.replaceChildren();
+                const title = document.createElement('div');
+                title.className = 'nool-reading-tooltip-title';
+                title.textContent = `${labels[index]} · ${matched.length} livre${matched.length > 1 ? 's' : ''} lu${matched.length > 1 ? 's' : ''}`;
+                coverTooltip.appendChild(title);
+                if (matched.length) {
+                    const covers = document.createElement('div');
+                    covers.className = 'nool-reading-tooltip-covers';
+                    matched.slice(0, 18).forEach(book => {
+                        const cover = typeof book.cover === 'string' ? book.cover.trim() : '';
+                        let el;
+                        if (/^https?:\/\//i.test(cover)) {
+                            el = document.createElement('img');
+                            el.src = cover;
+                            el.alt = book.title || 'Couverture';
+                            el.loading = 'lazy';
+                            el.referrerPolicy = 'no-referrer';
+                            el.onerror = () => {
+                                const fallback = document.createElement('div');
+                                fallback.className = 'nool-reading-tooltip-cover nool-reading-tooltip-placeholder';
+                                fallback.textContent = book.title || 'Livre';
+                                el.replaceWith(fallback);
+                            };
+                        } else {
+                            el = document.createElement('div');
+                            el.className = 'nool-reading-tooltip-placeholder';
+                            el.textContent = book.title || 'Livre';
+                        }
+                        el.classList.add('nool-reading-tooltip-cover');
+                        el.title = book.title || 'Livre';
+                        covers.appendChild(el);
+                    });
+                    if (matched.length > 18) {
+                        const more = document.createElement('span');
+                        more.className = 'nool-reading-tooltip-more';
+                        more.textContent = `+${matched.length - 18}`;
+                        covers.appendChild(more);
+                    }
+                    coverTooltip.appendChild(covers);
+                }
+                coverTooltip.style.display = 'block';
+                const rect = chart.canvas.getBoundingClientRect();
+                const w = coverTooltip.offsetWidth;
+                const h = coverTooltip.offsetHeight;
+                const left = Math.max(8, Math.min(window.innerWidth - w - 8, rect.left + tooltip.caretX - w / 2));
+                let top = rect.top + tooltip.caretY - h - 14;
+                if (top < 8) top = Math.min(window.innerHeight - h - 8, rect.top + tooltip.caretY + 14);
+                coverTooltip.style.left = `${left}px`;
+                coverTooltip.style.top = `${Math.max(8, top)}px`;
+            };
+
+            const mobilePace = window.matchMedia('(max-width: 767px)').matches;
+            const mobileBarColors = counts.map((count, i) => count === Math.max(...counts) && count > 0 ? chartColor : hexToRgba(chartColor, 0.56));
             readingChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: labels, datasets: [{ label: 'Livres', data: counts, borderColor: chartColor, backgroundColor: hexToRgba(chartColor, 0.1), fill: true, tension: 0.4 }] },
+                type: mobilePace ? 'bar' : 'line',
+                data: { labels: labels, datasets: [mobilePace ? {
+                    label: 'Livres lus', data: counts, backgroundColor: mobileBarColors,
+                    borderRadius: 5, borderSkipped: false,
+                    maxBarThickness: byYear ? 30 : 20,
+                    barPercentage: 0.82, categoryPercentage: 0.9
+                } : { label: 'Livres', data: counts, borderColor: chartColor, backgroundColor: hexToRgba(chartColor, 0.1), fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6, pointHitRadius: 20 }] },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } }, 
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false, external: externalReadingTooltip, intersect: true, mode: 'nearest' }
+                    },
+                    layout: mobilePace ? { padding: { top: 12, left: 0, right: 2, bottom: 0 } } : {},
                     scales: { 
                         y: { 
                             beginAtZero: true, 
-                            grid: { display: false },
-                            ticks: { 
+                            grid: mobilePace ? { color: 'rgba(140,140,140,0.11)', drawTicks: false } : { display: false },
+                            border: mobilePace ? { display: false } : {},
+                            ticks: {
+                                color: mobilePace ? '#929292' : undefined,
+                                font: mobilePace ? { size: 10 } : {},
+                                padding: mobilePace ? 9 : 3,
                                 stepSize: 1,
                                 callback: function(value) { if (value % 1 === 0) {return value;} }
                             } 
                         },
-                        x: { grid: { display: false } }
+                        x: mobilePace ? {
+                            grid: { display: false }, border: { display: false },
+                            ticks: { autoSkip: false, maxRotation: 0, minRotation: 0, color: '#a1a1a1', font: { size: byYear ? 10 : 9, weight: '600' }, padding: 9 }
+                        } : { grid: { display: false } }
                     } 
                 }
             });
